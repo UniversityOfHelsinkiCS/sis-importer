@@ -1,13 +1,21 @@
 const { schedule } = require('./utils/cron')
+const { sadd, smembers } = require('./utils/redis')
 const educationSearchQuery = require('./queries/educationSearch')
 
 const testQuery = async () => {
-  const response = await educationSearchQuery({ fullTextQuery: 'Tietojenkäsittely' })
+  const response = await educationSearchQuery({ fullTextQuery: 'Tietojenkäsittelytietee' })
   console.log('response', response)
 }
 
-testQuery()
+const init = async () => {
+  await sadd('time', `Initialized at ${new Date()}`)
+  const times = await smembers('time')
+  console.log(times)
+  await testQuery()
+}
 
-schedule('* * * * * *', async () => {
-  console.log('Hello world!', process.env.NODE_ENV)
+schedule('*/10 * * * * *', async () => {
+  console.log('CRON!', process.env.NODE_ENV)
 })
+
+init()

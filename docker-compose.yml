@@ -5,3 +5,15 @@ services:
     build:
       context: updater-api
     container_name: updater-api
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:5.0.7
+    command: ["redis-server", "--appendonly", "yes"]
+    container_name: redis
+    volumes:
+      - sis-updater-redis:/data
+
+volumes:
+  sis-updater-redis:

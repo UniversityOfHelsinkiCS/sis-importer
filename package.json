@@ -29,5 +29,6 @@
   "homepage": "https://github.com/UniversityOfHelsinkiCS/sis-updater#readme",
   "devDependencies": {
     "husky": "^3.1.0"
-  }
+  },
+  "dependencies": {}
 }

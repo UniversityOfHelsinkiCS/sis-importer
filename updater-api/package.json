@@ -14,7 +14,8 @@
   "license": "MIT",
   "dependencies": {
     "cron": "^1.7.2",
-    "graphql-request": "^1.8.2"
+    "graphql-request": "^1.8.2",
+    "redis": "^2.8.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
