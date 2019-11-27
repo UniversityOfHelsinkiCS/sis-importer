@@ -1,0 +1,26 @@
+version: 2.1
+
+executors:
+  updater-executor:
+    machine:
+      image: ubuntu-1604:201903-01
+
+jobs:
+  build-test-and-deploy:
+    executor: updater-executor
+    steps:
+      - run: checkout
+      - run: npm run dco:ci -- build
+      - run: npm run dco:ci -- up -d
+      - run:
+          name: logs
+          background: true
+          command: npm run dco:ci -- logs
+      - run: docker exec -t updater-api npm run test
+      # TODO: Deploy
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-test-and-deploy
