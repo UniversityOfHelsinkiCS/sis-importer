@@ -1,0 +1,10 @@
+version: '3.2'
+
+services:
+  updater-api:
+    build:
+      args:
+        NODE_ENV: 'development'
+    command: 'npm run start:dev'
+    volumes:
+      - ./updater-api:/usr/src/app
