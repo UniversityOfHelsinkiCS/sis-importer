@@ -3,7 +3,7 @@ const { SIS_API_URL, SIS_TOKEN } = process.env
 
 const api = new GraphQLClient(SIS_API_URL, {
   headers: {
-    Authorization: `Bearer ${SIS_TOKEN}`
+    Authorization: `Application ${SIS_TOKEN}`
   }
 })
 
