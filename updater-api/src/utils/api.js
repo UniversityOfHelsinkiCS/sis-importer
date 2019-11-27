@@ -8,8 +8,10 @@ const api = new GraphQLClient(SIS_API_URL, {
 })
 
 const request = async (query, variables) => {
-  const data = await api.request(query, variables)
-  return data
+  if (SIS_API_URL) {
+    const data = await api.request(query, variables)
+    return data
+  }
 }
 
 module.exports = {

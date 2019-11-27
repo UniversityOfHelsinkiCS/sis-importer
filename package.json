@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "dco": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml",
-    "dco:ci": "docker-compose",
+    "dco:ci": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.ci.yml",
     "dco:up": "npm run dco -- up -d",
     "dco:down": "npm run dco -- down",
     "dco:logs": "npm run dco -- logs -f",
