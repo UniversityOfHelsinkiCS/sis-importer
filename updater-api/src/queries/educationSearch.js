@@ -1,9 +1,14 @@
-const { request } = require('../utils/api')
+const queryWrapper = require('../utils/queryWrapper')
 
-module.exports = async fullTextQuery => {
-  return await request(`
-    {
-      education_search(fullTextQuery: "${fullTextQuery}") {
+/**
+ * @param {Object} variables - Education search query variables
+ * @param {string} [variables.fullTextQuery=""] - Full text query
+ */
+module.exports = variables =>
+  queryWrapper(
+    `
+    query education_search($fullTextQuery: String) {
+      education_search(fullTextQuery: $fullTextQuery) {
         name {
           fi
         }
@@ -57,5 +62,6 @@ module.exports = async fullTextQuery => {
         }
       }
     }
-  `)
-}
+  `,
+    variables
+  )
