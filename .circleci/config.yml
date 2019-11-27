@@ -9,7 +9,7 @@ jobs:
   build-test-and-deploy:
     executor: updater-executor
     steps:
-      - run: checkout
+      - checkout
       - run: npm run dco:ci -- build
       - run: npm run dco:ci -- up -d
       - run:

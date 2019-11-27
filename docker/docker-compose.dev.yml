@@ -1,10 +1,15 @@
-version: '3.2'
+version: "3.2"
 
 services:
   updater-api:
     build:
       args:
-        NODE_ENV: 'development'
-    command: 'npm run start:dev'
+        NODE_ENV: "development"
+    env_file:
+      - updater-api/.env
+    environment:
+      SIS_API_URL: "https://sis-helsinki-test.funidata.fi/api"
+
+    command: "npm run start:dev"
     volumes:
-      - ./updater-api:/usr/src/app
+      - updater-api:/usr/src/app
