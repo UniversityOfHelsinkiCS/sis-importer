@@ -7,8 +7,8 @@ const api = new GraphQLClient(SIS_API_URL, {
   }
 })
 
-const request = async query => {
-  const data = await api.request(query)
+const request = async (query, variables) => {
+  const data = await api.request(query, variables)
   return data
 }
 
