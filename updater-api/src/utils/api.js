@@ -1,0 +1,17 @@
+const { GraphQLClient } = require('graphql-request')
+const { SIS_API_URL, SIS_TOKEN } = process.env
+
+const api = new GraphQLClient(SIS_API_URL, {
+  headers: {
+    Authorization: `Bearer ${SIS_TOKEN}`
+  }
+})
+
+const request = async query => {
+  const data = await api.request(query)
+  return data
+}
+
+module.exports = {
+  request
+}

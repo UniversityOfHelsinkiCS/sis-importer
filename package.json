@@ -10,7 +10,12 @@
     "dco:logs": "npm run dco -- logs -f",
     "start": "npm run dco:up && npm run dco:logs",
     "build": "npm run dco -- build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm test --prefix ./updater-api"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm test"
+    }
   },
   "repository": {
     "type": "git",
@@ -21,5 +26,8 @@
   "bugs": {
     "url": "https://github.com/UniversityOfHelsinkiCS/sis-updater/issues"
   },
-  "homepage": "https://github.com/UniversityOfHelsinkiCS/sis-updater#readme"
+  "homepage": "https://github.com/UniversityOfHelsinkiCS/sis-updater#readme",
+  "devDependencies": {
+    "husky": "^3.1.0"
+  }
 }
