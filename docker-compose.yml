@@ -1,0 +1,7 @@
+version: '3.2'
+
+services:
+  updater-api:
+    build:
+      context: updater-api
+    container_name: updater-api

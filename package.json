@@ -1,0 +1,25 @@
+{
+  "name": "sis-updater",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dco": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml",
+    "dco:ci": "docker-compose",
+    "dco:up": "npm run dco -- up -d",
+    "dco:down": "npm run dco -- down",
+    "dco:logs": "npm run dco -- logs -f",
+    "start": "npm run dco:up && npm run dco:logs",
+    "build": "npm run dco -- build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UniversityOfHelsinkiCS/sis-updater.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/UniversityOfHelsinkiCS/sis-updater/issues"
+  },
+  "homepage": "https://github.com/UniversityOfHelsinkiCS/sis-updater#readme"
+}
