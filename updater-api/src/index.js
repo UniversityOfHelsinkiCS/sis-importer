@@ -1,4 +1,3 @@
-const { schedule } = require('./utils/cron')
 const { sadd, smembers } = require('./utils/redis')
 const educationSearchQuery = require('./queries/educationSearch')
 
@@ -13,9 +12,5 @@ const init = async () => {
   console.log(times)
   await testQuery()
 }
-
-schedule('*/10 * * * * *', async () => {
-  console.log('CRON!', process.env.NODE_ENV)
-})
 
 init()

@@ -12,3 +12,13 @@ services:
     command: "npm run start:dev"
     volumes:
       - ./updater-api:/usr/src/app
+
+  updater-scheduler:
+    build:
+      args:
+        NODE_ENV: "development"
+    env_file:
+      - updater-scheduler/.env
+    command: "npm run start:dev"
+    volumes:
+      - ./updater-scheduler:/usr/src/app

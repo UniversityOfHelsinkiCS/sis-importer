@@ -34,7 +34,7 @@ jobs:
           name: logs
           background: true
           command: npm run dco:ci -- logs
-      - run: docker exec -t updater-api npm run test
+      - run: npm test
       # TODO: Deploy
 
 workflows:

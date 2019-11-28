@@ -8,6 +8,13 @@ services:
     depends_on:
       - redis
 
+  updater-scheduler:
+    build:
+      context: updater-scheduler
+    container_name: updater-scheduler
+    depends_on:
+      - redis
+
   redis:
     image: redis:5.0.7
     command: ["redis-server", "--appendonly", "yes"]
