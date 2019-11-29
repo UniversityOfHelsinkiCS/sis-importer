@@ -1,4 +1,4 @@
-const { schedule } = require('./utils/cron')
+const { stan, opts, UPDATER_API_CHANNEL } = require('./utils/stan')
 const { sadd, smembers } = require('./utils/redis')
 const educationSearchQuery = require('./queries/educationSearch')
 
@@ -14,8 +14,11 @@ const init = async () => {
   await testQuery()
 }
 
-schedule('*/10 * * * * *', async () => {
-  console.log('CRON!', process.env.NODE_ENV)
+stan.on('connect', async () => {
+  init()
+  const sub = stan.subscribe(UPDATER_API_CHANNEL, 'updater-api.workers', opts)
+  sub.on('message', msg => {
+    console.log(JSON.parse(msg.getData()))
+    msg.ack()
+  })
 })
-
-init()
