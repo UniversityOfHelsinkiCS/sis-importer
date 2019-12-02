@@ -7,8 +7,6 @@ services:
         NODE_ENV: "development"
     env_file:
       - updater-api/.env
-    environment:
-      SIS_API_URL: "https://sis-helsinki-test.funidata.fi/api"
     command: "npm run start:dev"
     volumes:
       - ./updater-api:/usr/src/app

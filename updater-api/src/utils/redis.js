@@ -16,7 +16,13 @@ const sadd = async (key, val) => await redisPromisify(client.sadd, key, val)
 
 const smembers = async key => await redisPromisify(client.smembers, key)
 
+const set = async (key, val) => await redisPromisify(client.set, key, val)
+
+const del = async key => await redisPromisify(client.del, key)
+
 module.exports = {
   sadd,
-  smembers
+  smembers,
+  set,
+  del
 }
