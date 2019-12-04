@@ -10,8 +10,8 @@
     "dco:logs": "npm run dco -- logs -f",
     "start": "npm run dco:up && npm run dco:logs",
     "build": "npm run dco -- build",
-    "test": "npm test --prefix ./updater-api && npm test --prefix ./updater-scheduler",
-    "lintfix": "npm run lintfix --prefix ./updater-api && npm run lintfix --prefix ./updater-scheduler"
+    "test": "npm test --prefix ./updater-api",
+    "lintfix": "npm run lintfix --prefix ./updater-api"
   },
   "husky": {
     "hooks": {
