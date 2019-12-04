@@ -1,6 +1,8 @@
-// const { set: redisSet } = require('./utils/redis')
+const { set: redisSet } = require('./utils/redis')
+const { randomBytes } = require('crypto')
 const { PERSON_SCHEDULE_ID } = require('./services/person')
 const { schedule } = require('./scheduler')
+const { CURRENT_EXECUTION_HASH } = require('./config')
 
 if (process.env.NODE_ENV === 'development') {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
@@ -11,7 +13,10 @@ if (process.env.NODE_ENV === 'development') {
 } */
 
 const initialize = async () => {
-  await schedule(PERSON_SCHEDULE_ID)
+  const generatedHash = randomBytes(12).toString('hex')
+  await redisSet(CURRENT_EXECUTION_HASH, generatedHash)
+  console.log('CURRENT_EXECUTION_HASH', generatedHash)
+  await schedule(PERSON_SCHEDULE_ID, generatedHash)
 }
 
 initialize()
