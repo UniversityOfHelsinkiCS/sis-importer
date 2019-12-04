@@ -3,6 +3,3 @@ version: "3.2"
 services:
   updater-api:
     image: toska/sis-updater-api:${TAG}
-
-  updater-scheduler:
-    image: toska/sis-updater-scheduler:${TAG}

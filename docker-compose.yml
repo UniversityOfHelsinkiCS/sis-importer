@@ -11,16 +11,6 @@ services:
       - redis
       - nats
 
-  updater-scheduler:
-    build:
-      context: updater-scheduler
-    environment:
-      NATS_URI: nats://nats:4222
-    container_name: updater-scheduler
-    depends_on:
-      - redis
-      - nats
-
   redis:
     image: redis:5.0.7
     command: ["redis-server", "--appendonly", "yes"]

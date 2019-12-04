@@ -1,9 +1,17 @@
-const { stan, opts, UPDATER_API_CHANNEL } = require('./utils/stan')
+const { set: redisSet } = require('./utils/redis')
+const { PERSON_SCHEDULE_ID } = require('./services/person')
+const { schedule } = require('./scheduler')
 
-stan.on('connect', async () => {
-  const sub = stan.subscribe(UPDATER_API_CHANNEL, 'updater-api.workers', opts)
-  sub.on('message', msg => {
-    console.log(JSON.parse(msg.getData()))
-    msg.ack()
-  })
-})
+if (process.env.NODE_ENV === 'development') {
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
+}
+
+/* const updateOrdinalFrom = async (data, redisKey) => {
+  if (data.entities && data.entities.length) await redisSet(redisKey, data.greatestOrdinal)
+} */
+
+const initialize = async () => {
+  await schedule(PERSON_SCHEDULE_ID)
+}
+
+initialize()
