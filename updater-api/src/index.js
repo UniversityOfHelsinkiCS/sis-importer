@@ -1,4 +1,4 @@
-const { set: redisSet } = require('./utils/redis')
+// const { set: redisSet } = require('./utils/redis')
 const { PERSON_SCHEDULE_ID } = require('./services/person')
 const { schedule } = require('./scheduler')
 

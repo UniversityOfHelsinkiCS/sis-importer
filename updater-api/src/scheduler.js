@@ -24,8 +24,12 @@ const schedule = async id => {
   const ordinalFromRedis = await redisGet(LATEST_ORDINAL_KEY)
   const latestOrdinal = ordinalFromRedis ? JSON.parse(ordinalFromRedis) : { ordinal: 0 }
 
-  const { hasMore, entities, greatestOrdinal } = await fetchByOrdinal(API_URL, latestOrdinal.ordinal, 2)
-  await updateOrdinalStatus(LATEST_ORDINAL_KEY, { ordinal: latestOrdinal.ordinal, passedCount: 0, totalCount: entities.length })
+  const { /* hasMore, */ entities /* greatestOrdinal */ } = await fetchByOrdinal(API_URL, latestOrdinal.ordinal, 2)
+  await updateOrdinalStatus(LATEST_ORDINAL_KEY, {
+    ordinal: latestOrdinal.ordinal,
+    passedCount: 0,
+    totalCount: entities.length
+  })
 
   // Create jobs
   await createJobsFromEntities(ID, entities)
