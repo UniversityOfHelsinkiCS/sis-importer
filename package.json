@@ -9,9 +9,9 @@
     "dco:down": "npm run dco -- down",
     "dco:logs": "npm run dco -- logs -f",
     "start": "npm run dco:up && npm run dco:logs",
-    "build": "npm run dco -- build",
-    "test": "npm test --prefix ./updater-api",
-    "lintfix": "npm run lintfix --prefix ./updater-api"
+    "build": "npm i --prefix ./updater-api && npm i --prefix ./updater-mankeli && npm run dco -- build",
+    "test": "npm test --prefix ./updater-api && npm test --prefix ./updater-mankeli",
+    "lintfix": "npm run lintfix --prefix ./updater-api && npm run lintfix --prefix ./updater-mankeli"
   },
   "husky": {
     "hooks": {

@@ -3,6 +3,7 @@ const { randomBytes } = require('crypto')
 const { PERSON_SCHEDULE_ID } = require('./services/person')
 const { schedule } = require('./scheduler')
 const { CURRENT_EXECUTION_HASH } = require('./config')
+const { stan } = require('./utils/stan')
 
 if (process.env.NODE_ENV === 'development') {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
@@ -15,8 +16,12 @@ if (process.env.NODE_ENV === 'development') {
 const initialize = async () => {
   const generatedHash = randomBytes(12).toString('hex')
   await redisSet(CURRENT_EXECUTION_HASH, generatedHash)
-  console.log('CURRENT_EXECUTION_HASH', generatedHash)
+
+  // TODO: Schedule all entities in correct order. Increment
+  // ordinal for current target entity if hasMore.
   await schedule(PERSON_SCHEDULE_ID, generatedHash)
 }
 
-initialize()
+stan.on('connect', () => {
+  initialize()
+})

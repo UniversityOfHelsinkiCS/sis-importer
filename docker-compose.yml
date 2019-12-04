@@ -11,17 +11,27 @@ services:
       - redis
       - nats
 
+  updater-mankeli:
+    build:
+      context: updater-api
+    environment:
+      NATS_URI: nats://nats:4222
+    container_name: updater-mankeli
+    depends_on:
+      - redis
+      - nats
+
   redis:
     image: redis:5.0.7
     command: ["redis-server", "--appendonly", "yes"]
-    container_name: redis
+    container_name: sis-redis
     volumes:
       - sis-updater-redis:/data
 
   nats:
     image: nats-streaming:0.16.2
     command: -cid sis-updater-nats --file_slice_max_bytes 0 --file_slice_max_age 100h -store file -dir datastore
-    container_name: nats
+    container_name: sis-nats
     volumes:
       - sis-updater-datastore:/datastore
 

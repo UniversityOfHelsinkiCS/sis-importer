@@ -1,3 +1,5 @@
+const { chunk } = require('lodash')
+const { stan } = require('./utils/stan')
 const { request } = require('./utils/oriApi')
 const { get: redisGet, set: redisSet, sadd: redisSetAdd } = require('./utils/redis')
 const { PERSON_SCHEDULE_ID, info: personInfo } = require('./services/person')
@@ -22,15 +24,19 @@ const updateOrdinalStatus = async (
   if (scheduled.length) await redisSetAdd(`${key}_SCHEDULED`, scheduled)
 }
 
-const createJobsFromEntities = async (id, entities) => {
-  console.log(id, entities)
+const createJobsFromEntities = async (channel, entities, executionHash) => {
+  chunk(entities, 100).forEach(c => {
+    stan.publish(channel, JSON.stringify({ entities, executionHash }), (err) => {
+      if (err) console.log('failed publishing', err)
+    })
+  })
 }
 
 const schedule = async (id, executionHash) => {
-  const { API_URL, LATEST_ORDINAL_KEY, ID } = services[id]
+  const { API_URL, LATEST_ORDINAL_KEY, CHANNEL } = services[id]
   const latestOrdinal = (await redisGet(LATEST_ORDINAL_KEY)) || 0
 
-  const { hasMore, entities, greatestOrdinal } = await fetchByOrdinal(API_URL, latestOrdinal, 2)
+  const { hasMore, entities, greatestOrdinal } = await fetchByOrdinal(API_URL, latestOrdinal, 1000)
   await updateOrdinalStatus(LATEST_ORDINAL_KEY, {
     ordinal: latestOrdinal,
     scheduled: entities.map(({ id }) => id),
@@ -41,7 +47,7 @@ const schedule = async (id, executionHash) => {
   })
 
   // Create jobs
-  await createJobsFromEntities(ID, entities)
+  await createJobsFromEntities(CHANNEL, entities, executionHash)
 }
 
 module.exports = {
