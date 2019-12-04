@@ -26,7 +26,7 @@ const updateOrdinalStatus = async (
 
 const createJobsFromEntities = async (channel, entities, executionHash) => {
   chunk(entities, 100).forEach(c => {
-    stan.publish(channel, JSON.stringify({ entities, executionHash }), (err) => {
+    stan.publish(channel, JSON.stringify({ c, executionHash }), err => {
       if (err) console.log('failed publishing', err)
     })
   })
