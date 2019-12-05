@@ -10,13 +10,13 @@ services:
     depends_on:
       - redis
       - nats
+      - updater-mankeli
 
   updater-mankeli:
     build:
       context: updater-api
     environment:
       NATS_URI: nats://nats:4222
-    container_name: updater-mankeli
     depends_on:
       - redis
       - nats
