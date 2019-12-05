@@ -50,7 +50,7 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
         result = await redisIncrementBy(`${ordinalKey}_UPDATED`, entities.length)
       }
     }
-    if (result) console.log(result)
+
     if (result === Number(amountScheduled)) statusChannel.unsubscribe()
     msg.ack()
   })
@@ -58,29 +58,31 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
 }
 
 const schedule = async (id, executionHash) => {
-  return new Promise(async resolve => {
-    const { API_URL, LATEST_ORDINAL_KEY, CHANNEL } = services[id]
+  const { API_URL, LATEST_ORDINAL_KEY, CHANNEL } = services[id]
+  const statusChannel = initializeStatusChannel(CHANNEL, LATEST_ORDINAL_KEY, executionHash)
+
+  return new Promise(async (resolve, reject) => {
     const latestOrdinal = (await redisGet(LATEST_ORDINAL_KEY)) || 0
 
-    const { hasMore, entities, greatestOrdinal } = await fetchByOrdinal(API_URL, latestOrdinal, FETCH_AMOUNT)
-    if (!entities || !entities.length) return resolve(null)
+    try {
+      const { hasMore, entities, greatestOrdinal } = await fetchByOrdinal(API_URL, latestOrdinal, FETCH_AMOUNT)
+      if (!entities || !entities.length) return resolve(null)
 
-    await updateOrdinalStatus(LATEST_ORDINAL_KEY, {
-      ordinal: latestOrdinal,
-      scheduled: entities.length,
-      updated: 0,
-      executionHash
-    })
+      await updateOrdinalStatus(LATEST_ORDINAL_KEY, {
+        ordinal: latestOrdinal,
+        scheduled: entities.length,
+        updated: 0,
+        executionHash
+      })
 
-    // Listen for success & fails
-    const statusChannel = initializeStatusChannel(CHANNEL, LATEST_ORDINAL_KEY, executionHash)
+      statusChannel.on('unsubscribed', async () => {
+        resolve({ greatestOrdinal, hasMore, total: entities.length, ordinalKey: LATEST_ORDINAL_KEY })
+      })
 
-    statusChannel.on('unsubscribed', function() {
-      resolve({ greatestOrdinal, hasMore, total: entities.length, ordinalKey: LATEST_ORDINAL_KEY })
-    })
-
-    // Create initial jobs
-    await createJobsFromEntities(CHANNEL, entities, executionHash, 100)
+      createJobsFromEntities(CHANNEL, entities, executionHash, 100)
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 

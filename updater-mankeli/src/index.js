@@ -2,17 +2,17 @@ const { stan, opts, ORI_PERSON_CHANNEL, ORI_ATTAINMENTS_CHANNEL } = require('./u
 const personHandler = require('./messageHandlers/person')
 const attainmentsHandler = require('./messageHandlers/attainments')
 
+const channels = {
+  [ORI_PERSON_CHANNEL]: personHandler,
+  [ORI_ATTAINMENTS_CHANNEL]: attainmentsHandler
+}
+
 const handleMessage = (CHANNEL, msgHandler) => async msg => {
   const response = await msgHandler(JSON.parse(msg.getData()))
   stan.publish(`${CHANNEL}_STATUS`, JSON.stringify(response), err => {
     if (err) console.log('Failed publishing', err)
   })
   msg.ack()
-}
-
-const channels = {
-  [ORI_PERSON_CHANNEL]: personHandler,
-  [ORI_ATTAINMENTS_CHANNEL]: attainmentsHandler
 }
 
 stan.on('connect', () => {

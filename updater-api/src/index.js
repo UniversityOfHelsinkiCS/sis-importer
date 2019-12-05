@@ -19,13 +19,18 @@ const update = async (current, generatedHash) => {
     console.log('finito!')
     return
   }
-  const data = await schedule(serviceId, generatedHash)
-  if (data) {
-    const { greatestOrdinal, hasMore, total, ordinalKey } = data
-    await updateOrdinalFrom(total, ordinalKey, greatestOrdinal)
-    update(hasMore ? current : current + 1, generatedHash)
-  } else {
-    update(current + 1, generatedHash)
+  console.log(`Updating ${serviceId}`)
+  try {
+    const data = await schedule(serviceId, generatedHash)
+    if (data) {
+      const { greatestOrdinal, hasMore, total, ordinalKey } = data
+      await updateOrdinalFrom(total, ordinalKey, greatestOrdinal)
+      update(hasMore ? current : current + 1, generatedHash)
+    } else {
+      update(current + 1, generatedHash)
+    }
+  } catch (e) {
+    console.log('Updating failed', e)
   }
 }
 
