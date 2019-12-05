@@ -11,3 +11,11 @@ services:
     volumes:
       - ./updater-api:/usr/src/app
 
+  updater-mankeli:
+    build:
+      args:
+        NODE_ENV: "development"
+    command: "npm run start:dev"
+    volumes:
+      - ./updater-mankeli:/usr/src/app
+

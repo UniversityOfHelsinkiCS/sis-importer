@@ -22,10 +22,13 @@ const set = async (key, val) => await redisPromisify(client.set, key, val)
 
 const del = async key => await redisPromisify(client.del, key)
 
+const incrby = async (key, val) => await redisPromisify(client.incrby, key, val)
+
 module.exports = {
   sadd,
   smembers,
   get,
   set,
-  del
+  del,
+  incrby
 }
