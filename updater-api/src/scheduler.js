@@ -2,12 +2,8 @@ const { chunk } = require('lodash')
 const { stan, opts } = require('./utils/stan')
 const { request } = require('./utils/oriApi')
 const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./utils/redis')
-const { PERSON_SCHEDULE_ID, info: personInfo } = require('./services/person')
+const { services } = require('./services')
 const { FETCH_AMOUNT } = require('./config')
-
-const services = {
-  [PERSON_SCHEDULE_ID]: personInfo
-}
 
 const fetchByOrdinal = async (url, ordinal, limit = 1000) => {
   return await request(`${url}?since=${ordinal}&limit=${limit}`)

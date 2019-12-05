@@ -10,9 +10,11 @@ opts.setAckWait(10 * 1000)
 opts.setMaxInFlight(20)
 
 const ORI_PERSON_CHANNEL = 'ORI_PERSON_CHANNEL'
+const ORI_ATTAINMENTS_CHANNEL = 'ORI_ATTAINMENTS_CHANNEL'
 
 module.exports = {
   stan,
   opts,
-  ORI_PERSON_CHANNEL
+  ORI_PERSON_CHANNEL,
+  ORI_ATTAINMENTS_CHANNEL
 }

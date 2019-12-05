@@ -1,11 +1,9 @@
 const { set: redisSet } = require('./utils/redis')
 const { randomBytes } = require('crypto')
-const { PERSON_SCHEDULE_ID } = require('./services/person')
+const { serviceIds } = require('./services')
 const { schedule } = require('./scheduler')
 const { CURRENT_EXECUTION_HASH } = require('./config')
 const { stan } = require('./utils/stan')
-
-const SCHEDULE_IDS = [PERSON_SCHEDULE_ID]
 
 if (process.env.NODE_ENV === 'development') {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
@@ -16,12 +14,12 @@ const updateOrdinalFrom = async (total, redisKey, ordinal) => {
 }
 
 const update = async (current, generatedHash) => {
-  const SCHEDULE_ID = SCHEDULE_IDS[current]
-  if (!SCHEDULE_ID) {
+  const serviceId = serviceIds[current]
+  if (!serviceId) {
     console.log('finito!')
     return
   }
-  const data = await schedule(SCHEDULE_ID, generatedHash)
+  const data = await schedule(serviceId, generatedHash)
   if (data) {
     const { greatestOrdinal, hasMore, total, ordinalKey } = data
     await updateOrdinalFrom(total, ordinalKey, greatestOrdinal)
