@@ -13,6 +13,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "graphql-request": "^1.8.2",
+    "moment": "^2.24.0",
     "node-nats-streaming": "^0.2.6",
     "redis": "^2.8.0"
   },

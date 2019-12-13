@@ -30,7 +30,7 @@ const createJobsFromEntities = async (channel, entities, executionHash, chunks =
 const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
   const statusChannel = stan.subscribe(`${channel}_STATUS`, opts)
   statusChannel.on('message', async msg => {
-    const { status, entities, executionHash: msgExecutionHash } = JSON.parse(msg.getData())
+    const { status, entities, amount, executionHash: msgExecutionHash } = JSON.parse(msg.getData())
     const amountScheduled = await redisGet(`${ordinalKey}_SCHEDULED`)
 
     if (msgExecutionHash !== executionHash) {
@@ -40,17 +40,18 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
 
     let result
     if (status === 'OK') {
-      result = await redisIncrementBy(`${ordinalKey}_UPDATED`, entities.length)
+      result = await redisIncrementBy(`${ordinalKey}_UPDATED`, amount)
     } else if (status === 'FAIL') {
       if (entities.length > 1) {
-        await createJobsFromEntities(channel, entities, executionHash, Math.floor(entities.length / 2))
+        await createJobsFromEntities(channel, entities, executionHash, Math.ceil(entities.length / 2))
       } else {
         // Log error to sentry?
         console.log('Failed multiple times')
         result = await redisIncrementBy(`${ordinalKey}_UPDATED`, entities.length)
       }
     }
-    if (result) console.log(result)
+
+    console.log(`${result}/${amountScheduled}`)
     if (result === Number(amountScheduled)) statusChannel.unsubscribe()
     msg.ack()
   })
@@ -58,29 +59,31 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
 }
 
 const schedule = async (id, executionHash) => {
-  return new Promise(async resolve => {
-    const { API_URL, LATEST_ORDINAL_KEY, CHANNEL } = services[id]
+  const { API_URL, LATEST_ORDINAL_KEY, CHANNEL } = services[id]
+  const statusChannel = initializeStatusChannel(CHANNEL, LATEST_ORDINAL_KEY, executionHash)
+
+  return new Promise(async (resolve, reject) => {
     const latestOrdinal = (await redisGet(LATEST_ORDINAL_KEY)) || 0
 
-    const { hasMore, entities, greatestOrdinal } = await fetchByOrdinal(API_URL, latestOrdinal, FETCH_AMOUNT)
-    if (!entities || !entities.length) return resolve(null)
+    try {
+      const { hasMore, entities, greatestOrdinal } = await fetchByOrdinal(API_URL, latestOrdinal, FETCH_AMOUNT)
+      if (!entities || !entities.length) return resolve(null)
 
-    await updateOrdinalStatus(LATEST_ORDINAL_KEY, {
-      ordinal: latestOrdinal,
-      scheduled: entities.length,
-      updated: 0,
-      executionHash
-    })
+      await updateOrdinalStatus(LATEST_ORDINAL_KEY, {
+        ordinal: latestOrdinal,
+        scheduled: entities.length,
+        updated: 0,
+        executionHash
+      })
 
-    // Listen for success & fails
-    const statusChannel = initializeStatusChannel(CHANNEL, LATEST_ORDINAL_KEY, executionHash)
+      statusChannel.on('unsubscribed', async () => {
+        resolve({ greatestOrdinal, hasMore, total: entities.length, ordinalKey: LATEST_ORDINAL_KEY })
+      })
 
-    statusChannel.on('unsubscribed', function() {
-      resolve({ greatestOrdinal, hasMore, total: entities.length, ordinalKey: LATEST_ORDINAL_KEY })
-    })
-
-    // Create initial jobs
-    await createJobsFromEntities(CHANNEL, entities, executionHash, 100)
+      createJobsFromEntities(CHANNEL, entities, executionHash, 100)
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 

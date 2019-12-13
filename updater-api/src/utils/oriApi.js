@@ -21,7 +21,6 @@ const request = async (path, retry = 6) => {
       await sleep(i * 1000)
     }
   }
-  throw new Error(`Request failed for ${path}`)
 }
 
 module.exports = {
