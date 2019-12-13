@@ -30,7 +30,7 @@ const createJobsFromEntities = async (channel, entities, executionHash, chunks =
 const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
   const statusChannel = stan.subscribe(`${channel}_STATUS`, opts)
   statusChannel.on('message', async msg => {
-    const { status, entities, executionHash: msgExecutionHash } = JSON.parse(msg.getData())
+    const { status, entities, amount, executionHash: msgExecutionHash } = JSON.parse(msg.getData())
     const amountScheduled = await redisGet(`${ordinalKey}_SCHEDULED`)
 
     if (msgExecutionHash !== executionHash) {
@@ -40,10 +40,10 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
 
     let result
     if (status === 'OK') {
-      result = await redisIncrementBy(`${ordinalKey}_UPDATED`, entities.length)
+      result = await redisIncrementBy(`${ordinalKey}_UPDATED`, amount)
     } else if (status === 'FAIL') {
       if (entities.length > 1) {
-        await createJobsFromEntities(channel, entities, executionHash, Math.floor(entities.length / 2))
+        await createJobsFromEntities(channel, entities, executionHash, Math.ceil(entities.length / 2))
       } else {
         // Log error to sentry?
         console.log('Failed multiple times')
@@ -51,6 +51,7 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
       }
     }
 
+    console.log(`${result}/${amountScheduled}`)
     if (result === Number(amountScheduled)) statusChannel.unsubscribe()
     msg.ack()
   })
