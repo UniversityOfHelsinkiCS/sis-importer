@@ -6,8 +6,8 @@ const stan = natsStreaming.connect('sis-updater-nats', HOSTNAME, NATS_URI)
 
 const opts = stan.subscriptionOptions()
 opts.setManualAckMode(true)
-opts.setAckWait(60 * 1000)
-opts.setMaxInFlight(20)
+opts.setAckWait(60 * 1000 * 15)
+opts.setMaxInFlight(3)
 
 const ORI_PERSON_CHANNEL = 'ORI_PERSON_CHANNEL'
 const ORI_ATTAINMENTS_CHANNEL = 'ORI_ATTAINMENTS_CHANNEL'

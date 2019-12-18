@@ -3,7 +3,7 @@ const { stan, opts } = require('./utils/stan')
 const { request } = require('./utils/oriApi')
 const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./utils/redis')
 const { services } = require('./services')
-const { FETCH_AMOUNT } = require('./config')
+const { FETCH_AMOUNT, DEFAULT_CHUNK_SIZE } = require('./config')
 
 const fetchByOrdinal = async (url, ordinal, limit = 1000) => {
   return await request(`${url}?since=${ordinal}&limit=${limit}`)
@@ -19,7 +19,7 @@ const updateOrdinalStatus = async (
   if (scheduled !== undefined) await redisSet(`${key}_SCHEDULED`, scheduled)
 }
 
-const createJobsFromEntities = async (channel, entities, executionHash, chunks = 100) => {
+const createJobsFromEntities = async (channel, entities, executionHash, chunks = DEFAULT_CHUNK_SIZE) => {
   chunk(entities, chunks).forEach(c => {
     stan.publish(channel, JSON.stringify({ entities: c, executionHash }), err => {
       if (err) console.log('failed publishing', err)
@@ -51,7 +51,7 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
       }
     }
 
-    console.log(`${result}/${amountScheduled}`)
+    if (result) console.log(`${result}/${amountScheduled}`)
     if (result === Number(amountScheduled)) statusChannel.unsubscribe()
     msg.ack()
   })
@@ -80,7 +80,7 @@ const schedule = async (id, executionHash) => {
         resolve({ greatestOrdinal, hasMore, total: entities.length, ordinalKey: LATEST_ORDINAL_KEY })
       })
 
-      createJobsFromEntities(CHANNEL, entities, executionHash, 100)
+      createJobsFromEntities(CHANNEL, entities, executionHash)
     } catch (e) {
       reject(e)
     }

@@ -30,8 +30,8 @@ const queryWrapper = async (query, variables, retry = 6) => {
         console.log('variables', variables)
         throw e
       }
-      console.log(`Retrying ${i}/${retry - 1} for ${query}`)
-      await sleep(i * 1000)
+      console.log(`Retrying ${i}/${retry - 1}`)
+      await sleep(i * 100)
     }
   }
 }
