@@ -21,16 +21,18 @@ const parseCountry = (address, countries) => {
 }
 
 const parsePerson = (person, countries, genders) => {
+  const TODO = undefined
   return {
+    person_id: person.id,
     studentnumber: person.studentNumber,
     email: person.primaryEmail,
-    // creditcount: TODO,
+    creditcount: TODO,
     birthdate: getDate(person.dateOfBirth),
     lastname: person.lastName,
     ...parseCountry(person.primaryAddress, countries),
 
     firstnames: person.firstNames,
-    //  dateofuniversityenrollment: TODO,
+    dateofuniversityenrollment: TODO,
     abbreviatedname: [person.lastName, person.firstNames].join(' '),
     ...parseGender(person.genderUrn, genders)
   }

@@ -13,6 +13,8 @@ const getDate = (date, format = 'DD.MM.YYYY') => {
   return moment(date, format).format('YYYY-MM-DD')
 }
 
+const parseDate = (date, format = 'YYYY-MM-DD HH:mm') => date && moment.utc(date, format).toDate()
+
 const retry = async (func, params, attempts = 6) => {
   for (let i = 1; i <= attempts; i++) {
     try {
@@ -32,6 +34,7 @@ const retry = async (func, params, attempts = 6) => {
 module.exports = {
   idfy,
   getDate,
+  parseDate,
   sleep,
   retry
 }

@@ -4,6 +4,7 @@ const { serviceIds } = require('./services')
 const { schedule } = require('./scheduler')
 const { CURRENT_EXECUTION_HASH } = require('./config')
 const { stan } = require('./utils/stan')
+const sleep = require('./utils/sleep')
 
 if (process.env.NODE_ENV === 'development') {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
@@ -20,6 +21,9 @@ const updateHash = async () => {
 }
 
 const update = async current => {
+  if (process.env.NODE_ENV === 'development') {
+    await sleep(1000)
+  }
   const generatedHash = await updateHash()
   const serviceId = serviceIds[current]
   if (!serviceId) {
@@ -43,7 +47,7 @@ const update = async current => {
 }
 
 const initialize = async () => {
-  update(0)
+  update(1)
 }
 
 stan.on('connect', () => {
