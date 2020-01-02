@@ -22,6 +22,10 @@ const redisPromisify = async (func, ...params) =>
 
 const get = async key => await redisPromisify(client.get, key)
 
+const set = async (key, val) => await redisPromisify(client.set, key, val)
+
+const expire = async (key, val) => await redisPromisify(client.expire, key, val)
+
 const onCurrentExecutionHashChange = async handleChange => {
   const initialValue = await get(CURRENT_EXECUTION_HASH)
   handleChange(initialValue)
@@ -35,5 +39,8 @@ const onCurrentExecutionHashChange = async handleChange => {
 }
 
 module.exports = {
-  onCurrentExecutionHashChange
+  onCurrentExecutionHashChange,
+  get,
+  set,
+  expire
 }

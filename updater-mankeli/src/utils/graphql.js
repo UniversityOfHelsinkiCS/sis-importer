@@ -1,5 +1,5 @@
 const { GraphQLClient } = require('graphql-request')
-const sleep = require('./sleep')
+const { sleep } = require('./index')
 const { SIS_API_URL, SIS_TOKEN, PROXY_TOKEN } = process.env
 
 const BASE_URL = `${SIS_API_URL}/graphql`
