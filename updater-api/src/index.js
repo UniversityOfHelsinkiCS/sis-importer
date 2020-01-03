@@ -4,7 +4,7 @@ const { serviceIds } = require('./services')
 const { schedule } = require('./scheduler')
 const { CURRENT_EXECUTION_HASH } = require('./config')
 const { stan } = require('./utils/stan')
-const sleep = require('./utils/sleep')
+const { sleep } = require('./utils')
 
 let isUpdating = false
 

@@ -1,6 +1,6 @@
 const { chunk } = require('lodash')
 const { stan, opts } = require('./utils/stan')
-const { request: oriRequest } = require('./utils/oriApi')
+const { oriRequest } = require('./utils/oriApi')
 const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./utils/redis')
 const { services } = require('./services')
 const { FETCH_AMOUNT, DEFAULT_CHUNK_SIZE, APIS } = require('./config')
