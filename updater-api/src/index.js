@@ -6,6 +6,8 @@ const { CURRENT_EXECUTION_HASH } = require('./config')
 const { stan } = require('./utils/stan')
 const sleep = require('./utils/sleep')
 
+let isUpdating = false
+
 if (process.env.NODE_ENV === 'development') {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 }
@@ -27,7 +29,8 @@ const update = async current => {
   const generatedHash = await updateHash()
   const serviceId = serviceIds[current]
   if (!serviceId) {
-    console.log('finito!')
+    console.log('Updating finished')
+    isUpdating = false
     return
   }
   console.log(`Updating ${serviceId}`)
@@ -47,7 +50,10 @@ const update = async current => {
 }
 
 const initialize = async () => {
-  update(1)
+  if (!isUpdating) {
+    isUpdating = true
+    update(0)
+  }
 }
 
 stan.on('connect', () => {

@@ -9,6 +9,7 @@ const parseCreditTypeCode = attainment => {
   switch (attainment.state) {
     case 'ATTAINED':
       return 4
+    // Validate this
     case 'SUBSTITUTED':
     case 'INCLUDED':
       return 9

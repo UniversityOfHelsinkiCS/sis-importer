@@ -1,12 +1,13 @@
 const { chunk } = require('lodash')
 const { stan, opts } = require('./utils/stan')
-const { request } = require('./utils/oriApi')
+const { request: oriRequest } = require('./utils/oriApi')
 const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./utils/redis')
 const { services } = require('./services')
-const { FETCH_AMOUNT, DEFAULT_CHUNK_SIZE } = require('./config')
+const { FETCH_AMOUNT, DEFAULT_CHUNK_SIZE, APIS } = require('./config')
 
-const fetchByOrdinal = async (url, ordinal, limit = 1000) => {
-  return await request(`${url}?since=${ordinal}&limit=${limit}`)
+const fetchByOrdinal = async (api, url, ordinal, limit = 1000) => {
+  const targetUrl = `${url}?since=${ordinal}&limit=${limit}`
+  return await (api === APIS.ori ? oriRequest(targetUrl) : null)
 }
 
 const updateOrdinalStatus = async (
@@ -59,14 +60,14 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
 }
 
 const schedule = async (id, executionHash) => {
-  const { API_URL, LATEST_ORDINAL_KEY, CHANNEL } = services[id]
+  const { API, API_URL, LATEST_ORDINAL_KEY, CHANNEL } = services[id]
   const statusChannel = initializeStatusChannel(CHANNEL, LATEST_ORDINAL_KEY, executionHash)
 
   return new Promise(async (resolve, reject) => {
     const latestOrdinal = (await redisGet(LATEST_ORDINAL_KEY)) || 0
 
     try {
-      const { hasMore, entities, greatestOrdinal } = await fetchByOrdinal(API_URL, latestOrdinal, FETCH_AMOUNT)
+      const { hasMore, entities, greatestOrdinal } = await fetchByOrdinal(API, API_URL, latestOrdinal, FETCH_AMOUNT)
       if (!entities || !entities.length) return resolve(null)
 
       await updateOrdinalStatus(LATEST_ORDINAL_KEY, {

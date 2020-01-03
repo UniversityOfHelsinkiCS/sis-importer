@@ -1,6 +1,7 @@
-const { stan, opts, ORI_PERSON_CHANNEL, ORI_ATTAINMENTS_CHANNEL } = require('./utils/stan')
+const { stan, opts, ORI_PERSON_CHANNEL, ORI_ATTAINMENTS_CHANNEL, ORI_STUDY_RIGHTS_CHANNEL } = require('./utils/stan')
 const personHandler = require('./messageHandlers/person')
-const attainmentsHandler = require('./messageHandlers/attainments')
+const attainmentHandler = require('./messageHandlers/attainment')
+const studyRightHandler = require('./messageHandlers/studyRight')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
 
 if (process.env.NODE_ENV === 'development') {
@@ -9,7 +10,8 @@ if (process.env.NODE_ENV === 'development') {
 
 const channels = {
   [ORI_PERSON_CHANNEL]: personHandler,
-  [ORI_ATTAINMENTS_CHANNEL]: attainmentsHandler
+  [ORI_ATTAINMENTS_CHANNEL]: attainmentHandler,
+  [ORI_STUDY_RIGHTS_CHANNEL]: studyRightHandler
 }
 
 let CURRENT_EXECUTION_HASH = null
