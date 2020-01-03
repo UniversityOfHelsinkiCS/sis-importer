@@ -1,5 +1,5 @@
 const { GraphQLClient } = require('graphql-request')
-const sleep = require('./sleep')
+const { sleep } = require('./index')
 const { SIS_API_URL, SIS_TOKEN, PROXY_TOKEN } = process.env
 
 const BASE_URL = `${SIS_API_URL}/graphql`
@@ -30,8 +30,8 @@ const queryWrapper = async (query, variables, retry = 6) => {
         console.log('variables', variables)
         throw e
       }
-      console.log(`Retrying ${i}/${retry - 1} for ${query}`)
-      await sleep(i * 1000)
+      console.log(`Retrying ${i}/${retry - 1}`)
+      await sleep(i * 500)
     }
   }
 }

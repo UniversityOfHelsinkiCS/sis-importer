@@ -1,12 +1,13 @@
 const { chunk } = require('lodash')
 const { stan, opts } = require('./utils/stan')
-const { request } = require('./utils/oriApi')
+const { oriRequest } = require('./utils/oriApi')
 const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./utils/redis')
 const { services } = require('./services')
-const { FETCH_AMOUNT } = require('./config')
+const { FETCH_AMOUNT, DEFAULT_CHUNK_SIZE, APIS } = require('./config')
 
-const fetchByOrdinal = async (url, ordinal, limit = 1000) => {
-  return await request(`${url}?since=${ordinal}&limit=${limit}`)
+const fetchByOrdinal = async (api, url, ordinal, limit = 1000) => {
+  const targetUrl = `${url}?since=${ordinal}&limit=${limit}`
+  return await (api === APIS.ori ? oriRequest(targetUrl) : null)
 }
 
 const updateOrdinalStatus = async (
@@ -19,7 +20,7 @@ const updateOrdinalStatus = async (
   if (scheduled !== undefined) await redisSet(`${key}_SCHEDULED`, scheduled)
 }
 
-const createJobsFromEntities = async (channel, entities, executionHash, chunks = 100) => {
+const createJobsFromEntities = async (channel, entities, executionHash, chunks = DEFAULT_CHUNK_SIZE) => {
   chunk(entities, chunks).forEach(c => {
     stan.publish(channel, JSON.stringify({ entities: c, executionHash }), err => {
       if (err) console.log('failed publishing', err)
@@ -51,7 +52,7 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
       }
     }
 
-    console.log(`${result}/${amountScheduled}`)
+    if (result) console.log(`${result}/${amountScheduled}`)
     if (result === Number(amountScheduled)) statusChannel.unsubscribe()
     msg.ack()
   })
@@ -59,14 +60,14 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
 }
 
 const schedule = async (id, executionHash) => {
-  const { API_URL, LATEST_ORDINAL_KEY, CHANNEL } = services[id]
+  const { API, API_URL, LATEST_ORDINAL_KEY, CHANNEL } = services[id]
   const statusChannel = initializeStatusChannel(CHANNEL, LATEST_ORDINAL_KEY, executionHash)
 
   return new Promise(async (resolve, reject) => {
     const latestOrdinal = (await redisGet(LATEST_ORDINAL_KEY)) || 0
 
     try {
-      const { hasMore, entities, greatestOrdinal } = await fetchByOrdinal(API_URL, latestOrdinal, FETCH_AMOUNT)
+      const { hasMore, entities, greatestOrdinal } = await fetchByOrdinal(API, API_URL, latestOrdinal, FETCH_AMOUNT)
       if (!entities || !entities.length) return resolve(null)
 
       await updateOrdinalStatus(LATEST_ORDINAL_KEY, {
@@ -80,7 +81,7 @@ const schedule = async (id, executionHash) => {
         resolve({ greatestOrdinal, hasMore, total: entities.length, ordinalKey: LATEST_ORDINAL_KEY })
       })
 
-      createJobsFromEntities(CHANNEL, entities, executionHash, 100)
+      createJobsFromEntities(CHANNEL, entities, executionHash)
     } catch (e) {
       reject(e)
     }

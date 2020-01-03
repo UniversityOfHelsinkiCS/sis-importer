@@ -19,7 +19,13 @@ module.exports = variables =>
             }
           }
         }
-        genderUrn
+        attainments {
+          credits
+          misregistration
+          primary
+          state
+        }
+        studyStartDate
       }
     }
   `,
