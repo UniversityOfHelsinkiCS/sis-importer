@@ -4,6 +4,8 @@ const { STUDY_RIGHT_SCHEDULE_ID, info: studyRightInfo } = require('./studyRight'
 const { COURSE_UNIT_SCHEDULE_ID, info: courseUnitInfo } = require('./courseUnit')
 const { COURSE_UNIT_REALISATION_SCHEDULE_ID, info: courseUnitRealisationInfo } = require('./courseUnitRealisation')
 const { ASSESSMENT_ITEM_SCHEDULE_ID, info: assessmentItemInfo } = require('./assessmentItem')
+const { EDUCATION_SCHEDULE_ID, info: educationInfo } = require('./education')
+const { MODULE_SCHEDULE_ID, info: moduleInfo } = require('./module')
 
 const services = {
   [ATTAINMENT_SCHEDULE_ID]: attainmentInfo,
@@ -11,7 +13,9 @@ const services = {
   [STUDY_RIGHT_SCHEDULE_ID]: studyRightInfo,
   [COURSE_UNIT_SCHEDULE_ID]: courseUnitInfo,
   [COURSE_UNIT_REALISATION_SCHEDULE_ID]: courseUnitRealisationInfo,
-  [ASSESSMENT_ITEM_SCHEDULE_ID]: assessmentItemInfo
+  [ASSESSMENT_ITEM_SCHEDULE_ID]: assessmentItemInfo,
+  [EDUCATION_SCHEDULE_ID]: educationInfo,
+  [MODULE_SCHEDULE_ID]: moduleInfo
 }
 
 const serviceIds = [
@@ -20,7 +24,9 @@ const serviceIds = [
   STUDY_RIGHT_SCHEDULE_ID,
   COURSE_UNIT_SCHEDULE_ID,
   COURSE_UNIT_REALISATION_SCHEDULE_ID,
-  ASSESSMENT_ITEM_SCHEDULE_ID
+  ASSESSMENT_ITEM_SCHEDULE_ID,
+  EDUCATION_SCHEDULE_ID,
+  MODULE_SCHEDULE_ID
 ]
 
 module.exports = {

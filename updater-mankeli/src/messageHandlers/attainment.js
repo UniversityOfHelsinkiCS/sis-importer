@@ -34,7 +34,7 @@ const parseCredit = attainment => {
     course_unit_realisation_id: attainment.courseUnitRealisationId,
     course_code: TODO, // from course unit
     semestercode: TODO, // from course unit realisation
-    isStudyModule: false, // groupId?
+    isStudyModule: false, // groupId? or from type (CourseModuleAttainment)?
     documentState: attainment.documentState
   }
 }
