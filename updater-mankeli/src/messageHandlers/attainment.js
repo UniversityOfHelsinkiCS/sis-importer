@@ -19,6 +19,7 @@ const parseCreditTypeCode = attainment => {
 }
 
 const parseCredit = attainment => {
+  // assessmentItemAttainmentIds?
   const TODO = undefined
   return {
     id: attainment.id,

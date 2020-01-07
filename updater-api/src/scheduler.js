@@ -1,13 +1,14 @@
 const { chunk } = require('lodash')
 const { stan, opts } = require('./utils/stan')
 const { oriRequest } = require('./utils/oriApi')
+const { koriRequest } = require('./utils/koriApi')
 const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./utils/redis')
 const { services } = require('./services')
 const { FETCH_AMOUNT, DEFAULT_CHUNK_SIZE, APIS } = require('./config')
 
 const fetchByOrdinal = async (api, url, ordinal, limit = 1000) => {
   const targetUrl = `${url}?since=${ordinal}&limit=${limit}`
-  return await (api === APIS.ori ? oriRequest(targetUrl) : null)
+  return await (api === APIS.ori ? oriRequest(targetUrl) : koriRequest(targetUrl))
 }
 
 const updateOrdinalStatus = async (
