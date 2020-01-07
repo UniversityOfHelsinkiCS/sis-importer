@@ -11,8 +11,7 @@ const parseCourseUnitRealisation = courseUnitRealisation => {
 }
 
 module.exports = ({ entities, executionHash }) => {
-  const lul = entities.map(parseCourseUnitRealisation)
-  console.log(lul)
+  entities.map(parseCourseUnitRealisation)
 
   return { executionHash }
 }
