@@ -10,7 +10,8 @@ const parseCourse = courseUnit => {
     startdate: courseUnit.validityPeriod.startDate || null,
     enddate: courseUnit.validityPeriod.endDate || null,
     max_attainment_date: TODO, // calculated from attainments
-    min_attainment_date: TODO // calculated from attainments
+    min_attainment_date: TODO, // calculated from attainments
+    groupId: courseUnit.groupId
   }
 }
 

@@ -5,13 +5,15 @@ const {
   ORI_ATTAINMENT_CHANNEL,
   ORI_STUDY_RIGHT_CHANNEL,
   KORI_COURSE_UNIT_CHANNEL,
-  KORI_COURSE_UNIT_REALISATION_CHANNEL
+  KORI_COURSE_UNIT_REALISATION_CHANNEL,
+  KORI_ASSESSMENT_ITEM_CHANNEL
 } = require('./utils/stan')
 const personHandler = require('./messageHandlers/person')
 const attainmentHandler = require('./messageHandlers/attainment')
 const studyRightHandler = require('./messageHandlers/studyRight')
 const courseUnitHandler = require('./messageHandlers/courseUnit')
 const courseUnitRealisationHandler = require('./messageHandlers/courseUnitRealisation')
+const assessmentItemHandler = require('./messageHandlers/assessmentItem')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
 
 if (process.env.NODE_ENV === 'development') {
@@ -23,7 +25,8 @@ const channels = {
   [ORI_ATTAINMENT_CHANNEL]: attainmentHandler,
   [ORI_STUDY_RIGHT_CHANNEL]: studyRightHandler,
   [KORI_COURSE_UNIT_CHANNEL]: courseUnitHandler,
-  [KORI_COURSE_UNIT_REALISATION_CHANNEL]: courseUnitRealisationHandler
+  [KORI_COURSE_UNIT_REALISATION_CHANNEL]: courseUnitRealisationHandler,
+  [KORI_ASSESSMENT_ITEM_CHANNEL]: assessmentItemHandler
 }
 
 let CURRENT_EXECUTION_HASH = null

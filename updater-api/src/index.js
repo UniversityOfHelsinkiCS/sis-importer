@@ -52,7 +52,7 @@ const update = async current => {
 const initialize = async () => {
   if (!isUpdating) {
     isUpdating = true
-    update(4)
+    update(0)
   }
 }
 
