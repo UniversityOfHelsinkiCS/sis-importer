@@ -5,6 +5,8 @@ const { get: redisGet, set: redisSet, expire: redisExpire } = require('./redis')
 const COUNTRY_URN = 'https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:country'
 const GENDER_URN = 'https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:gender'
 const COURSE_UNIT_TYPE_URN = 'https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:course-unit-type'
+const COURSE_UNIT_REALISATION_TYPE_URN =
+  'https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:course-unit-realisation-type'
 
 const get = async url => {
   const redisHit = await redisGet(url)
@@ -24,8 +26,11 @@ const getGenders = async () => await get(GENDER_URN)
 
 const getCourseUnitTypes = async () => await get(COURSE_UNIT_TYPE_URN)
 
+const getCourseUnitRealisationTypes = async () => await get(COURSE_UNIT_REALISATION_TYPE_URN)
+
 module.exports = {
   getCountries,
   getGenders,
-  getCourseUnitTypes
+  getCourseUnitTypes,
+  getCourseUnitRealisationTypes
 }
