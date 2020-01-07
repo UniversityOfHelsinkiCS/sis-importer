@@ -9,6 +9,9 @@ const COURSE_UNIT_REALISATION_TYPE_URN =
   'https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:course-unit-realisation-type'
 const ASSESSMENT_ITEM_TYPE_URN =
   'https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:assessment-item-type'
+const EDUCATION_TYPE_URN = 'https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:education-type'
+
+const STUDY_LEVEL_URN = 'https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:study-level'
 
 const get = async url => {
   const redisHit = await redisGet(url)
@@ -32,10 +35,16 @@ const getCourseUnitRealisationTypes = async () => await get(COURSE_UNIT_REALISAT
 
 const getAssessmentItemTypes = async () => await get(ASSESSMENT_ITEM_TYPE_URN)
 
+const getEducationTypes = async () => await get(EDUCATION_TYPE_URN)
+
+const getStudyLevels = async () => await get(STUDY_LEVEL_URN)
+
 module.exports = {
   getCountries,
   getGenders,
   getCourseUnitTypes,
   getCourseUnitRealisationTypes,
-  getAssessmentItemTypes
+  getAssessmentItemTypes,
+  getEducationTypes,
+  getStudyLevels
 }
