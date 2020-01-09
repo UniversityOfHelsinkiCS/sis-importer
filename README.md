@@ -4,3 +4,6 @@
 2. `npm run build`
 3. [Start node proxy](https://github.com/UniversityOfHelsinkiCS/node-proxy/blob/master/README.md#installing-and-running) in oodikone-staging
 4. `npm start`
+
+### Shutting down
+`npm run dco:down`
