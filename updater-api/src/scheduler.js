@@ -1,21 +1,17 @@
 const { chunk } = require('lodash')
-const { stan, opts } = require('./utils/stan')
+const { stan, opts, SCHEDULER_STATUS_CHANNEL } = require('./utils/stan')
 const { oriRequest } = require('./utils/oriApi')
 const { koriRequest } = require('./utils/koriApi')
 const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./utils/redis')
 const { services } = require('./services')
-const { FETCH_AMOUNT, DEFAULT_CHUNK_SIZE, APIS } = require('./config')
+const { FETCH_AMOUNT, DEFAULT_CHUNK_SIZE, APIS, PANIC_TIMEOUT } = require('./config')
 
 const fetchByOrdinal = async (api, url, ordinal, limit = 1000) => {
   const targetUrl = `${url}?since=${ordinal}&limit=${limit}`
   return await (api === APIS.ori ? oriRequest(targetUrl) : koriRequest(targetUrl))
 }
 
-const updateOrdinalStatus = async (
-  key,
-  { ordinal = undefined, updated = undefined, scheduled = undefined, executionHash }
-) => {
-  await redisSet(`${key}_EXECUTION_HASH`, executionHash)
+const updateOrdinalStatus = async (key, { ordinal = undefined, updated = undefined, scheduled = undefined }) => {
   if (ordinal !== undefined) await redisSet(key, ordinal)
   if (updated !== undefined) await redisSet(`${key}_UPDATED`, updated)
   if (scheduled !== undefined) await redisSet(`${key}_SCHEDULED`, scheduled)
@@ -29,13 +25,13 @@ const createJobsFromEntities = async (channel, entities, executionHash, chunks =
   })
 }
 
-const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
-  const statusChannel = stan.subscribe(`${channel}_STATUS`, opts)
+const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinish) => {
+  const statusChannel = stan.subscribe(SCHEDULER_STATUS_CHANNEL, opts)
   statusChannel.on('message', async msg => {
-    const { status, entities, amount, executionHash: msgExecutionHash } = JSON.parse(msg.getData())
+    const { channel: msgChannel, status, entities, amount, executionHash: msgExecutionHash } = JSON.parse(msg.getData())
     const amountScheduled = await redisGet(`${ordinalKey}_SCHEDULED`)
 
-    if (msgExecutionHash !== executionHash) {
+    if (msgExecutionHash !== executionHash || channel !== msgChannel) {
       msg.ack()
       return
     }
@@ -54,15 +50,18 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash) => {
     }
 
     if (result) console.log(`${result}/${amountScheduled}`)
-    if (result === Number(amountScheduled)) statusChannel.unsubscribe()
+    if (result === Number(amountScheduled)) {
+      handleFinish()
+      statusChannel.unsubscribe()
+    }
     msg.ack()
   })
+
   return statusChannel
 }
 
 const schedule = async (id, executionHash) => {
   const { API, API_URL, LATEST_ORDINAL_KEY, CHANNEL } = services[id]
-  const statusChannel = initializeStatusChannel(CHANNEL, LATEST_ORDINAL_KEY, executionHash)
 
   return new Promise(async (resolve, reject) => {
     const latestOrdinal = (await redisGet(LATEST_ORDINAL_KEY)) || 0
@@ -74,12 +73,22 @@ const schedule = async (id, executionHash) => {
       await updateOrdinalStatus(LATEST_ORDINAL_KEY, {
         ordinal: latestOrdinal,
         scheduled: entities.length,
-        updated: 0,
-        executionHash
+        updated: 0
       })
 
-      statusChannel.on('unsubscribed', async () => {
+      const handleFinish = () => {
         resolve({ greatestOrdinal, hasMore, total: entities.length, ordinalKey: LATEST_ORDINAL_KEY })
+      }
+
+      const statusChannel = initializeStatusChannel(CHANNEL, LATEST_ORDINAL_KEY, executionHash, handleFinish)
+
+      const panicTimeout = setTimeout(() => {
+        statusChannel.unsubscribe()
+        reject(`No response for ${PANIC_TIMEOUT}ms`)
+      }, PANIC_TIMEOUT)
+
+      statusChannel.on('unsubscribed', () => {
+        clearTimeout(panicTimeout)
       })
 
       createJobsFromEntities(CHANNEL, entities, executionHash)

@@ -30,10 +30,18 @@ services:
 
   nats:
     image: nats-streaming:0.16.2
-    command: -cid sis-updater-nats --file_slice_max_bytes 0 --file_slice_max_age 100h --max_msgs 10000 -store file -dir datastore
+    command: -cid sis-updater-nats -m 8222 --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 5000 -store file -dir datastore
     container_name: sis-nats
     volumes:
       - sis-updater-datastore:/datastore
+    ports:
+      - 8222:8222 # Monitoring at http://localhost:8222/
+
+  nats-streaming-console:
+    image: kuali/nats-streaming-console:latest
+    container_name: sis-nats-streaming-console
+    ports:
+      - 8282:8282 # http://localhost:8282/, set host to nats when prompted
 
 volumes:
   sis-updater-redis:

@@ -1,6 +1,7 @@
 const {
   stan,
   opts,
+  SCHEDULER_STATUS_CHANNEL,
   ORI_PERSON_CHANNEL,
   ORI_ATTAINMENT_CHANNEL,
   ORI_STUDY_RIGHT_CHANNEL,
@@ -37,7 +38,7 @@ const channels = {
 
 let CURRENT_EXECUTION_HASH = null
 
-const handleMessage = (CHANNEL, msgHandler) => async msg => {
+const handleMessage = (channel, msgHandler) => async msg => {
   let response = null
   try {
     const data = JSON.parse(msg.getData())
@@ -45,17 +46,20 @@ const handleMessage = (CHANNEL, msgHandler) => async msg => {
       msg.ack()
       return
     }
-    response = { ...(await msgHandler(data)), status: 'OK', amount: data.entities.length }
+    response = { ...(await msgHandler(data)), status: 'OK', amount: data.entities.length, channel }
   } catch (e) {
-    response = { ...JSON.parse(msg.getData()), status: 'FAIL', amount: 0 }
+    response = { ...JSON.parse(msg.getData()), status: 'FAIL', amount: 0, channel }
   }
-  msg.ack()
-  stan.publish(`${CHANNEL}_STATUS`, JSON.stringify(response), err => {
+
+  stan.publish(SCHEDULER_STATUS_CHANNEL, JSON.stringify(response), err => {
     if (err) console.log('Failed publishing', err)
+    else msg.ack()
   })
 }
 
-stan.on('connect', async () => {
+stan.on('connect', async ({ clientID }) => {
+  console.log(`Connecting to NATS as ${clientID}...`)
+
   await onCurrentExecutionHashChange(hash => {
     CURRENT_EXECUTION_HASH = hash
   })
