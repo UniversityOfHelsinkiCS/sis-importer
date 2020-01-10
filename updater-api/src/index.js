@@ -2,7 +2,7 @@ const { set: redisSet } = require('./utils/redis')
 const { randomBytes } = require('crypto')
 const { serviceIds } = require('./services')
 const { schedule } = require('./scheduler')
-const { CURRENT_EXECUTION_HASH } = require('./config')
+const { CURRENT_EXECUTION_HASH, UPDATE_RETRY_LIMIT } = require('./config')
 const { stan } = require('./utils/stan')
 const { sleep } = require('./utils')
 
@@ -22,7 +22,7 @@ const updateHash = async () => {
   return generatedHash
 }
 
-const update = async current => {
+const update = async (current, attempt = 1) => {
   if (process.env.NODE_ENV === 'development') {
     await sleep(1000)
   }
@@ -40,12 +40,16 @@ const update = async current => {
       const { greatestOrdinal, hasMore, total, ordinalKey } = data
       console.log(`New ordinal for ${serviceId}: ${greatestOrdinal}`)
       await updateOrdinalFrom(total, ordinalKey, greatestOrdinal)
-      update(hasMore ? current : current + 1, generatedHash)
+      update(hasMore ? current : current + 1)
     } else {
-      update(current + 1, generatedHash)
+      update(current + 1)
     }
   } catch (e) {
-    console.log('Updating failed', e)
+    if (attempt === UPDATE_RETRY_LIMIT) {
+      console.log('Updating failed', e)
+      return
+    }
+    update(current, ++attempt)
   }
 }
 
@@ -56,6 +60,7 @@ const initialize = async () => {
   }
 }
 
-stan.on('connect', () => {
+stan.on('connect', ({ clientID }) => {
+  console.log(`Connecting to NATS as ${clientID}...`)
   initialize()
 })
