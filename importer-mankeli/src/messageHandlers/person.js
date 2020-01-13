@@ -42,7 +42,7 @@ module.exports = async ({ entities, executionHash }) => {
   const countries = await getCountries()
   const genders = await getGenders()
   entities.map(p => parsePerson(p, countries, genders))
-  // TODO: Send to updater writer, check operation type (create, delete or update)
+  // TODO: Send to importer writer, check operation type (create, delete or update)
 
   return { executionHash }
 }

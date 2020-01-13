@@ -1,8 +1,8 @@
 version: "3.2"
 
 services:
-  updater-api:
-    image: toska/sis-updater-api:${TAG}
+  importer-api:
+    image: toska/sis-importer-api:${TAG}
 
-  updater-api:
-    image: toska/sis-updater-mankeli:${TAG}
+  importer-api:
+    image: toska/sis-importer-mankeli:${TAG}

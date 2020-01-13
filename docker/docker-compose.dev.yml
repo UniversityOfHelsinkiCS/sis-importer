@@ -1,23 +1,23 @@
 version: "3.2"
 
 services:
-  updater-api:
+  importer-api:
     build:
       args:
         NODE_ENV: "development"
     env_file:
-      - updater-api/.env
+      - importer-api/.env
     command: "npm run start:dev"
     volumes:
-      - ./updater-api:/usr/src/app
+      - ./importer-api:/usr/src/app
 
-  updater-mankeli:
+  importer-mankeli:
     build:
       args:
         NODE_ENV: "development"
     env_file:
-      - updater-api/.env
+      - importer-api/.env
     command: "npm run start:dev"
     volumes:
-      - ./updater-mankeli:/usr/src/app
+      - ./importer-mankeli:/usr/src/app
 

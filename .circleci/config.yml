@@ -1,13 +1,13 @@
 version: 2.1
 
 executors:
-  updater-executor:
+  importer-executor:
     machine:
       image: ubuntu-1604:201903-01
 
 jobs:
   build-test-and-deploy:
-    executor: updater-executor
+    executor: importer-executor
     steps:
       - run:
           name: set_env_variables
@@ -34,7 +34,7 @@ jobs:
           name: logs
           background: true
           command: npm run dco:ci -- logs
-      - run: docker exec -t updater-api npm run test
+      - run: docker exec -t importer-api npm run test
       # TODO: Deploy
 
 workflows:

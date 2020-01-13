@@ -1,5 +1,5 @@
 {
-  "name": "sis-updater",
+  "name": "sis-importer",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -8,10 +8,10 @@
     "dco:up": "npm run dco -- up -d",
     "dco:down": "npm run dco -- down",
     "dco:logs": "npm run dco -- logs -f",
-    "start": "npm run dco:up -- --scale updater-mankeli=3 && npm run dco:logs",
-    "build": "npm i --prefix ./updater-api && npm i --prefix ./updater-mankeli && npm run dco -- build",
-    "test": "npm test --prefix ./updater-api && npm test --prefix ./updater-mankeli",
-    "lintfix": "npm run lintfix --prefix ./updater-api && npm run lintfix --prefix ./updater-mankeli"
+    "start": "npm run dco:up -- --scale importer-mankeli=3 && npm run dco:logs",
+    "build": "npm i --prefix ./importer-api && npm i --prefix ./importer-mankeli && npm run dco -- build",
+    "test": "npm test --prefix ./importer-api && npm test --prefix ./importer-mankeli",
+    "lintfix": "npm run lintfix --prefix ./importer-api && npm run lintfix --prefix ./importer-mankeli"
   },
   "husky": {
     "hooks": {
@@ -20,14 +20,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/UniversityOfHelsinkiCS/sis-updater.git"
+    "url": "git+https://github.com/UniversityOfHelsinkiCS/sis-importer.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/UniversityOfHelsinkiCS/sis-updater/issues"
+    "url": "https://github.com/UniversityOfHelsinkiCS/sis-importer/issues"
   },
-  "homepage": "https://github.com/UniversityOfHelsinkiCS/sis-updater#readme",
+  "homepage": "https://github.com/UniversityOfHelsinkiCS/sis-importer#readme",
   "devDependencies": {
     "husky": "^3.1.0"
   },
