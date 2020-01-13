@@ -17,6 +17,9 @@ services:
         NODE_ENV: "development"
     env_file:
       - importer-mankeli/.env
+    environment:
+      DB_USERNAME: dev
+      DB_PASSWORD: dev
     command: "npm run start:dev"
     volumes:
       - ./importer-mankeli:/usr/src/app

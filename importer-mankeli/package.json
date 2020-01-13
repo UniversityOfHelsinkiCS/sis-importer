@@ -17,7 +17,11 @@
     "graphql-request": "^1.8.2",
     "moment": "^2.24.0",
     "node-nats-streaming": "^0.2.6",
-    "redis": "^2.8.0"
+    "pg": "^7.17.1",
+    "redis": "^2.8.0",
+    "redis-lock": "^0.1.4",
+    "sequelize": "^5.21.3",
+    "umzug": "^2.2.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",

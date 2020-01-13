@@ -1,4 +1,5 @@
 const redis = require('redis')
+const redisLock = require('redis-lock')
 const { CURRENT_EXECUTION_HASH } = require('../config')
 
 const listener = redis.createClient({
@@ -11,6 +12,8 @@ listener.subscribe('__keyevent@0__:set', CURRENT_EXECUTION_HASH)
 const client = redis.createClient({
   url: '//importer-redis:6379'
 })
+
+const lock = redisLock(client)
 
 const redisPromisify = async (func, ...params) =>
   new Promise((res, rej) => {
@@ -42,5 +45,6 @@ module.exports = {
   onCurrentExecutionHashChange,
   get,
   set,
-  expire
+  expire,
+  lock
 }

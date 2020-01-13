@@ -6,6 +6,9 @@ services:
       context: importer-mankeli
     environment:
       NATS_URI: importer-nats://importer-nats:4222
+      DB_PORT: 5432
+      DB_HOST: importer-db
+      DB_DATABASE: importer-db
     depends_on:
       - importer-db
       - importer-redis

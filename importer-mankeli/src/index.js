@@ -19,7 +19,9 @@ const courseUnitRealisationHandler = require('./messageHandlers/courseUnitRealis
 const assessmentItemHandler = require('./messageHandlers/assessmentItem')
 const educationItemHandler = require('./messageHandlers/education')
 const moduleItemHandler = require('./messageHandlers/module')
+const { sleep } = require('./utils')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
+const { connection } = require('./db/connection')
 
 if (process.env.NODE_ENV === 'development') {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
@@ -58,6 +60,10 @@ const handleMessage = (channel, msgHandler) => async msg => {
 }
 
 stan.on('connect', async ({ clientID }) => {
+  while (!connection.established) {
+    if (connection.error) return
+    await sleep(100)
+  }
   console.log(`Connecting to NATS as ${clientID}...`)
 
   await onCurrentExecutionHashChange(hash => {

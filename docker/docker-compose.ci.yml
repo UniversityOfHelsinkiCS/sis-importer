@@ -6,3 +6,4 @@ services:
 
   importer-mankeli:
     image: toska/sis-importer-mankeli:${TAG}
+    container_name: sis-importer-mankeli
