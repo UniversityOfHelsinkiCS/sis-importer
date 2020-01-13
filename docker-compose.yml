@@ -47,8 +47,8 @@ services:
   importer-nats-streaming-console:
     image: mozgoo/nats-streaming-console:latest
     environment:
-      - STAN_URL=nats://nats:4222
-      - STAN_MONITOR_URL=http://nats:8222
+      - STAN_URL=importer-nats://importer-nats:4222
+      - STAN_MONITOR_URL=http://importer-nats:8222
     container_name: sis-nats-streaming-console
     ports:
       - 8282:8282 # http://localhost:8282/, set host to nats when prompted
