@@ -47,6 +47,7 @@ const update = async (current, attempt = 1) => {
   } catch (e) {
     if (attempt === UPDATE_RETRY_LIMIT) {
       console.log('Updating failed', e)
+      isUpdating = false
       return
     }
     update(current, ++attempt)
