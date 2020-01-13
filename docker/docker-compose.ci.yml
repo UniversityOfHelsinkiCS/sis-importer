@@ -4,5 +4,5 @@ services:
   importer-api:
     image: toska/sis-importer-api:${TAG}
 
-  importer-api:
+  importer-mankeli:
     image: toska/sis-importer-mankeli:${TAG}

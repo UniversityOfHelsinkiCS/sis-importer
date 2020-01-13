@@ -16,8 +16,13 @@ services:
       args:
         NODE_ENV: "development"
     env_file:
-      - importer-api/.env
+      - importer-mankeli/.env
     command: "npm run start:dev"
     volumes:
       - ./importer-mankeli:/usr/src/app
 
+  importer-db:
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: importer-db
