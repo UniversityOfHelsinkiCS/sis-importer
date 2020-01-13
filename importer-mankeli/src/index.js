@@ -65,7 +65,7 @@ stan.on('connect', async ({ clientID }) => {
   })
 
   Object.entries(channels).forEach(([CHANNEL, msgHandler]) => {
-    const channel = stan.subscribe(CHANNEL, 'updater-api.workers', opts)
+    const channel = stan.subscribe(CHANNEL, 'importer-api.workers', opts)
     channel.on('message', handleMessage(CHANNEL, msgHandler))
   })
 })

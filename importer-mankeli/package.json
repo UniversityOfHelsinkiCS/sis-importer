@@ -1,5 +1,5 @@
 {
-  "name": "updater-api",
+  "name": "importer-mankeli",
   "version": "1.0.0",
   "description": "",
   "main": "./src/index.js",
@@ -14,9 +14,8 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.19.0",
-    "cron": "^1.7.2",
     "graphql-request": "^1.8.2",
-    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
     "node-nats-streaming": "^0.2.6",
     "redis": "^2.8.0"
   },
