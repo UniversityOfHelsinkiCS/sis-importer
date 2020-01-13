@@ -15,6 +15,7 @@ class Connection {
 
   async connectToDatabase(attempt = 1) {
     this.error = false
+    this.established = false
     try {
       await sequelize.authenticate()
       console.log('Connected to database successfully!')
@@ -33,29 +34,28 @@ class Connection {
   }
 
   async runMigrations() {
-    lock(MIGRATIONS_LOCK, async done => {
-      try {
-        const migrator = new Umzug({
-          storage: 'sequelize',
-          storageOptions: {
-            sequelize,
-            tableName: 'migrations'
-          },
-          logging: console.log,
-          migrations: {
-            params: [sequelize.getQueryInterface(), Sequelize],
-            path: `${process.cwd()}/src/db/migrations`,
-            pattern: /\.js$/
-          }
-        })
-        const migrations = await migrator.up()
-        console.log('Migrations up to date', migrations)
-      } catch (e) {
-        this.error = true
-        console.log('Migration error', e)
-      }
-      done()
-    })
+    const unlock = await lock(MIGRATIONS_LOCK)
+    try {
+      const migrator = new Umzug({
+        storage: 'sequelize',
+        storageOptions: {
+          sequelize,
+          tableName: 'migrations'
+        },
+        logging: console.log,
+        migrations: {
+          params: [sequelize.getQueryInterface(), Sequelize],
+          path: `${process.cwd()}/src/db/migrations`,
+          pattern: /\.js$/
+        }
+      })
+      const migrations = await migrator.up()
+      console.log('Migrations up to date', migrations)
+    } catch (e) {
+      this.error = true
+      console.log('Migration error', e)
+    }
+    unlock()
   }
 }
 
