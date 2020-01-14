@@ -1,48 +1,63 @@
-const { getDate } = require('../utils')
+const { Op } = require('sequelize')
+const { getColumnsToUpdate } = require('../utils')
 const { getCountries, getGenders } = require('../utils/urnApi')
+const Person = require('../db/models/person')
 
-const parseGender = (code, genders) => {
-  if (!(code && genders[code])) return { gender_fi: null, gender_en: null, gender_sv: null }
-  const { fi: gender_fi, en: gender_en, sv: gender_sv } = genders[code].name
+const parseGender = (genderUrn, genders) => {
+  if (!(genderUrn && genders[genderUrn])) return { genderFi: null, genderEn: null, genderSv: null, genderUrn: null }
+  const { fi: genderFi, en: genderEn, sv: genderSv } = genders[genderUrn].name
   return {
-    gender_fi,
-    gender_en,
-    gender_sv,
-    gender_code: code === 'urn:code:gender:male' ? 1 : code === 'urn:code:gender:female' ? 2 : 3
+    genderFi,
+    genderEn,
+    genderSv,
+    genderUrn
   }
 }
 
 const parseCountry = (address, countries) => {
   if (!(address && address.countryUrn && countries[address.countryUrn]))
-    return { country_fi: null, country_en: null, country_sv: null }
+    return { countryFi: null, countryEn: null, countrySv: null, countryUrn: null }
 
-  const { fi: country_fi, en: country_en, sv: country_sv } = countries[address.countryUrn].name
-  return { country_fi, country_en, country_sv }
+  const { fi: countryFi, en: countryEn, sv: countrySv } = countries[address.countryUrn].name
+  return { countryFi, countryEn, countrySv, countryUrn: address.countryUrn }
 }
 
 const parsePerson = (person, countries, genders) => {
-  const TODO = undefined
   return {
-    person_id: person.id,
-    studentnumber: person.studentNumber,
-    email: person.primaryEmail,
-    creditcount: TODO,
-    birthdate: getDate(person.dateOfBirth),
-    lastname: person.lastName,
-    ...parseCountry(person.primaryAddress, countries),
-
-    firstnames: person.firstNames,
-    dateofuniversityenrollment: TODO,
-    abbreviatedname: [person.lastName, person.firstNames].join(' '),
-    ...parseGender(person.genderUrn, genders)
+    id: person.id,
+    studentNumber: person.studentNumber,
+    dateOfBirth: person.dateOfBirth,
+    firstNames: person.firstNames,
+    lastName: person.lastName,
+    employeeNumber: person.employeeNumber,
+    primaryEmail: person.primaryEmail,
+    genderUrn: person.genderUrn,
+    oppijaId: person.oppijaID,
+    citizenships: person.citizenshipUrns,
+    dead: person.dead,
+    ...parseGender(person.genderUrn, genders),
+    ...parseCountry(person.primaryAddress, countries)
   }
 }
 
-module.exports = async ({ entities, executionHash }) => {
+module.exports = async ({ active, deleted, executionHash }, transaction) => {
   const countries = await getCountries()
   const genders = await getGenders()
-  entities.map(p => parsePerson(p, countries, genders))
-  // TODO: Send to importer writer, check operation type (create, delete or update)
+  const parsedPersons = active.map(p => parsePerson(p, countries, genders))
+
+  await Person.bulkCreate(parsedPersons, {
+    updateOnDuplicate: getColumnsToUpdate(parsedPersons),
+    transaction
+  })
+
+  await Person.destroy({
+    where: {
+      id: {
+        [Op.in]: deleted
+      }
+    },
+    transaction
+  })
 
   return { executionHash }
 }

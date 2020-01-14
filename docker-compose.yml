@@ -25,8 +25,6 @@ services:
 
   importer-db:
     image: postgres:9.6.3
-    environment:
-      POSTGRES_DB: importer-db
     volumes:
       - sis-importer-pgdata:/var/lib/postgresql/data
     container_name: sis-importer-db
@@ -44,17 +42,6 @@ services:
     container_name: sis-importer-nats
     volumes:
       - sis-importer-datastore:/datastore
-    ports:
-      - 8222:8222 # Monitoring at http://localhost:8222/
-
-  importer-nats-streaming-console:
-    image: mozgoo/nats-streaming-console:latest
-    environment:
-      - STAN_URL=importer-nats://importer-nats:4222
-      - STAN_MONITOR_URL=http://importer-nats:8222
-    container_name: sis-nats-streaming-console
-    ports:
-      - 8282:8282 # http://localhost:8282/, set host to nats when prompted
 
 volumes:
   sis-importer-redis:
