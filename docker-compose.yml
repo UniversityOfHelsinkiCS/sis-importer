@@ -1,48 +1,49 @@
 version: "3.2"
 
 services:
-  importer-api:
-    build:
-      context: importer-api
-    environment:
-      NATS_URI: nats://nats:4222
-    container_name: importer-api
-    depends_on:
-      - redis
-      - nats
-      - importer-mankeli
-
   importer-mankeli:
     build:
       context: importer-mankeli
     environment:
-      NATS_URI: nats://nats:4222
+      NATS_URI: importer-nats://importer-nats:4222
+      DB_PORT: 5432
+      DB_HOST: importer-db
+      DB_DATABASE: importer-db
     depends_on:
-      - redis
-      - nats
+      - importer-db
+      - importer-redis
+      - importer-nats
 
-  redis:
+  importer-api:
+    build:
+      context: importer-api
+    environment:
+      NATS_URI: importer-nats://importer-nats:4222
+    container_name: sis-importer-api
+    depends_on:
+      - importer-mankeli
+
+  importer-db:
+    image: postgres:9.6.3
+    volumes:
+      - sis-importer-pgdata:/var/lib/postgresql/data
+    container_name: sis-importer-db
+
+  importer-redis:
     image: redis:5.0.7
     command: ["redis-server", "--appendonly", "yes"]
     container_name: sis-redis
     volumes:
       - sis-importer-redis:/data
 
-  nats:
+  importer-nats:
     image: nats-streaming:0.16.2
     command: -cid sis-importer-nats -m 8222 --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 5000 -store file -dir datastore
-    container_name: sis-nats
+    container_name: sis-importer-nats
     volumes:
       - sis-importer-datastore:/datastore
-    ports:
-      - 8222:8222 # Monitoring at http://localhost:8222/
-
-  nats-streaming-console:
-    image: kuali/nats-streaming-console:latest
-    container_name: sis-nats-streaming-console
-    ports:
-      - 8282:8282 # http://localhost:8282/, set host to nats when prompted
 
 volumes:
   sis-importer-redis:
   sis-importer-datastore:
+  sis-importer-pgdata:

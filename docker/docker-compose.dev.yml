@@ -16,8 +16,39 @@ services:
       args:
         NODE_ENV: "development"
     env_file:
-      - importer-api/.env
+      - importer-mankeli/.env
+    environment:
+      DB_USERNAME: dev
+      DB_PASSWORD: dev
     command: "npm run start:dev"
     volumes:
       - ./importer-mankeli:/usr/src/app
 
+  importer-db:
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: importer-db
+  
+  importer-nats:
+    ports:
+      - 8222:8222 # Monitoring at http://localhost:8222/
+
+  importer-nats-streaming-console:
+    image: mozgoo/nats-streaming-console:latest
+    environment:
+      - STAN_URL=importer-nats://importer-nats:4222
+      - STAN_MONITOR_URL=http://importer-nats:8222
+    container_name: sis-nats-streaming-console
+    ports:
+      - 8282:8282 # http://localhost:8282/
+
+  importer-adminer:
+    image: adminer:4.7.5
+    environment:
+      - ADMINER_DESIGN=pepa-linha
+      - ADMINER_DEFAULT_SERVER=importer-db
+    ports:
+      - 5050:8080 # http://localhost:5050/?pgsql=importer-db&username=dev&db=importer-db&ns=public
+    container_name: importer-adminer
+    restart: unless-stopped

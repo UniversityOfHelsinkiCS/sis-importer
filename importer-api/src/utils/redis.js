@@ -1,7 +1,7 @@
 const redis = require('redis')
 
 const client = redis.createClient({
-  url: '//redis:6379'
+  url: '//importer-redis:6379'
 })
 
 const redisPromisify = async (func, ...params) =>

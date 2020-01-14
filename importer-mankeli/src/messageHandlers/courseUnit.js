@@ -1,22 +1,29 @@
-const parseCourse = courseUnit => {
-  const TODO = undefined
+const CourseUnit = require('../db/models/courseUnit')
+const { bulkCreate, bulkDelete } = require('../utils/db')
 
+const parseCourse = courseUnit => {
   return {
+    id: courseUnit.id,
+    groupId: courseUnit.groupId,
     code: courseUnit.code,
     name: courseUnit.name,
-    latest_instance_date: TODO, // calculated from course unit realisations (assessment items -> realisations) or attainments
-    is_study_module: TODO, // doesn't exist anymore?
-    coursetypecode: TODO, // from courseUnitType? https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:course-unit-type
-    startdate: courseUnit.validityPeriod.startDate || null,
-    enddate: courseUnit.validityPeriod.endDate || null,
-    max_attainment_date: TODO, // calculated from attainments
-    min_attainment_date: TODO, // calculated from attainments
-    groupId: courseUnit.groupId
+    validityPeriod: courseUnit.validityPeriod,
+    gradeScaleId: courseUnit.gradeScaleId,
+    studyLevel: courseUnit.studyLevel,
+    courseUnitType: courseUnit.courseUnitType,
+    possibleAttainmentLanguages: courseUnit.possibleAttainmentLanguages,
+    assessmentItemOrder: courseUnit.assessmentItemOrder,
+    organisations: courseUnit.organisations,
+    universityOrgIds: courseUnit.universityOrgIds,
+    studyFields: courseUnit.studyFields,
+    substitutions: courseUnit.substitutions,
+    completionMethods: courseUnit.completionMethods,
+    responsibilityInfos: courseUnit.responsibilityInfos
   }
 }
 
-module.exports = async ({ entities, executionHash }) => {
-  entities.map(parseCourse)
-
+module.exports = async ({ active, deleted, executionHash }, transaction) => {
+  await bulkCreate(CourseUnit, active.map(parseCourse), transaction)
+  await bulkDelete(CourseUnit, deleted, transaction)
   return { executionHash }
 }

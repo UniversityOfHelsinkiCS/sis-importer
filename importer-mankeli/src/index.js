@@ -19,7 +19,9 @@ const courseUnitRealisationHandler = require('./messageHandlers/courseUnitRealis
 const assessmentItemHandler = require('./messageHandlers/assessmentItem')
 const educationItemHandler = require('./messageHandlers/education')
 const moduleItemHandler = require('./messageHandlers/module')
+const { sleep } = require('./utils')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
+const { connection, sequelize } = require('./db/connection')
 
 if (process.env.NODE_ENV === 'development') {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
@@ -40,15 +42,26 @@ let CURRENT_EXECUTION_HASH = null
 
 const handleMessage = (channel, msgHandler) => async msg => {
   let response = null
+  const transaction = await sequelize.transaction()
   try {
     const data = JSON.parse(msg.getData())
     if (data.executionHash !== CURRENT_EXECUTION_HASH) {
       msg.ack()
       return
     }
-    response = { ...(await msgHandler(data)), status: 'OK', amount: data.entities.length, channel }
+
+    data.active = []
+    data.deleted = []
+    data.entities.forEach(e => {
+      e.documentState === 'ACTIVE' ? data.active.push(e) : data.deleted.push(e.id)
+    })
+
+    response = { ...(await msgHandler(data, transaction)), status: 'OK', amount: data.entities.length, channel }
+    transaction.commit()
   } catch (e) {
+    console.error('e', e)
     response = { ...JSON.parse(msg.getData()), status: 'FAIL', amount: 0, channel }
+    transaction.rollback()
   }
 
   stan.publish(SCHEDULER_STATUS_CHANNEL, JSON.stringify(response), err => {
@@ -58,6 +71,10 @@ const handleMessage = (channel, msgHandler) => async msg => {
 }
 
 stan.on('connect', async ({ clientID }) => {
+  while (!connection.established) {
+    if (connection.error) return
+    await sleep(100)
+  }
   console.log(`Connecting to NATS as ${clientID}...`)
 
   await onCurrentExecutionHashChange(hash => {

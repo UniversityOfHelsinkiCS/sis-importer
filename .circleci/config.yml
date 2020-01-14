@@ -34,7 +34,7 @@ jobs:
           name: logs
           background: true
           command: npm run dco:ci -- logs
-      - run: docker exec -t importer-api npm run test
+      - run: docker exec -t sis-importer-api npm run test && docker exec -t sis-importer-mankeli npm run test
       # TODO: Deploy
 
 workflows:
