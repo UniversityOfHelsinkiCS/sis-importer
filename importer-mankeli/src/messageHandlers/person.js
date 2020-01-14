@@ -1,5 +1,4 @@
-const { Op } = require('sequelize')
-const { getColumnsToUpdate } = require('../utils')
+const { bulkCreate, bulkDelete } = require('../utils/db')
 const { getCountries, getGenders } = require('../utils/urnApi')
 const Person = require('../db/models/person')
 
@@ -43,21 +42,12 @@ const parsePerson = (person, countries, genders) => {
 module.exports = async ({ active, deleted, executionHash }, transaction) => {
   const countries = await getCountries()
   const genders = await getGenders()
-  const parsedPersons = active.map(p => parsePerson(p, countries, genders))
 
-  await Person.bulkCreate(parsedPersons, {
-    updateOnDuplicate: getColumnsToUpdate(parsedPersons),
+  await bulkCreate(
+    Person,
+    active.map(p => parsePerson(p, countries, genders)),
     transaction
-  })
-
-  await Person.destroy({
-    where: {
-      id: {
-        [Op.in]: deleted
-      }
-    },
-    transaction
-  })
-
+  )
+  await bulkDelete(Person, deleted, transaction)
   return { executionHash }
 }

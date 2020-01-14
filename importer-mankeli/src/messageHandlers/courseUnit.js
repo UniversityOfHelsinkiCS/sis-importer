@@ -1,6 +1,5 @@
-const { Op } = require('sequelize')
 const CourseUnit = require('../db/models/courseUnit')
-const { getColumnsToUpdate } = require('../utils')
+const { bulkCreate, bulkDelete } = require('../utils/db')
 
 const parseCourse = courseUnit => {
   return {
@@ -15,6 +14,8 @@ const parseCourse = courseUnit => {
     possibleAttainmentLanguages: courseUnit.possibleAttainmentLanguages,
     assessmentItemOrder: courseUnit.assessmentItemOrder,
     organisations: courseUnit.organisations,
+    universityOrgIds: courseUnit.universityOrgIds,
+    studyFields: courseUnit.studyFields,
     substitutions: courseUnit.substitutions,
     completionMethods: courseUnit.completionMethods,
     responsibilityInfos: courseUnit.responsibilityInfos
@@ -22,21 +23,7 @@ const parseCourse = courseUnit => {
 }
 
 module.exports = async ({ active, deleted, executionHash }, transaction) => {
-  const parsedCourses = active.map(parseCourse)
-
-  await CourseUnit.bulkCreate(parsedCourses, {
-    updateOnDuplicate: getColumnsToUpdate(parsedCourses),
-    transaction
-  })
-
-  await CourseUnit.destroy({
-    where: {
-      id: {
-        [Op.in]: deleted
-      }
-    },
-    transaction
-  })
-
+  await bulkCreate(CourseUnit, active.map(parseCourse), transaction)
+  await bulkDelete(CourseUnit, deleted, transaction)
   return { executionHash }
 }

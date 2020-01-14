@@ -31,13 +31,10 @@ const retry = async (func, params, attempts = 6) => {
   }
 }
 
-const getColumnsToUpdate = arr => (arr[0] ? Object.keys(arr[0]) : [])
-
 module.exports = {
   idfy,
   getDate,
   parseDate,
   sleep,
-  retry,
-  getColumnsToUpdate
+  retry
 }

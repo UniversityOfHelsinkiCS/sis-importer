@@ -1,9 +1,9 @@
 const { Model, STRING, DATE, ARRAY, JSONB } = require('sequelize')
 const { sequelize } = require('../connection')
 
-class CourseUnit extends Model {}
+class Education extends Model {}
 
-CourseUnit.init(
+Education.init(
   {
     id: {
       type: STRING,
@@ -12,29 +12,17 @@ CourseUnit.init(
     groupId: {
       type: STRING
     },
-    code: {
-      type: STRING
-    },
     name: {
       type: JSONB
     },
+    code: {
+      type: STRING
+    },
+    educationType: {
+      type: STRING
+    },
     validityPeriod: {
       type: JSONB
-    },
-    gradeScaleId: {
-      type: STRING
-    },
-    studyLevel: {
-      type: STRING
-    },
-    courseUnitType: {
-      type: STRING
-    },
-    possibleAttainmentLanguages: {
-      type: ARRAY(STRING)
-    },
-    assessmentItemOrder: {
-      type: ARRAY(STRING)
     },
     organisations: {
       type: ARRAY(JSONB)
@@ -42,14 +30,14 @@ CourseUnit.init(
     universityOrgIds: {
       type: ARRAY(STRING)
     },
-    studyFields: {
+    attainmentLanguages: {
       type: ARRAY(STRING)
     },
-    substitutions: {
-      type: ARRAY(JSONB)
+    structure: {
+      type: JSONB
     },
-    completionMethods: {
-      type: ARRAY(JSONB)
+    studyFields: {
+      type: ARRAY(STRING)
     },
     responsibilityInfos: {
       type: ARRAY(JSONB)
@@ -64,9 +52,9 @@ CourseUnit.init(
   {
     underscored: true,
     sequelize,
-    modelName: 'course_unit',
-    tableName: 'course_units'
+    modelName: 'education',
+    tableName: 'educations'
   }
 )
 
-module.exports = CourseUnit
+module.exports = Education
