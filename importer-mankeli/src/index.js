@@ -53,7 +53,7 @@ const handleMessage = (channel, msgHandler) => async msg => {
     data.active = []
     data.deleted = []
     data.entities.forEach(e => {
-      e.documentState === 'ACTIVE' ? data.active.push(e) : data.deleted.push(e.id)
+      data[e.documentState === 'ACTIVE' ? 'active' : 'deleted'].push(e)
     })
 
     response = { ...(await msgHandler(data, transaction)), status: 'OK', amount: data.entities.length, channel }

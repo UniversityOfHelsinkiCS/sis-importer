@@ -31,13 +31,10 @@ const retry = async (func, params, attempts = 6) => {
   }
 }
 
-const valuefy = p => (p ? `${p}` : null)
-
 module.exports = {
   idfy,
   getDate,
   parseDate,
   sleep,
-  retry,
-  valuefy
+  retry
 }

@@ -1,19 +1,19 @@
 const { Op } = require('sequelize')
 
-const getColumnsToUpdate = (model, primaryKey) => Object.keys(model.rawAttributes).filter(a => a !== primaryKey)
+const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).filter(a => !keys.includes(a))
 
-const bulkCreate = async (model, entities, transaction, property = 'id') => {
+const bulkCreate = async (model, entities, transaction, properties = ['id']) => {
   await model.bulkCreate(entities, {
-    updateOnDuplicate: getColumnsToUpdate(model, property),
+    updateOnDuplicate: getColumnsToUpdate(model, properties),
     transaction
   })
 }
 
-const bulkDelete = async (model, ids, transaction, property = 'id') => {
+const bulkDelete = async (model, entities, transaction, property = 'id') => {
   await model.destroy({
     where: {
       [property]: {
-        [Op.in]: ids
+        [Op.in]: entities.map(entity => entity[property])
       }
     },
     transaction
