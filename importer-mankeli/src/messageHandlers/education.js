@@ -1,4 +1,4 @@
-const Education = require('../db/models/education')
+const { Education } = require('../db/models')
 const { bulkCreate, bulkDelete } = require('../utils/db')
 
 const parseEducation = education => {

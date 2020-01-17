@@ -1,6 +1,6 @@
 const { bulkCreate, bulkDelete } = require('../utils/db')
 const { getCountries, getGenders } = require('../utils/urnApi')
-const Person = require('../db/models/person')
+const { Person } = require('../db/models')
 
 const parseGender = (genderUrn, genders) => {
   if (!(genderUrn && genders[genderUrn])) return { genderFi: null, genderEn: null, genderSv: null, genderUrn: null }
