@@ -9,6 +9,7 @@ services:
       - importer-api/.env
     environment:
       REJECT_UNAUTHORIZED: 1
+      SONIC: 0
     command: "npm run start:dev"
     volumes:
       - ./importer-api:/usr/src/app

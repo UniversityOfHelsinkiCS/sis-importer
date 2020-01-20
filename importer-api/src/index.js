@@ -2,7 +2,7 @@ const { set: redisSet } = require('./utils/redis')
 const { randomBytes } = require('crypto')
 const { serviceIds } = require('./services')
 const { schedule } = require('./scheduler')
-const { REJECT_UNAUTHORIZED, IS_DEV, CURRENT_EXECUTION_HASH, UPDATE_RETRY_LIMIT } = require('./config')
+const { SONIC, REJECT_UNAUTHORIZED, IS_DEV, CURRENT_EXECUTION_HASH, UPDATE_RETRY_LIMIT } = require('./config')
 const { stan } = require('./utils/stan')
 const { schedule: scheduleCron } = require('./utils/cron')
 const { sleep } = require('./utils')
@@ -24,7 +24,7 @@ const updateHash = async () => {
 }
 
 const update = async (current, attempt = 1) => {
-  if (IS_DEV) {
+  if (IS_DEV && !SONIC) {
     await sleep(1000)
   }
   const generatedHash = await updateHash()
@@ -64,5 +64,5 @@ const run = async () => {
 
 stan.on('connect', ({ clientID }) => {
   console.log(`Connecting to NATS as ${clientID}...`)
-  scheduleCron(IS_DEV ? '* * * * * *' : '*/30 * * * *', run)
+  scheduleCron(IS_DEV || SONIC ? '* * * * * *' : '*/30 * * * *', run)
 })
