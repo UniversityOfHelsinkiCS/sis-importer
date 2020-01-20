@@ -7,5 +7,14 @@
 5.
 ![catto](http://i.imgur.com/1uYroRF.gif)
 
+### SONIC mode
+If one wishes to increase the speed of the importer, set the flag `SONIC` to `1` [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/docker/docker-compose.dev.yml#L12)
+
+### Adminer
+http://localhost:5050/?pgsql=importer-db&username=dev&db=importer-db&ns=public  
+
+### NATS-streaming-console
+http://localhost:8282/  
+
 ### Shutting down
 `npm run dco:down`
