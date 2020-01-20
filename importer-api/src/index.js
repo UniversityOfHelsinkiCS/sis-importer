@@ -34,7 +34,7 @@ const update = async (current, attempt = 1) => {
     isUpdating = false
     return
   }
-  console.log(`Updating ${serviceId}`)
+  console.log(`Updating ${serviceId} (${current + 1}/${Object.keys(serviceIds).length})`)
   try {
     const data = await schedule(serviceId, generatedHash)
     if (data) {
