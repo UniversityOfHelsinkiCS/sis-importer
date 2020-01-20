@@ -24,7 +24,7 @@ jobs:
               echo 'USING STAGING CONFIG';
             else
               echo 'export TAG=trunk' >> $BASH_ENV;
-              echo 'export DEPLOY=true' >> $BASH_ENV;
+              echo 'export DEPLOY=false' >> $BASH_ENV;
               echo 'USING TRUNK CONFIG';
             fi
       - checkout
