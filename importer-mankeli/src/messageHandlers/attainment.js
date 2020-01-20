@@ -1,45 +1,41 @@
-const moment = require('moment')
-const { getDate, parseDate } = require('../utils')
+const { Attainment } = require('../db/models')
+const { bulkCreate, bulkDelete } = require('../utils/db')
 
-const parseCreditTypeCode = attainment => {
-  if (attainment.misregistration) return 5
-  if (!attainment.primary) return 7
-  if (attainment.expiryDate && moment(attainment.expiryDate).isBefore(moment())) return 6
-
-  switch (attainment.state) {
-    case 'ATTAINED':
-      return 4
-    // Validate this
-    case 'SUBSTITUTED':
-    case 'INCLUDED':
-      return 9
-    case 'FAILED':
-      return 10
-  }
-}
-
-const parseCredit = attainment => {
-  // assessmentItemAttainmentIds?
-  const TODO = undefined
+const parseAttainment = attainment => {
   return {
     id: attainment.id,
-    grade: attainment.gradeId,
+    personId: attainment.personId,
+    personStudentNumber: attainment.personStudentNumber,
+    verifierPersonId: attainment.verifierPersonId,
+    studyRightId: attainment.studyRightId,
+    attainmentDate: attainment.attainmentDate,
+    registrationDate: attainment.registrationDate,
+    expiryDate: attainment.expiryDate,
+    attainmentLanguageUrn: attainment.attainmentLanguageUrn,
+    acceptorPersons: attainment.acceptorPersons,
+    organisations: attainment.organisations,
+    state: attainment.state,
+    misregistration: attainment.misregistration,
+    misregistrationRationale: attainment.misregistrationRationale,
+    primary: attainment.primary,
     credits: attainment.credits,
-    ordering: getDate(attainment.attainmentDate),
-    credittypecode: parseCreditTypeCode(attainment),
-    person_id: attainment.personId,
-    student_studentnumber: attainment.personStudentNumber,
-    attainment_date: parseDate(attainment.attainmentDate),
-    course_unit_id: attainment.courseUnitId,
-    course_unit_realisation_id: attainment.courseUnitRealisationId,
-    course_code: TODO, // from course unit
-    semestercode: TODO, // from course unit realisation
-    isStudyModule: false, // groupId? or from type (CourseModuleAttainment)?
-    documentState: attainment.documentState
+    studyWeeks: attainment.studyWeeks,
+    gradeScaleId: attainment.gradeScaleId,
+    gradeId: attainment.gradeId,
+    gradeAverage: attainment.gradeAverage,
+    additionalInfo: attainment.additionalInfo,
+    studyFieldUrn: attainment.studyFieldUrn,
+    name: attainment.name,
+    studyLevelUrn: attainment.studyLevelUrn,
+    courseUnitTypeUrn: attainment.courseUnitTypeUrn,
+    code: attainment.code,
+    type: attainment.type
   }
 }
 
-module.exports = ({ entities, executionHash }) => {
-  entities.map(parseCredit)
+module.exports = async ({ active, deleted, executionHash }, transaction) => {
+  await bulkCreate(Attainment, active.map(parseAttainment), transaction)
+  await bulkDelete(Attainment, deleted, transaction)
+
   return { executionHash }
 }

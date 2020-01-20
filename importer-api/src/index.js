@@ -57,7 +57,7 @@ const update = async (current, attempt = 1) => {
 const initialize = async () => {
   if (!isUpdating) {
     isUpdating = true
-    update(5)
+    update(6)
   }
 }
 
