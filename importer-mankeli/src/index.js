@@ -1,3 +1,4 @@
+const { REJECT_UNAUTHORIZED } = require('./config')
 const {
   stan,
   opts,
@@ -23,7 +24,7 @@ const { sleep } = require('./utils')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
 const { connection, sequelize } = require('./db/connection')
 
-if (process.env.NODE_ENV === 'development') {
+if (REJECT_UNAUTHORIZED) {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 }
 
