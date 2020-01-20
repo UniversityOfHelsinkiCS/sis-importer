@@ -1,17 +1,21 @@
+const REJECT_UNAUTHORIZED = process.env.REJECT_UNAUTHORIZED === '1'
 const CURRENT_EXECUTION_HASH = 'CURRENT_EXECUTION_HASH'
-const FETCH_AMOUNT = process.env.NODE_ENV === 'development' ? 15 : 1000
-const DEFAULT_CHUNK_SIZE = process.env.NODE_ENV === 'development' ? 5 : 100
+const IS_DEV = process.env.NODE_ENV === 'development'
+const FETCH_AMOUNT = IS_DEV ? 15 : 1000
+const DEFAULT_CHUNK_SIZE = IS_DEV ? 5 : 50
 const APIS = {
   ori: 'ORI',
   kori: 'KORI'
 }
 const UPDATE_RETRY_LIMIT = 6
-const PANIC_TIMEOUT = process.env.NODE_ENV === 'development' ? 60 * 1000 : 60 * 1000 * 15
+const PANIC_TIMEOUT = IS_DEV ? 60 * 1000 : 60 * 1000 * 15
 
 module.exports = {
+  REJECT_UNAUTHORIZED,
   CURRENT_EXECUTION_HASH,
   FETCH_AMOUNT,
   DEFAULT_CHUNK_SIZE,
+  IS_DEV,
   APIS,
   UPDATE_RETRY_LIMIT,
   PANIC_TIMEOUT

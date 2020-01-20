@@ -1,31 +1,33 @@
-const { parseDate } = require('../utils')
+const { StudyRight } = require('../db/models')
+const { bulkCreate } = require('../utils/db')
 
 const parseStudyRight = studyRight => {
-  // termRegistrations?
-  const TODO = undefined
   return {
-    studyrightid: studyRight.id,
-    canceldate: studyRight.studyRightCancellation ? studyRight.studyRightCancellation.cancellationDate : null,
-    enddate: studyRight.valid.endDate ? parseDate(studyRight.valid.endDate) : null,
-    education_id: studyRight.educationId,
-    extentcode: TODO, // from educationId
-    givendate: parseDate(studyRight.grantDate),
-    graduated: !!studyRight.studyRightGraduation,
-    graduation_date: studyRight.studyRightGraduation
-      ? studyRight.studyRightGraduation.phase1GraduationDate || studyRight.studyRightGraduation.phase2GraduationDate
-      : null, // Validate this
-    prioritycode: TODO, // doesn't exist anymore?
-    startdate: parseDate(studyRight.valid.startDate),
-    studystartdate: parseDate(studyRight.studyStartDate),
-    organization_code: studyRight.organisationId,
-    student_id: studyRight.studentId,
-    student_studentnumber: TODO, // from studentId
-    faculty_code: TODO // from organization_code
+    id: studyRight.id,
+    personId: studyRight.studentId,
+    educationId: studyRight.educationId,
+    organisationId: studyRight.organisationId,
+    state: studyRight.state,
+    documentState: studyRight.documentState,
+    valid: studyRight.valid,
+    grantDate: studyRight.grantDate,
+    studyStartDate: studyRight.studyStartDate,
+    transferOutDate: studyRight.transferOutDate,
+    termRegistrations: studyRight.termRegistrations,
+    studyRightCancellation: studyRight.studyRightCancellation,
+    studyRightGraduation: studyRight.studyRightGraduation,
+    snapshotDateTime: studyRight.snapshotDateTime,
+    modificationOrdinal: studyRight.metadata.modificationOrdinal
   }
 }
 
-module.exports = ({ entities, executionHash }) => {
-  entities.map(parseStudyRight)
+// Studyrights are a bit special compared to other entities. There can be
+// different instances of the same studyright id (snapshots) and we want to
+// save all of them. Thus we can't use id as the primary key. We also don't
+// want to delete any studyrights even if their state is deleted.
+module.exports = async ({ active, deleted, executionHash }, transaction) => {
+  const parsedStudyRights = [...active, ...deleted].map(parseStudyRight)
+  await bulkCreate(StudyRight, parsedStudyRights, transaction, ['id', 'modificationOrdinal', 'autoId'])
 
   return { executionHash }
 }

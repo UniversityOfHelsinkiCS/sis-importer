@@ -1,3 +1,4 @@
+const { REJECT_UNAUTHORIZED } = require('./config')
 const {
   stan,
   opts,
@@ -23,7 +24,7 @@ const { sleep } = require('./utils')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
 const { connection, sequelize } = require('./db/connection')
 
-if (process.env.NODE_ENV === 'development') {
+if (REJECT_UNAUTHORIZED) {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 }
 
@@ -53,13 +54,12 @@ const handleMessage = (channel, msgHandler) => async msg => {
     data.active = []
     data.deleted = []
     data.entities.forEach(e => {
-      e.documentState === 'ACTIVE' ? data.active.push(e) : data.deleted.push(e.id)
+      data[e.documentState === 'ACTIVE' ? 'active' : 'deleted'].push(e)
     })
 
     response = { ...(await msgHandler(data, transaction)), status: 'OK', amount: data.entities.length, channel }
     transaction.commit()
   } catch (e) {
-    console.error('e', e)
     response = { ...JSON.parse(msg.getData()), status: 'FAIL', amount: 0, channel }
     transaction.rollback()
   }

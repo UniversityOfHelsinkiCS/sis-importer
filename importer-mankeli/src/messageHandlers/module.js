@@ -1,25 +1,36 @@
-const { getStudyLevels } = require('../utils/urnApi')
+const { Module } = require('../db/models')
+const { bulkCreate, bulkDelete } = require('../utils/db')
 
-const parseStudyLevel = (studyLevel, studyLevels) => {
-  if (!studyLevel) return null
-  const { name, urn } = studyLevels[studyLevel]
-  return { name, urn }
-}
-
-const parseModule = (module, studyLevels) => {
+const parseModule = mod => {
   return {
-    id: module.id,
-    groupId: module.groupId,
-    name: module.name,
-    type: module.type,
-    code: module.code,
-    studyLevel: parseStudyLevel(module.studyLevel, studyLevels)
+    id: mod.id,
+    universityOrgIds: mod.universityOrgIds,
+    groupId: mod.groupId,
+    moduleContentApprovalRequired: mod.moduleContentApprovalRequired,
+    code: mod.code,
+    targetCredits: mod.targetCredits,
+    curriculumPeriodIds: mod.curriculumPeriodIds,
+    approvalState: mod.approvalState,
+    validityPeriod: mod.validityPeriod,
+    contentDescription: mod.contentDescription,
+    responsibilityInfos: mod.responsibilityInfos,
+    organisations: mod.organisations,
+    name: mod.name,
+    studyLevel: mod.studyLevel,
+    possibleAttainmentLanguages: mod.possibleAttainmentLanguages,
+    studyFields: mod.studyFields,
+    graded: mod.graded,
+    gradeScaleId: mod.gradeScaleId,
+    studyRightSelectionType: mod.studyRightSelectionType,
+    minorStudyRightAcceptanceType: mod.minorStudyRightAcceptanceType,
+    type: mod.type,
+    rule: mod.rule
   }
 }
 
-module.exports = async ({ entities, executionHash }) => {
-  const studyLevels = await getStudyLevels()
-  entities.map(entity => parseModule(entity, studyLevels))
+module.exports = async ({ active, deleted, executionHash }, transaction) => {
+  await bulkCreate(Module, active.map(parseModule), transaction)
+  await bulkDelete(Module, deleted, transaction)
 
   return { executionHash }
 }

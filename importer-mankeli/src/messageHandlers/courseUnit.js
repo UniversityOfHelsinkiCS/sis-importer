@@ -1,4 +1,4 @@
-const CourseUnit = require('../db/models/courseUnit')
+const { CourseUnit } = require('../db/models')
 const { bulkCreate, bulkDelete } = require('../utils/db')
 
 const parseCourse = courseUnit => {
