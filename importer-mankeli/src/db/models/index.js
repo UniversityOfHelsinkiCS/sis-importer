@@ -3,6 +3,7 @@ const Education = require('./education')
 const Person = require('./person')
 const StudyRight = require('./studyRight')
 const AssessmentItem = require('./assessmentItem')
+const CourseUnitRealisation = require('./courseUnitRealisation')
 
 Person.hasMany(StudyRight)
 Education.hasMany(StudyRight)
@@ -15,5 +16,6 @@ module.exports = {
   Education,
   Person,
   StudyRight,
-  AssessmentItem
+  AssessmentItem,
+  CourseUnitRealisation
 }

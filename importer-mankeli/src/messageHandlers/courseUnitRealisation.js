@@ -1,17 +1,26 @@
+const { CourseUnitRealisation } = require('../db/models')
+const { bulkCreate, bulkDelete } = require('../utils/db')
+
 const parseCourseUnitRealisation = courseUnitRealisation => {
-  const TODO = undefined
   return {
+    id: courseUnitRealisation.id,
+    universityOrgIds: courseUnitRealisation.universityOrgIds,
+    flowState: courseUnitRealisation.flowState,
     name: courseUnitRealisation.name,
-    startdate: courseUnitRealisation.activityPeriod.startDate,
-    enddate: courseUnitRealisation.activityPeriod.endDate,
-    realisationtypecode: TODO, // FROM courseUnitRealisationTypeUrn,
+    nameSpecifier: courseUnitRealisation.nameSpecifier,
     assessmentItemIds: courseUnitRealisation.assessmentItemIds,
-    coursecode: TODO // assessmentItemIds -> courseunits
+    activityPeriod: courseUnitRealisation.activityPeriod,
+    teachingLanguageUrn: courseUnitRealisation.teachingLanguageUrn,
+    courseUnitRealisationTypeUrn: courseUnitRealisation.courseUnitRealisationTypeUrn,
+    studyGroupSets: courseUnitRealisation.studyGroupSets,
+    organisations: courseUnitRealisation.organisations,
+    enrolmentPeriod: courseUnitRealisation.enrolmentPeriod
   }
 }
 
-module.exports = ({ entities, executionHash }) => {
-  entities.map(parseCourseUnitRealisation)
+module.exports = async ({ active, deleted, executionHash }, transaction) => {
+  await bulkCreate(CourseUnitRealisation, active.map(parseCourseUnitRealisation), transaction)
+  await bulkDelete(CourseUnitRealisation, deleted, transaction)
 
   return { executionHash }
 }
