@@ -7,7 +7,7 @@ const { stan } = require('./utils/stan')
 const { schedule: scheduleCron } = require('./utils/cron')
 const { sleep } = require('./utils')
 
-let isUpdating = false
+let isImporting = false
 
 if (!REJECT_UNAUTHORIZED) {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
@@ -30,11 +30,11 @@ const update = async (current, attempt = 1) => {
   const generatedHash = await updateHash()
   const serviceId = serviceIds[current]
   if (!serviceId) {
-    console.log('Updating finished')
-    isUpdating = false
+    console.log('Importing finished')
+    isImporting = false
     return
   }
-  console.log(`Updating ${serviceId} (${current + 1}/${Object.keys(serviceIds).length})`)
+  console.log(`Importing ${serviceId} (${current + 1}/${Object.keys(serviceIds).length})`)
   try {
     const data = await schedule(serviceId, generatedHash)
     if (data) {
@@ -47,8 +47,8 @@ const update = async (current, attempt = 1) => {
     }
   } catch (e) {
     if (attempt === UPDATE_RETRY_LIMIT) {
-      console.log('Updating failed', e)
-      isUpdating = false
+      console.log('Importing failed', e)
+      isImporting = false
       return
     }
     update(current, ++attempt)
@@ -56,8 +56,8 @@ const update = async (current, attempt = 1) => {
 }
 
 const run = async () => {
-  if (!isUpdating) {
-    isUpdating = true
+  if (!isImporting) {
+    isImporting = true
     update(0)
   }
 }
