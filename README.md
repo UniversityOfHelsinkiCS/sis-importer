@@ -7,6 +7,11 @@
 5.
 ![catto](http://i.imgur.com/1uYroRF.gif)
 
+### Populate db
+```bash
+./populate-db.sh
+```
+
 ### SONIC mode
 If one wishes to increase the speed of the importer, set the flag `SONIC` to `1` [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/docker/docker-compose.dev.yml#L12)
 
