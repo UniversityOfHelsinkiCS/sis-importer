@@ -3,7 +3,11 @@ version: "3.2"
 services:
   importer-api:
     image: toska/sis-importer-api:${TAG}
+    environment:
+      NATS_TOKEN: dev
 
   importer-mankeli:
     image: toska/sis-importer-mankeli:${TAG}
+    environment:
+      NATS_TOKEN: dev
     container_name: sis-importer-mankeli
