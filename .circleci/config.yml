@@ -39,7 +39,7 @@ jobs:
           if [ "${DEPLOY}" == "true" ]; then
             echo "$DOCKER_PASS" > DOCKER_PASS
             cat DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-            npm run dco:ci -- push
+            npm run dco:ci -- push importer-api importer-mankeli
           fi
 
 workflows:

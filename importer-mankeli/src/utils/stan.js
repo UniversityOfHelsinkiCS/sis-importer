@@ -1,6 +1,10 @@
 const natsStreaming = require('node-nats-streaming')
-const { HOSTNAME, NATS_URI } = process.env
-const stan = natsStreaming.connect('sis-importer-nats', HOSTNAME, NATS_URI)
+const { HOSTNAME, NATS_URI, NATS_TOKEN } = process.env
+
+const stan = natsStreaming.connect('sis-importer-nats', HOSTNAME, {
+  url: NATS_URI,
+  token: NATS_TOKEN
+})
 
 const opts = stan.subscriptionOptions()
 opts.setManualAckMode(true)

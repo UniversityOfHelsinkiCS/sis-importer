@@ -8,6 +8,7 @@ services:
     env_file:
       - importer-api/.env
     environment:
+      NATS_TOKEN: dev
       REJECT_UNAUTHORIZED: 1
       SONIC: 0
     command: "npm run start:dev"
@@ -21,6 +22,7 @@ services:
     env_file:
       - importer-mankeli/.env
     environment:
+      NATS_TOKEN: dev
       DB_USERNAME: dev
       DB_PASSWORD: dev
       REJECT_UNAUTHORIZED: 1
