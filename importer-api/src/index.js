@@ -9,7 +9,7 @@ const { sleep } = require('./utils')
 
 let isUpdating = false
 
-if (REJECT_UNAUTHORIZED) {
+if (!REJECT_UNAUTHORIZED) {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 }
 

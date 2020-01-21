@@ -1,4 +1,4 @@
-module.exports.REJECT_UNAUTHORIZED = process.env.REJECT_UNAUTHORIZED === '1'
+module.exports.REJECT_UNAUTHORIZED = process.env.REJECT_UNAUTHORIZED === '0' ? false : true
 
 module.exports.CURRENT_EXECUTION_HASH = 'CURRENT_EXECUTION_HASH'
 
