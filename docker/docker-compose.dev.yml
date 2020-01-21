@@ -8,6 +8,7 @@ services:
     env_file:
       - importer-api/.env
     environment:
+      NATS_TOKEN: dev
       REJECT_UNAUTHORIZED: 1
       SONIC: 0
     command: "npm run start:dev"
@@ -21,6 +22,7 @@ services:
     env_file:
       - importer-mankeli/.env
     environment:
+      NATS_TOKEN: dev
       DB_USERNAME: dev
       DB_PASSWORD: dev
       REJECT_UNAUTHORIZED: 1
@@ -35,6 +37,7 @@ services:
       POSTGRES_DB: importer-db
   
   importer-nats:
+    command: -cid sis-importer-nats -m 8222 --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 5000 -store file -dir datastore
     ports:
       - 8222:8222 # Monitoring at http://localhost:8222/
 
