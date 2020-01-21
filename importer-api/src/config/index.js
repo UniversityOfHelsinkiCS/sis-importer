@@ -1,4 +1,4 @@
-const REJECT_UNAUTHORIZED = process.env.REJECT_UNAUTHORIZED === '1'
+const REJECT_UNAUTHORIZED = process.env.REJECT_UNAUTHORIZED === '0' ? false : true
 const SONIC = process.env.SONIC === '1'
 const CURRENT_EXECUTION_HASH = 'CURRENT_EXECUTION_HASH'
 const IS_DEV = process.env.NODE_ENV === 'development'
