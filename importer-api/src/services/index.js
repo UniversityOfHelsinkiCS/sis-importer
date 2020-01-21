@@ -6,6 +6,7 @@ const { COURSE_UNIT_REALISATION_SCHEDULE_ID, info: courseUnitRealisationInfo } =
 const { ASSESSMENT_ITEM_SCHEDULE_ID, info: assessmentItemInfo } = require('./assessmentItem')
 const { EDUCATION_SCHEDULE_ID, info: educationInfo } = require('./education')
 const { MODULE_SCHEDULE_ID, info: moduleInfo } = require('./module')
+const { ORGANISATION_SCHEDULE_ID, info: organisationInfo } = require('./organisation')
 
 const services = {
   [ATTAINMENT_SCHEDULE_ID]: attainmentInfo,
@@ -15,12 +16,14 @@ const services = {
   [COURSE_UNIT_REALISATION_SCHEDULE_ID]: courseUnitRealisationInfo,
   [ASSESSMENT_ITEM_SCHEDULE_ID]: assessmentItemInfo,
   [EDUCATION_SCHEDULE_ID]: educationInfo,
-  [MODULE_SCHEDULE_ID]: moduleInfo
+  [MODULE_SCHEDULE_ID]: moduleInfo,
+  [ORGANISATION_SCHEDULE_ID]: organisationInfo
 }
 
 // Imported in this order
 const serviceIds = [
   PERSON_SCHEDULE_ID,
+  ORGANISATION_SCHEDULE_ID,
   COURSE_UNIT_SCHEDULE_ID,
   EDUCATION_SCHEDULE_ID,
   STUDY_RIGHT_SCHEDULE_ID,
