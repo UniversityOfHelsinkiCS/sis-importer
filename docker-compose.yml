@@ -5,7 +5,7 @@ services:
     build:
       context: importer-mankeli
     environment:
-      NATS_URI: importer-nats://importer-nats:4222
+      NATS_URI: importer-nats://importer-nats:4223
       DB_PORT: 5432
       DB_HOST: importer-db
       DB_DATABASE: importer-db
@@ -18,7 +18,7 @@ services:
     build:
       context: importer-api
     environment:
-      NATS_URI: importer-nats://importer-nats:4222
+      NATS_URI: importer-nats://importer-nats:4223
     container_name: sis-importer-api
     depends_on:
       - importer-mankeli
@@ -31,14 +31,14 @@ services:
 
   importer-redis:
     image: redis:5.0.7
-    command: ["redis-server", "--appendonly", "yes"]
+    command: ["redis-server", "--appendonly", "yes", "--port", "6380"]
     container_name: sis-redis
     volumes:
       - sis-importer-redis:/data
 
   importer-nats:
     image: nats-streaming:0.16.2
-    command: -cid sis-importer-nats -m 8222 --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 5000 -store file -dir datastore
+    command: -cid sis-importer-nats -m 8222 -p 4223 --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 5000 -store file -dir datastore
     container_name: sis-importer-nats
     volumes:
       - sis-importer-datastore:/datastore

@@ -4,10 +4,12 @@ services:
   importer-api:
     image: toska/sis-importer-api:${TAG}
     environment:
+      REDIS_URI: //importer-redis:6380
       NATS_TOKEN: dev
 
   importer-mankeli:
     image: toska/sis-importer-mankeli:${TAG}
     environment:
+      REDIS_URI: //importer-redis:6380
       NATS_TOKEN: dev
     container_name: sis-importer-mankeli

@@ -8,6 +8,7 @@ services:
     env_file:
       - importer-api/.env
     environment:
+      REDIS_URI: //importer-redis:6380
       NATS_TOKEN: dev
       REJECT_UNAUTHORIZED: 0
       SONIC: 0
@@ -20,6 +21,7 @@ services:
       args:
         NODE_ENV: "development"
     environment:
+      REDIS_URI: //importer-redis:6380
       NATS_TOKEN: dev
       DB_USERNAME: dev
       DB_PASSWORD: dev
@@ -35,12 +37,12 @@ services:
 
   importer-nats:
     ports:
-      - 8222:8222 # Monitoring at http://localhost:8222/
+      - 8223:8222 # Monitoring at http://localhost:8223/
 
   importer-nats-streaming-console:
     image: mozgoo/nats-streaming-console:latest
     environment:
-      - STAN_URL=importer-nats://importer-nats:4222
+      - STAN_URL=importer-nats://importer-nats:4223
       - STAN_MONITOR_URL=http://importer-nats:8222
     container_name: sis-nats-streaming-console
     ports:
@@ -52,6 +54,6 @@ services:
       - ADMINER_DESIGN=pepa-linha
       - ADMINER_DEFAULT_SERVER=importer-db
     ports:
-      - 5050:8080 # http://localhost:5050/?pgsql=importer-db&username=dev&db=importer-db&ns=public
+      - 5051:8080 # http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public
     container_name: importer-adminer
     restart: unless-stopped
