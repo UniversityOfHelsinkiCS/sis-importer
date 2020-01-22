@@ -1,4 +1,3 @@
-const { REJECT_UNAUTHORIZED } = require('./config')
 const {
   stan,
   opts,
@@ -26,10 +25,6 @@ const { sleep } = require('./utils')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
 const { connection, sequelize } = require('./db/connection')
 
-if (!REJECT_UNAUTHORIZED) {
-  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
-}
-
 const channels = {
   [ORI_PERSON_CHANNEL]: personHandler,
   [ORI_ATTAINMENT_CHANNEL]: attainmentHandler,
@@ -42,14 +37,14 @@ const channels = {
   [KORI_ORGANISATION_CHANNEL]: organisationHandler
 }
 
-let CURRENT_EXECUTION_HASH = null
+let currentExecutionHash = null
 
 const handleMessage = (channel, msgHandler) => async msg => {
   let response = null
   const transaction = await sequelize.transaction()
   try {
     const data = JSON.parse(msg.getData())
-    if (data.executionHash !== CURRENT_EXECUTION_HASH) {
+    if (data.executionHash !== currentExecutionHash) {
       msg.ack()
       return
     }
@@ -81,7 +76,7 @@ stan.on('connect', async ({ clientID }) => {
   console.log(`Connecting to NATS as ${clientID}...`)
 
   await onCurrentExecutionHashChange(hash => {
-    CURRENT_EXECUTION_HASH = hash
+    currentExecutionHash = hash
   })
 
   Object.entries(channels).forEach(([CHANNEL, msgHandler]) => {

@@ -1,19 +1,4 @@
-const moment = require('moment')
-
 const sleep = ms => new Promise(res => setTimeout(() => res(), ms))
-
-const idfy = data =>
-  data.reduce((acc, { id, ...p }) => {
-    acc[id] = { ...p }
-    return acc
-  }, {})
-
-const getDate = (date, format = 'DD.MM.YYYY') => {
-  if (!date) return null
-  return moment(date, format).format('YYYY-MM-DD')
-}
-
-const parseDate = (date, format = 'YYYY-MM-DD HH:mm') => date && moment.utc(date, format).toDate()
 
 const retry = async (func, params, attempts = 6) => {
   for (let i = 1; i <= attempts; i++) {
@@ -32,9 +17,6 @@ const retry = async (func, params, attempts = 6) => {
 }
 
 module.exports = {
-  idfy,
-  getDate,
-  parseDate,
   sleep,
   retry
 }
