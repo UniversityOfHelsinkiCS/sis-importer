@@ -4,14 +4,14 @@ const { promisify } = require('util')
 const { CURRENT_EXECUTION_HASH } = require('../config')
 
 const listener = redis.createClient({
-  url: '//importer-redis:6379'
+  url: process.env.REDIS_URI
 })
 
 listener.config('set', 'notify-keyspace-events', 'KEA')
 listener.subscribe('__keyevent@0__:set', CURRENT_EXECUTION_HASH)
 
 const client = redis.createClient({
-  url: '//importer-redis:6379'
+  url: process.env.REDIS_URI
 })
 
 const lock = promisify(redisLock(client))

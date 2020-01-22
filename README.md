@@ -16,7 +16,7 @@
 If one wants to increase the speed of the importer when developing, set the flag `SONIC` to `1` [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/docker/docker-compose.dev.yml#L13)
 
 ### Adminer
-http://localhost:5050/?pgsql=importer-db&username=dev&db=importer-db&ns=public  
+http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public
 
 ### NATS-streaming-console
 http://localhost:8282/  
