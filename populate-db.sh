@@ -33,7 +33,7 @@ echo "Populating $DB"
 docker cp $BACKUP $CONTAINER:/asd.sqz
 docker exec $CONTAINER pg_restore -U postgres --no-owner -F c --dbname="$DB" -j4 /asd.sqz
 
-echo "Cleaning up"
+echo "Restarting services"
 npm run dco:up --prefix $DIR_PATH -- --scale importer-mankeli=3
 
 echo "View adminer here: http://localhost:5050/?pgsql=importer-db&username=dev&db=importer-db&ns=public (password = dev)"
