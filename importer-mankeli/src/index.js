@@ -10,7 +10,8 @@ const {
   KORI_ASSESSMENT_ITEM_CHANNEL,
   KORI_EDUCATION_CHANNEL,
   KORI_MODULE_CHANNEL,
-  KORI_ORGANISATION_CHANNEL
+  KORI_ORGANISATION_CHANNEL,
+  ORI_TERM_REGISTRATION_CHANNEL
 } = require('./utils/stan')
 const personHandler = require('./messageHandlers/person')
 const attainmentHandler = require('./messageHandlers/attainment')
@@ -21,6 +22,7 @@ const assessmentItemHandler = require('./messageHandlers/assessmentItem')
 const educationHandler = require('./messageHandlers/education')
 const moduleHandler = require('./messageHandlers/module')
 const organisationHandler = require('./messageHandlers/organisationHandler')
+const termRegistrationHandler = require('./messageHandlers/termRegistration')
 const { sleep } = require('./utils')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
 const { connection, sequelize } = require('./db/connection')
@@ -34,7 +36,8 @@ const channels = {
   [KORI_ASSESSMENT_ITEM_CHANNEL]: assessmentItemHandler,
   [KORI_EDUCATION_CHANNEL]: educationHandler,
   [KORI_MODULE_CHANNEL]: moduleHandler,
-  [KORI_ORGANISATION_CHANNEL]: organisationHandler
+  [KORI_ORGANISATION_CHANNEL]: organisationHandler,
+  [ORI_TERM_REGISTRATION_CHANNEL]: termRegistrationHandler
 }
 
 let currentExecutionHash = null
