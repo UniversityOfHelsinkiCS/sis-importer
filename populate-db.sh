@@ -18,6 +18,7 @@ echo "Fetching latest staging backup data"
 scp -r -o ProxyCommand="ssh -W %h:%p melkinpaasi.cs.helsinki.fi" oodikone-staging:/home/tkt_oodi/backups/sis-importer-staging.sqz $BACKUP
 
 echo "Setting up db"
+npm run dco:setup_network
 npm run dco:down --prefix $DIR_PATH
 npm run dco:up --prefix $DIR_PATH -- $SERVICE
 
@@ -34,7 +35,7 @@ docker cp $BACKUP $CONTAINER:/asd.sqz
 docker exec $CONTAINER pg_restore -U postgres --no-owner -F c --dbname="$DB" -j4 /asd.sqz
 
 echo "Restarting db and adminer"
-npm run dco:setup_network && npm run dco:up:db --prefix $DIR_PATH
+npm run dco:up:db --prefix $DIR_PATH
 
 echo "View adminer here: http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public (password = dev)"
 echo "Run npm start to restart other services"
