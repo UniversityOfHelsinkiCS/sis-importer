@@ -18,7 +18,7 @@ echo "Fetching latest staging backup data"
 scp -r -o ProxyCommand="ssh -W %h:%p melkinpaasi.cs.helsinki.fi" oodikone-staging:/home/tkt_oodi/backups/sis-importer-staging.sqz $BACKUP
 
 echo "Setting up db"
-npm run dco:setup_network
+npm run dco:setup_network --prefix $DIR_PATH
 npm run dco:down --prefix $DIR_PATH
 npm run dco:up --prefix $DIR_PATH -- $SERVICE
 
