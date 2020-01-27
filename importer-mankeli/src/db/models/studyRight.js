@@ -57,6 +57,9 @@ StudyRight.init(
     snapshotDateTime: {
       type: DATE
     },
+    acceptedSelectionPath: {
+      type: JSONB
+    },
     createdAt: {
       type: DATE
     },

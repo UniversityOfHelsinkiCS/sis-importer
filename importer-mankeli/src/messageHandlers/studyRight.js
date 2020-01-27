@@ -17,6 +17,7 @@ const parseStudyRight = studyRight => {
     studyRightCancellation: studyRight.studyRightCancellation,
     studyRightGraduation: studyRight.studyRightGraduation,
     snapshotDateTime: studyRight.snapshotDateTime,
+    acceptedSelectionPath: studyRight.acceptedSelectionPath,
     modificationOrdinal: studyRight.metadata.modificationOrdinal
   }
 }
