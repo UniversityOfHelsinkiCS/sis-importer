@@ -72,10 +72,11 @@ const handleMessage = (channel, msgHandler) => async msg => {
 }
 
 stan.on('connect', async ({ clientID }) => {
-  while (!connection.established) {
-    if (connection.error) return
+  while (!connection.established && !connection.error) {
     await sleep(100)
   }
+
+  if (connection.error) return
   console.log(`Connecting to NATS as ${clientID}...`)
 
   await onCurrentExecutionHashChange(hash => {
