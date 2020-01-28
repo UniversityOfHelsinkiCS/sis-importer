@@ -9,7 +9,7 @@ const stan = natsStreaming.connect('sis-importer-nats', HOSTNAME, {
 const opts = stan.subscriptionOptions()
 opts.setManualAckMode(true)
 opts.setAckWait(60 * 1000 * 15)
-opts.setMaxInFlight(3)
+opts.setMaxInFlight(5)
 
 const SCHEDULER_STATUS_CHANNEL = 'SCHEDULER_STATUS_CHANNEL'
 const ORI_PERSON_CHANNEL = 'ORI_PERSON_CHANNEL'
