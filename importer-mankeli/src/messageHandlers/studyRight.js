@@ -18,6 +18,12 @@ const parseStudyRight = studyRight => {
     studyRightGraduation: studyRight.studyRightGraduation,
     snapshotDateTime: studyRight.snapshotDateTime,
     acceptedSelectionPath: studyRight.acceptedSelectionPath,
+    studyRightTransfer: studyRight.studyRightTransfer,
+    studyRightExtensions: studyRight.studyRightExtensions,
+    transferOutUniversityUrn: studyRight.transferOutUniversityUrn,
+    requestedSelectionPath: studyRight.requestedSelectionPath,
+    phase1MinorSelections: studyRight.phase1MinorSelections,
+    phase2MinorSelections: studyRight.phase2MinorSelections,
     modificationOrdinal: studyRight.metadata.modificationOrdinal
   }
 }

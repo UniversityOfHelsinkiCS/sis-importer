@@ -60,6 +60,24 @@ StudyRight.init(
     acceptedSelectionPath: {
       type: JSONB
     },
+    studyRightTransfer: {
+      type: JSONB
+    },
+    studyRightExtensions: {
+      type: ARRAY(JSONB)
+    },
+    transferOutUniversityUrn: {
+      type: STRING
+    },
+    requestedSelectionPath: {
+      type: JSONB
+    },
+    phase1MinorSelections: {
+      type: ARRAY(JSONB)
+    },
+    phase2MinorSelections: {
+      type: ARRAY(JSONB)
+    },
     createdAt: {
       type: DATE
     },
