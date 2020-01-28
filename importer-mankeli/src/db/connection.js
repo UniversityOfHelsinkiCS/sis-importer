@@ -34,7 +34,7 @@ class Connection {
   }
 
   async runMigrations() {
-    const unlock = await lock(MIGRATIONS_LOCK)
+    const unlock = await lock(MIGRATIONS_LOCK, 1000 * 60 * 10)
     try {
       const migrator = new Umzug({
         storage: 'sequelize',
