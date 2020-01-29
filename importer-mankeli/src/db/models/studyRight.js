@@ -97,6 +97,9 @@ StudyRight.init(
       },
       {
         fields: ['id']
+      },
+      {
+        fields: ['person_id']
       }
     ]
   }

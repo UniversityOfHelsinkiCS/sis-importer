@@ -87,6 +87,9 @@ Attainment.init(
     type: {
       type: STRING
     },
+    courseUnitId: {
+      type: STRING
+    },
     createdAt: {
       type: DATE
     },
@@ -98,7 +101,15 @@ Attainment.init(
     underscored: true,
     sequelize,
     modelName: 'attainment',
-    tableName: 'attainments'
+    tableName: 'attainments',
+    indexes: [
+      {
+        fields: ['person_id']
+      },
+      {
+        fields: ['course_unit_id']
+      }
+    ]
   }
 )
 
