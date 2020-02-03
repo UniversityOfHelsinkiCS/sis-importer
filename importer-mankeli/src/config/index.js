@@ -7,7 +7,7 @@ const { DB_USERNAME, DB_PASSWORD, DB_PORT, DB_HOST, DB_DATABASE } = process.env
 module.exports.DB_CONFIG = {
   dialect: 'postgres',
   pool: {
-    max: 100,
+    max: 10,
     min: 0,
     acquire: 10000,
     idle: 300000000

@@ -8,6 +8,7 @@ const { EDUCATION_SCHEDULE_ID, info: educationInfo } = require('./education')
 const { MODULE_SCHEDULE_ID, info: moduleInfo } = require('./module')
 const { ORGANISATION_SCHEDULE_ID, info: organisationInfo } = require('./organisation')
 const { TERM_REGISTRATION_SCHEDULE_ID, info: termRegistrationInfo } = require('./termRegistration')
+const { STUDY_LEVEL_SCHEDULE_ID, info: studyLevelInfo } = require('./studyLevel')
 
 const services = {
   [ATTAINMENT_SCHEDULE_ID]: attainmentInfo,
@@ -19,7 +20,8 @@ const services = {
   [EDUCATION_SCHEDULE_ID]: educationInfo,
   [MODULE_SCHEDULE_ID]: moduleInfo,
   [ORGANISATION_SCHEDULE_ID]: organisationInfo,
-  [TERM_REGISTRATION_SCHEDULE_ID]: termRegistrationInfo
+  [TERM_REGISTRATION_SCHEDULE_ID]: termRegistrationInfo,
+  [STUDY_LEVEL_SCHEDULE_ID]: studyLevelInfo
 }
 
 // Imported in this order
@@ -33,7 +35,8 @@ const serviceIds = [
   ASSESSMENT_ITEM_SCHEDULE_ID,
   COURSE_UNIT_REALISATION_SCHEDULE_ID,
   ATTAINMENT_SCHEDULE_ID,
-  MODULE_SCHEDULE_ID
+  MODULE_SCHEDULE_ID,
+  STUDY_LEVEL_SCHEDULE_ID
 ]
 
 module.exports = {

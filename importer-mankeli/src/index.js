@@ -11,7 +11,8 @@ const {
   KORI_EDUCATION_CHANNEL,
   KORI_MODULE_CHANNEL,
   KORI_ORGANISATION_CHANNEL,
-  ORI_TERM_REGISTRATION_CHANNEL
+  ORI_TERM_REGISTRATION_CHANNEL,
+  URN_STUDY_LEVEL_CHANNEL
 } = require('./utils/stan')
 const personHandler = require('./messageHandlers/person')
 const attainmentHandler = require('./messageHandlers/attainment')
@@ -21,11 +22,13 @@ const courseUnitRealisationHandler = require('./messageHandlers/courseUnitRealis
 const assessmentItemHandler = require('./messageHandlers/assessmentItem')
 const educationHandler = require('./messageHandlers/education')
 const moduleHandler = require('./messageHandlers/module')
-const organisationHandler = require('./messageHandlers/organisationHandler')
+const organisationHandler = require('./messageHandlers/organisation')
 const termRegistrationHandler = require('./messageHandlers/termRegistration')
+const studyLevelHandler = require('./messageHandlers/studyLevel')
 const { sleep } = require('./utils')
+const { createTransaction } = require('./utils/db')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
-const { connection, sequelize } = require('./db/connection')
+const { connection } = require('./db/connection')
 
 const channels = {
   [ORI_PERSON_CHANNEL]: personHandler,
@@ -37,17 +40,20 @@ const channels = {
   [KORI_EDUCATION_CHANNEL]: educationHandler,
   [KORI_MODULE_CHANNEL]: moduleHandler,
   [KORI_ORGANISATION_CHANNEL]: organisationHandler,
-  [ORI_TERM_REGISTRATION_CHANNEL]: termRegistrationHandler
+  [ORI_TERM_REGISTRATION_CHANNEL]: termRegistrationHandler,
+  [URN_STUDY_LEVEL_CHANNEL]: studyLevelHandler
 }
 
 let currentExecutionHash = null
 
 const handleMessage = (channel, msgHandler) => async msg => {
   let response = null
-  const transaction = await sequelize.transaction()
+  const transaction = await createTransaction()
   try {
+    if (!transaction) throw new Error('Creating transaction failed')
     const data = JSON.parse(msg.getData())
-    if (data.executionHash !== currentExecutionHash) {
+    if (!data || data.executionHash !== currentExecutionHash) {
+      transaction.rollback()
       msg.ack()
       return
     }
@@ -58,11 +64,17 @@ const handleMessage = (channel, msgHandler) => async msg => {
       data[e.documentState === 'ACTIVE' ? 'active' : 'deleted'].push(e)
     })
 
-    response = { ...(await msgHandler(data, transaction)), status: 'OK', amount: data.entities.length, channel }
+    response = {
+      ...(await msgHandler(data, transaction)),
+      status: 'OK',
+      amount: data.entities.length,
+      channel,
+      executionHash: data.executionHash
+    }
     transaction.commit()
   } catch (e) {
     response = { ...JSON.parse(msg.getData()), status: 'FAIL', amount: 0, channel }
-    transaction.rollback()
+    if (transaction) transaction.rollback()
   }
 
   stan.publish(SCHEDULER_STATUS_CHANNEL, JSON.stringify(response), err => {

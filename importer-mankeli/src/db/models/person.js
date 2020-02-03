@@ -1,5 +1,5 @@
 const { Model, STRING, DATE, ARRAY, BOOLEAN } = require('sequelize')
-const { sequelize } = require('../connection')
+const { connection } = require('../connection')
 
 class Person extends Model {}
 
@@ -33,25 +33,7 @@ Person.init(
     genderUrn: {
       type: STRING
     },
-    genderFi: {
-      type: STRING
-    },
-    genderEn: {
-      type: STRING
-    },
-    genderSv: {
-      type: STRING
-    },
     countryUrn: {
-      type: STRING
-    },
-    countryFi: {
-      type: STRING
-    },
-    countryEn: {
-      type: STRING
-    },
-    countrySv: {
       type: STRING
     },
     citizenships: {
@@ -69,7 +51,7 @@ Person.init(
   },
   {
     underscored: true,
-    sequelize,
+    sequelize: connection.sequelize,
     modelName: 'person',
     tableName: 'persons'
   }

@@ -20,9 +20,7 @@ const parseOrganisation = organisation => {
 
 // Organisations need to be written into
 // the db in a similar fashion as studyrights.
-module.exports = async ({ active, deleted, executionHash }, transaction) => {
+module.exports = async ({ active, deleted }, transaction) => {
   const parsedOrganisations = [...active, ...deleted].map(parseOrganisation)
   await bulkCreate(Organisation, parsedOrganisations, transaction, ['id', 'modificationOrdinal', 'autoId'])
-
-  return { executionHash }
 }

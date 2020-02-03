@@ -28,9 +28,7 @@ const parseModule = mod => {
   }
 }
 
-module.exports = async ({ active, deleted, executionHash }, transaction) => {
+module.exports = async ({ active, deleted }, transaction) => {
   await bulkCreate(Module, active.map(parseModule), transaction)
   await bulkDelete(Module, deleted, transaction)
-
-  return { executionHash }
 }

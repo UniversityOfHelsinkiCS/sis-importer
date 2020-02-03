@@ -3,10 +3,6 @@ const Umzug = require('umzug')
 const { DB_CONFIG, DB_CONNECTION_RETRY_LIMIT, MIGRATIONS_LOCK } = require('../config')
 const { lock } = require('../utils/redis')
 
-const sequelize = new Sequelize({
-  ...DB_CONFIG
-})
-
 class Connection {
   constructor() {
     this.error = false
@@ -17,7 +13,10 @@ class Connection {
     this.error = false
     this.established = false
     try {
-      await sequelize.authenticate()
+      this.sequelize = new Sequelize({
+        ...DB_CONFIG
+      })
+      await this.sequelize.authenticate()
       console.log('Connected to database successfully!')
       await this.runMigrations()
       this.established = true
@@ -39,12 +38,12 @@ class Connection {
       const migrator = new Umzug({
         storage: 'sequelize',
         storageOptions: {
-          sequelize,
+          sequelize: this.sequelize,
           tableName: 'migrations'
         },
         logging: console.log,
         migrations: {
-          params: [sequelize.getQueryInterface(), Sequelize],
+          params: [this.sequelize.getQueryInterface(), Sequelize],
           path: `${process.cwd()}/src/db/migrations`,
           pattern: /\.js$/
         }
@@ -62,4 +61,4 @@ class Connection {
 const connection = new Connection()
 connection.connectToDatabase()
 
-module.exports = { sequelize, connection }
+module.exports = { connection }

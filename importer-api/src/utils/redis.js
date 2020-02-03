@@ -20,6 +20,8 @@ const get = async key => await redisPromisify(client.get, key)
 
 const set = async (key, val) => await redisPromisify(client.set, key, val)
 
+const expire = async (key, val) => await redisPromisify(client.expire, key, val)
+
 const del = async key => await redisPromisify(client.del, key)
 
 const incrby = async (key, val) => await redisPromisify(client.incrby, key, val)
@@ -29,6 +31,7 @@ module.exports = {
   smembers,
   get,
   set,
+  expire,
   del,
   incrby
 }

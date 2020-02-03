@@ -10,7 +10,7 @@ const parseTermRegistration = termRegistration => {
   }
 }
 
-module.exports = async ({ active, deleted, executionHash }, transaction) => {
+module.exports = async ({ active, deleted }, transaction) => {
   await bulkCreate(TermRegistration, active.map(parseTermRegistration), transaction, ['studyRightId', 'studentId'])
 
   // Bulk delete by composite primary key
@@ -28,6 +28,4 @@ module.exports = async ({ active, deleted, executionHash }, transaction) => {
       transaction
     }
   )
-
-  return { executionHash }
 }

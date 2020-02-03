@@ -1,5 +1,5 @@
 const { Model, ARRAY, STRING, DATE, BIGINT, JSONB } = require('sequelize')
-const { sequelize } = require('../connection')
+const { connection } = require('../connection')
 
 class Organisation extends Model {}
 
@@ -11,10 +11,12 @@ Organisation.init(
       autoIncrement: true
     },
     id: {
-      type: STRING
+      type: STRING,
+      unique: true
     },
     modificationOrdinal: {
-      type: BIGINT
+      type: BIGINT,
+      unique: true
     },
     documentState: {
       type: STRING
@@ -55,7 +57,7 @@ Organisation.init(
   },
   {
     underscored: true,
-    sequelize,
+    sequelize: connection.sequelize,
     modelName: 'organisation',
     tableName: 'organisations',
     indexes: [

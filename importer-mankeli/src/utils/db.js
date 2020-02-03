@@ -1,4 +1,5 @@
 const { Op } = require('sequelize')
+const { connection } = require('../db/connection')
 
 const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).filter(a => !keys.includes(a))
 
@@ -20,8 +21,18 @@ const bulkDelete = async (model, entities, transaction, property = 'id') => {
   })
 }
 
+const createTransaction = async () => {
+  try {
+    const t = await connection.sequelize.transaction()
+    return t
+  } catch (e) {
+    return null
+  }
+}
+
 module.exports = {
   bulkCreate,
   bulkDelete,
-  getColumnsToUpdate
+  getColumnsToUpdate,
+  createTransaction
 }

@@ -18,9 +18,7 @@ const parseCourseUnitRealisation = courseUnitRealisation => {
   }
 }
 
-module.exports = async ({ active, deleted, executionHash }, transaction) => {
+module.exports = async ({ active, deleted }, transaction) => {
   await bulkCreate(CourseUnitRealisation, active.map(parseCourseUnitRealisation), transaction)
   await bulkDelete(CourseUnitRealisation, deleted, transaction)
-
-  return { executionHash }
 }

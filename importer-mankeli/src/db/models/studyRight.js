@@ -1,5 +1,5 @@
 const { Model, ARRAY, STRING, DATE, BIGINT, JSONB } = require('sequelize')
-const { sequelize } = require('../connection')
+const { connection } = require('../connection')
 
 class StudyRight extends Model {}
 
@@ -87,7 +87,7 @@ StudyRight.init(
   },
   {
     underscored: true,
-    sequelize,
+    sequelize: connection.sequelize,
     modelName: 'studyright',
     tableName: 'studyrights',
     indexes: [
