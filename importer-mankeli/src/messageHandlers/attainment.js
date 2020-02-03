@@ -34,9 +34,7 @@ const parseAttainment = attainment => {
   }
 }
 
-module.exports = async ({ active, deleted, executionHash }, transaction) => {
+module.exports = async ({ active, deleted }, transaction) => {
   await bulkCreate(Attainment, active.map(parseAttainment), transaction)
   await bulkDelete(Attainment, deleted, transaction)
-
-  return { executionHash }
 }

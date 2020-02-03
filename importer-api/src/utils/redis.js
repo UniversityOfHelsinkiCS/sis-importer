@@ -1,7 +1,16 @@
 const redis = require('redis')
 
+const redisRetry = ({ attempt, error }) => {
+  if (attempt > 100) {
+    throw new Error('Lost connection to Redis...', error)
+  }
+
+  return Math.min(attempt * 100, 5000)
+}
+
 const client = redis.createClient({
-  url: process.env.REDIS_URI
+  url: process.env.REDIS_URI,
+  retry_strategy: redisRetry
 })
 
 const redisPromisify = async (func, ...params) =>
@@ -20,15 +29,21 @@ const get = async key => await redisPromisify(client.get, key)
 
 const set = async (key, val) => await redisPromisify(client.set, key, val)
 
+const expire = async (key, val) => await redisPromisify(client.expire, key, val)
+
 const del = async key => await redisPromisify(client.del, key)
 
 const incrby = async (key, val) => await redisPromisify(client.incrby, key, val)
+
+const publish = async (channel, message) => await redisPromisify(client.publish, channel, message)
 
 module.exports = {
   sadd,
   smembers,
   get,
   set,
+  expire,
   del,
-  incrby
+  incrby,
+  publish
 }

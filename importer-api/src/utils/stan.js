@@ -3,12 +3,14 @@ const { HOSTNAME, NATS_URI, NATS_TOKEN } = process.env
 
 const stan = natsStreaming.connect('sis-importer-nats', HOSTNAME, {
   url: NATS_URI,
-  token: NATS_TOKEN
+  token: NATS_TOKEN,
+  waitOnFirstConnect: true,
+  maxReconnectAttempts: 30
 })
 
 const opts = stan.subscriptionOptions()
 opts.setManualAckMode(true)
-opts.setAckWait(60 * 1000 * 15)
+opts.setAckWait(60 * 1000)
 opts.setMaxInFlight(5)
 
 const SCHEDULER_STATUS_CHANNEL = 'SCHEDULER_STATUS_CHANNEL'
@@ -22,6 +24,7 @@ const KORI_EDUCATION_CHANNEL = 'KORI_EDUCATION_CHANNEL'
 const KORI_MODULE_CHANNEL = 'KORI_MODULE_CHANNEL'
 const KORI_ORGANISATION_CHANNEL = 'KORI_ORGANISATION_CHANNEL'
 const ORI_TERM_REGISTRATION_CHANNEL = 'ORI_TERM_REGISTRATION'
+const URN_STUDY_LEVEL_CHANNEL = 'URN_STUDY_LEVEL_CHANNEL'
 
 module.exports = {
   stan,
@@ -36,5 +39,6 @@ module.exports = {
   KORI_EDUCATION_CHANNEL,
   KORI_MODULE_CHANNEL,
   KORI_ORGANISATION_CHANNEL,
-  ORI_TERM_REGISTRATION_CHANNEL
+  ORI_TERM_REGISTRATION_CHANNEL,
+  URN_STUDY_LEVEL_CHANNEL
 }

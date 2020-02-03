@@ -1,4 +1,4 @@
-const { set: redisSet } = require('./utils/redis')
+const { set: redisSet, publish: redisPublish } = require('./utils/redis')
 const { randomBytes } = require('crypto')
 const { serviceIds } = require('./services')
 const { schedule } = require('./scheduler')
@@ -20,6 +20,7 @@ const updateOrdinalFrom = async (total, redisKey, ordinal) => {
 const updateHash = async () => {
   const generatedHash = randomBytes(12).toString('hex')
   await redisSet(CURRENT_EXECUTION_HASH, generatedHash)
+  await redisPublish(CURRENT_EXECUTION_HASH, generatedHash)
   return generatedHash
 }
 

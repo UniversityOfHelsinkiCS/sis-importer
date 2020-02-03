@@ -6,7 +6,8 @@ const FETCH_AMOUNT = IS_DEV && !SONIC ? 15 : 1000
 const DEFAULT_CHUNK_SIZE = IS_DEV && !SONIC ? 5 : 50
 const APIS = {
   ori: 'ORI',
-  kori: 'KORI'
+  kori: 'KORI',
+  urn: 'URN'
 }
 const UPDATE_RETRY_LIMIT = 6
 const PANIC_TIMEOUT = IS_DEV || SONIC ? 60 * 1000 : 60 * 1000 * 5

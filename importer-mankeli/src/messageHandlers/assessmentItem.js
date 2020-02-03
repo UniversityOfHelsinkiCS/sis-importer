@@ -19,9 +19,7 @@ const parseAssessmentItem = assessmentItem => {
 
 // Assessment items need to be written into
 // the db in a similar fashion as studyrights.
-module.exports = async ({ active, deleted, executionHash }, transaction) => {
+module.exports = async ({ active, deleted }, transaction) => {
   const parsedAssessmentItems = [...active, ...deleted].map(parseAssessmentItem)
   await bulkCreate(AssessmentItem, parsedAssessmentItems, transaction, ['id', 'modificationOrdinal', 'autoId'])
-
-  return { executionHash }
 }
