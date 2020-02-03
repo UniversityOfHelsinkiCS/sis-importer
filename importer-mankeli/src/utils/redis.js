@@ -3,49 +3,34 @@ const redisLock = require('redis-lock')
 const { promisify } = require('util')
 const { CURRENT_EXECUTION_HASH } = require('../config')
 
+const redisRetry = ({ attempt, error }) => {
+  if (attempt > 100) {
+    throw new Error('Lost connection to Redis...', error)
+  }
+
+  return Math.min(attempt * 100, 5000)
+}
+
 const listener = redis.createClient({
-  url: process.env.REDIS_URI
+  url: process.env.REDIS_URI,
+  retry_strategy: redisRetry
 })
 
-listener.config('set', 'notify-keyspace-events', 'KEA')
-listener.subscribe('__keyevent@0__:set', CURRENT_EXECUTION_HASH)
-
 const client = redis.createClient({
-  url: process.env.REDIS_URI
+  url: process.env.REDIS_URI,
+  retry_strategy: redisRetry
 })
 
 const lock = promisify(redisLock(client))
 
-const redisPromisify = async (func, ...params) =>
-  new Promise((res, rej) => {
-    func.call(client, ...params, (err, data) => {
-      if (err) rej(err)
-      else res(data)
-    })
-  })
-
-const get = async key => await redisPromisify(client.get, key)
-
-const set = async (key, val) => await redisPromisify(client.set, key, val)
-
-const expire = async (key, val) => await redisPromisify(client.expire, key, val)
-
+listener.subscribe(CURRENT_EXECUTION_HASH)
 const onCurrentExecutionHashChange = async handleChange => {
-  const initialValue = await get(CURRENT_EXECUTION_HASH)
-  handleChange(initialValue)
-
-  listener.on('message', async (_, key) => {
-    if (key === CURRENT_EXECUTION_HASH) {
-      const val = await get(key)
-      handleChange(val)
-    }
+  listener.on('message', async (_, hash) => {
+    handleChange(hash)
   })
 }
 
 module.exports = {
   onCurrentExecutionHashChange,
-  get,
-  set,
-  expire,
   lock
 }

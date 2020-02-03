@@ -95,6 +95,10 @@ const schedule = async (id, executionHash) => {
         reject(`No response for ${PANIC_TIMEOUT}ms`)
       }, PANIC_TIMEOUT)
 
+      statusChannel.on('error', e => {
+        reject(e)
+      })
+
       statusChannel.on('unsubscribed', () => {
         clearTimeout(panicTimeout)
       })

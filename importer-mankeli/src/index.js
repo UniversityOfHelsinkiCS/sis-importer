@@ -92,11 +92,12 @@ stan.on('connect', async ({ clientID }) => {
   console.log(`Connecting to NATS as ${clientID}...`)
 
   await onCurrentExecutionHashChange(hash => {
+    if (!currentExecutionHash && hash) {
+      Object.entries(channels).forEach(([CHANNEL, msgHandler]) => {
+        const channel = stan.subscribe(CHANNEL, 'importer-api.workers', opts)
+        channel.on('message', handleMessage(CHANNEL, msgHandler))
+      })
+    }
     currentExecutionHash = hash
-  })
-
-  Object.entries(channels).forEach(([CHANNEL, msgHandler]) => {
-    const channel = stan.subscribe(CHANNEL, 'importer-api.workers', opts)
-    channel.on('message', handleMessage(CHANNEL, msgHandler))
   })
 })
