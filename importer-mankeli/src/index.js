@@ -81,6 +81,7 @@ const handleMessage = (channel, msgHandler) => async msg => {
     }
     transaction.commit()
   } catch (e) {
+    console.log('Handling message failed', e)
     response = { ...JSON.parse(msg.getData()), status: 'FAIL', amount: 0, channel }
     if (transaction) transaction.rollback()
   }
