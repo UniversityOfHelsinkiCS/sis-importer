@@ -22,3 +22,5 @@ module.exports.DB_CONFIG = {
 module.exports.DB_CONNECTION_RETRY_LIMIT = process.env.NODE_ENV === 'development' ? 6 : 20
 
 module.exports.REJECT_UNAUTHORIZED = process.env.KEY_PATH && process.env.CERT_PATH
+
+module.exports.NATS_GROUP = 'importer-api.workers'

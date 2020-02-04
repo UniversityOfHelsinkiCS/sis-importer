@@ -29,7 +29,7 @@ const { sleep } = require('./utils')
 const { createTransaction } = require('./utils/db')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
 const { connection } = require('./db/connection')
-const { REJECT_UNAUTHORIZED } = require('./config')
+const { REJECT_UNAUTHORIZED, NATS_GROUP } = require('./config')
 
 if (!REJECT_UNAUTHORIZED) {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
@@ -99,7 +99,7 @@ stan.on('connect', async ({ clientID }) => {
   await onCurrentExecutionHashChange(hash => {
     if (!currentExecutionHash && hash) {
       Object.entries(channels).forEach(([CHANNEL, msgHandler]) => {
-        const channel = stan.subscribe(CHANNEL, 'importer-api.workers', opts)
+        const channel = stan.subscribe(CHANNEL, NATS_GROUP, opts)
         channel.on('message', handleMessage(CHANNEL, msgHandler))
       })
     }
