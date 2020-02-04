@@ -10,7 +10,6 @@ services:
     environment:
       REDIS_URI: //importer-redis:6380
       NATS_TOKEN: dev
-      REJECT_UNAUTHORIZED: 0
       SONIC: 0
     command: "npm run start:dev"
     volumes:
@@ -20,6 +19,8 @@ services:
     build:
       args:
         NODE_ENV: "development"
+    env_file:
+      - importer-api/.env
     environment:
       REDIS_URI: //importer-redis:6380
       NATS_TOKEN: dev

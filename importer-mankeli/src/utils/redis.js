@@ -23,8 +23,24 @@ const client = redis.createClient({
 
 const lock = promisify(redisLock(client))
 
+const redisPromisify = async (func, ...params) =>
+  new Promise((res, rej) => {
+    func.call(client, ...params, (err, data) => {
+      if (err) rej(err)
+      else res(data)
+    })
+  })
+
+const get = async key => await redisPromisify(client.get, key)
+
+const set = async (key, val) => await redisPromisify(client.set, key, val)
+
+const expire = async (key, val) => await redisPromisify(client.expire, key, val)
+
 listener.subscribe(CURRENT_EXECUTION_HASH)
 const onCurrentExecutionHashChange = async handleChange => {
+  const initialExecutionHash = await get(CURRENT_EXECUTION_HASH)
+  if (initialExecutionHash) handleChange(initialExecutionHash)
   listener.on('message', async (_, hash) => {
     handleChange(hash)
   })
@@ -32,5 +48,8 @@ const onCurrentExecutionHashChange = async handleChange => {
 
 module.exports = {
   onCurrentExecutionHashChange,
-  lock
+  lock,
+  get,
+  set,
+  expire
 }

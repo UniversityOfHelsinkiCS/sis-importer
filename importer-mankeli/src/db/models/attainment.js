@@ -90,6 +90,15 @@ Attainment.init(
     courseUnitId: {
       type: STRING
     },
+    moduleId: {
+      type: STRING
+    },
+    moduleGroupId: {
+      type: STRING
+    },
+    nodes: {
+      type: ARRAY(JSONB)
+    },
     createdAt: {
       type: DATE
     },

@@ -29,6 +29,11 @@ const { sleep } = require('./utils')
 const { createTransaction } = require('./utils/db')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
 const { connection } = require('./db/connection')
+const { REJECT_UNAUTHORIZED } = require('./config')
+
+if (!REJECT_UNAUTHORIZED) {
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
+}
 
 const channels = {
   [ORI_PERSON_CHANNEL]: personHandler,

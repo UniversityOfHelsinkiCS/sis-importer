@@ -22,6 +22,7 @@ const request = async (instance, path, attemps = 6) => {
     return res.data
   } catch (e) {
     console.log(`Request failed for ${path}`, e)
+    throw e
   }
 }
 
