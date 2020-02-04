@@ -30,7 +30,10 @@ const parseAttainment = attainment => {
     courseUnitTypeUrn: attainment.courseUnitTypeUrn,
     courseUnitId: attainment.courseUnitId,
     code: attainment.code,
-    type: attainment.type
+    type: attainment.type,
+    moduleId: attainment.moduleId,
+    moduleGroupId: attainment.moduleGroupId,
+    nodes: attainment.nodes
   }
 }
 

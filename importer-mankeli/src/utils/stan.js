@@ -9,6 +9,11 @@ const stan = natsStreaming.connect('sis-importer-nats', HOSTNAME, {
 })
 
 const opts = stan.subscriptionOptions()
+if (process.env.NODE_ENV === 'development') {
+  opts.setDeliverAllAvailable()
+  opts.setDurableName('importer-api.workers')
+}
+
 opts.setManualAckMode(true)
 opts.setAckWait(60 * 1000)
 opts.setMaxInFlight(1)

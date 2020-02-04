@@ -9,6 +9,7 @@ const Module = require('./module')
 const Organisation = require('./organisation')
 const TermRegistration = require('./termRegistration')
 const StudyLevel = require('./studyLevel')
+const StudyYear = require('./studyYear')
 
 Person.hasMany(StudyRight)
 Education.hasMany(StudyRight)
@@ -27,5 +28,6 @@ module.exports = {
   Module,
   Organisation,
   TermRegistration,
-  StudyLevel
+  StudyLevel,
+  StudyYear
 }
