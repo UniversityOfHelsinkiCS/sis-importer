@@ -7,8 +7,9 @@ const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./ut
 const { services } = require('./services')
 const { FETCH_AMOUNT, DEFAULT_CHUNK_SIZE, APIS, PANIC_TIMEOUT } = require('./config')
 
-const fetchBy = async (api, url, ordinal, limit = 1000) => {
+const fetchBy = async (api, url, ordinal, customRequest, limit = 1000) => {
   if (api === APIS.urn) return urnRequest(url)
+  if (api === APIS.custom) return customRequest(url)
 
   const targetUrl = `${url}?since=${ordinal}&limit=${limit}`
   return await (api === APIS.ori ? oriRequest(targetUrl) : koriRequest(targetUrl))
@@ -69,14 +70,20 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinis
 }
 
 const schedule = async (id, executionHash) => {
-  const { API, API_URL, REDIS_KEY, CHANNEL } = services[id]
+  const { API, API_URL, REDIS_KEY, CHANNEL, customRequest } = services[id]
   let statusChannel
 
   return new Promise(async (resolve, reject) => {
     const latestOrdinal = (await redisGet(REDIS_KEY)) || 0
 
     try {
-      const { hasMore, entities, greatestOrdinal } = await fetchBy(API, API_URL, latestOrdinal, FETCH_AMOUNT)
+      const { hasMore, entities, greatestOrdinal } = await fetchBy(
+        API,
+        API_URL,
+        latestOrdinal,
+        customRequest,
+        FETCH_AMOUNT
+      )
       if (!entities || !entities.length) return resolve(null)
 
       await updateServiceStatus(REDIS_KEY, {
@@ -85,7 +92,11 @@ const schedule = async (id, executionHash) => {
       })
 
       const handleFinish = () => {
-        resolve(API === APIS.urn ? null : { greatestOrdinal, hasMore, total: entities.length, ordinalKey: REDIS_KEY })
+        resolve(
+          [APIS.urn, APIS.custom].includes(API)
+            ? null
+            : { greatestOrdinal, hasMore, total: entities.length, ordinalKey: REDIS_KEY }
+        )
       }
 
       statusChannel = initializeStatusChannel(CHANNEL, REDIS_KEY, executionHash, handleFinish)

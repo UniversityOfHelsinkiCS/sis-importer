@@ -14,7 +14,7 @@ const agent =
 
 const koriInstance = axios.create({
   baseURL: `${SIS_API_URL}/kori/api`,
-  headers: { token: PROXY_TOKEN },
+  headers: { ...(KEY_PATH && CERT_PATH ? {} : { token: PROXY_TOKEN }) },
   httpsAgent: agent
 })
 

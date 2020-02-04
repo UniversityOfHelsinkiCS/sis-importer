@@ -14,7 +14,7 @@ const agent =
 
 const oriInstance = axios.create({
   baseURL: `${SIS_API_URL}/ori/api`,
-  headers: { token: PROXY_TOKEN },
+  headers: { ...(KEY_PATH && CERT_PATH ? {} : { token: PROXY_TOKEN }) },
   httpsAgent: agent
 })
 
