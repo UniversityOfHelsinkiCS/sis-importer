@@ -1,4 +1,5 @@
 const natsStreaming = require('node-nats-streaming')
+const { NATS_GROUP } = require('../config')
 const { HOSTNAME, NATS_URI, NATS_TOKEN } = process.env
 
 const stan = natsStreaming.connect('sis-importer-nats', HOSTNAME, {
@@ -9,11 +10,8 @@ const stan = natsStreaming.connect('sis-importer-nats', HOSTNAME, {
 })
 
 const opts = stan.subscriptionOptions()
-if (process.env.NODE_ENV === 'development') {
-  opts.setDeliverAllAvailable()
-  opts.setDurableName('importer-api.workers')
-}
-
+opts.setDeliverAllAvailable()
+opts.setDurableName(NATS_GROUP)
 opts.setManualAckMode(true)
 opts.setAckWait(60 * 1000)
 opts.setMaxInFlight(1)
