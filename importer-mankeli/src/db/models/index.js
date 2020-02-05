@@ -11,6 +11,7 @@ const TermRegistration = require('./termRegistration')
 const StudyLevel = require('./studyLevel')
 const StudyYear = require('./studyYear')
 const GradeScale = require('./gradeScale')
+const Country = require('./country')
 
 Person.hasMany(StudyRight)
 Education.hasMany(StudyRight)
@@ -31,5 +32,6 @@ module.exports = {
   TermRegistration,
   StudyLevel,
   StudyYear,
-  GradeScale
+  GradeScale,
+  Country
 }

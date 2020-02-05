@@ -13,7 +13,8 @@ const {
   KORI_ORGANISATION_CHANNEL,
   ORI_TERM_REGISTRATION_CHANNEL,
   URN_STUDY_LEVEL_CHANNEL,
-  CUSTOM_GRADE_SCALE_CHANNEL
+  CUSTOM_GRADE_SCALE_CHANNEL,
+  URN_COUNTRY_CHANNEL
 } = require('./utils/stan')
 const personHandler = require('./messageHandlers/person')
 const attainmentHandler = require('./messageHandlers/attainment')
@@ -27,6 +28,7 @@ const organisationHandler = require('./messageHandlers/organisation')
 const termRegistrationHandler = require('./messageHandlers/termRegistration')
 const studyLevelHandler = require('./messageHandlers/studyLevel')
 const gradeScaleHandler = require('./messageHandlers/gradeScale')
+const countryHandler = require('./messageHandlers/country')
 const { sleep } = require('./utils')
 const { createTransaction } = require('./utils/db')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
@@ -49,7 +51,8 @@ const channels = {
   [KORI_ORGANISATION_CHANNEL]: organisationHandler,
   [ORI_TERM_REGISTRATION_CHANNEL]: termRegistrationHandler,
   [URN_STUDY_LEVEL_CHANNEL]: studyLevelHandler,
-  [CUSTOM_GRADE_SCALE_CHANNEL]: gradeScaleHandler
+  [CUSTOM_GRADE_SCALE_CHANNEL]: gradeScaleHandler,
+  [URN_COUNTRY_CHANNEL]: countryHandler
 }
 
 let currentExecutionHash = null
