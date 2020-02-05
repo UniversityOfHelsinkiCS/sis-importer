@@ -4,8 +4,8 @@ const { get: redisGet, set: redisSet, expire: redisExpire } = require('./redis')
 
 const toEntities = urnResult => ({
   entities: Object.values(urnResult).map(urnItem => ({
+    ...urnItem,
     id: urnItem.urn,
-    name: urnItem.name,
     documentState: 'ACTIVE'
   }))
 })
