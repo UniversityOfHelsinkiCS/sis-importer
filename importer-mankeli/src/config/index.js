@@ -16,7 +16,8 @@ module.exports.DB_CONFIG = {
   password: DB_PASSWORD,
   port: DB_PORT,
   host: DB_HOST,
-  database: DB_DATABASE
+  database: DB_DATABASE,
+  logging: false
 }
 
 module.exports.DB_CONNECTION_RETRY_LIMIT = process.env.NODE_ENV === 'development' ? 6 : 20
