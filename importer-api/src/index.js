@@ -64,7 +64,7 @@ const run = async () => {
 }
 
 stan.on('connect', ({ clientID }) => {
-  console.log(`Connecting to NATS as ${clientID}...`)
+  console.log(`Connected to NATS as ${clientID}...`)
   run()
   scheduleCron(IS_DEV || SONIC ? '* * * * * *' : '*/30 * * * *', run)
 })

@@ -117,6 +117,9 @@ Attainment.init(
       },
       {
         fields: ['course_unit_id']
+      },
+      {
+        fields: ['module_id']
       }
     ]
   }

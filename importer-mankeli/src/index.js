@@ -104,7 +104,7 @@ stan.on('connect', async ({ clientID }) => {
   }
 
   if (connection.error) return
-  console.log(`Connecting to NATS as ${clientID}...`)
+  console.log(`Connected to NATS as ${clientID}...`)
 
   await onCurrentExecutionHashChange(hash => {
     if (!currentExecutionHash && hash) {
