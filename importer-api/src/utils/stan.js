@@ -3,7 +3,9 @@ const { HOSTNAME, NATS_URI, NATS_TOKEN } = process.env
 
 const stan = natsStreaming.connect('sis-importer-nats', HOSTNAME, {
   url: NATS_URI,
-  token: NATS_TOKEN
+  token: NATS_TOKEN,
+  maxReconnectAttempts: -1,
+  waitOnFirstConnect: true
 })
 
 const opts = stan.subscriptionOptions()

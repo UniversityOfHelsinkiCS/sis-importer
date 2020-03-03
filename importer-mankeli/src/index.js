@@ -116,3 +116,7 @@ stan.on('connect', async ({ clientID }) => {
     currentExecutionHash = hash
   })
 })
+
+stan.on('error', e => {
+  console.log('NATS ERROR', e)
+})

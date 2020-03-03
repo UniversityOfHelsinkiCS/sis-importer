@@ -68,3 +68,7 @@ stan.on('connect', ({ clientID }) => {
   run()
   scheduleCron(IS_DEV || SONIC ? '* * * * * *' : '*/30 * * * *', run)
 })
+
+stan.on('error', e => {
+  console.log('STAN ERROR', e)
+})
