@@ -23,8 +23,7 @@ const bulkDelete = async (model, entities, transaction, property = 'id') => {
 
 const createTransaction = async () => {
   try {
-    const t = await connection.sequelize.transaction()
-    return t
+    return await connection.sequelize.transaction()
   } catch (e) {
     return null
   }
