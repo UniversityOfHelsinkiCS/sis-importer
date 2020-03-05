@@ -71,4 +71,5 @@ stan.on('connect', ({ clientID }) => {
 
 stan.on('error', e => {
   console.log('STAN ERROR', e)
+  process.exit(1)
 })
