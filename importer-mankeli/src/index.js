@@ -103,7 +103,7 @@ stan.on('connect', async ({ clientID }) => {
     await sleep(100)
   }
 
-  if (connection.error) return
+  if (connection.error) process.exit(1)
   console.log(`Connected to NATS as ${clientID}...`)
 
   await onCurrentExecutionHashChange(hash => {
@@ -119,4 +119,5 @@ stan.on('connect', async ({ clientID }) => {
 
 stan.on('error', e => {
   console.log('NATS ERROR', e)
+  process.exit(1)
 })
