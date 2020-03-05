@@ -9,7 +9,10 @@ services:
       DB_PORT: 5432
       DB_HOST: importer-db
       DB_DATABASE: importer-db
-    restart: unless-stopped
+    depends_on:
+      - importer-db
+      - importer-redis
+      - importer-nats
 
   importer-api:
     build:
@@ -17,7 +20,8 @@ services:
     environment:
       NATS_URI: importer-nats://importer-nats:4223
     container_name: sis-importer-api
-    restart: unless-stopped
+    depends_on:
+      - importer-mankeli
 
   importer-db:
     image: postgres:9.6.3
