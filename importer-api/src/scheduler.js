@@ -6,6 +6,7 @@ const { urnRequest } = require('./utils/urnApi')
 const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./utils/redis')
 const { services } = require('./services')
 const { FETCH_AMOUNT, DEFAULT_CHUNK_SIZE, APIS, PANIC_TIMEOUT } = require('./config')
+const { logger } = require('./utils/logger')
 
 const fetchBy = async (api, url, ordinal, customRequest, limit = 1000) => {
   if (api === APIS.urn) return urnRequest(url)
@@ -28,11 +29,11 @@ const createJobsFromEntities = async (channel, entities, executionHash, chunks =
   })
 }
 
-const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinish) => {
+const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinish, serviceId) => {
   const statusChannel = stan.subscribe(SCHEDULER_STATUS_CHANNEL, opts)
   statusChannel.on('message', async msg => {
     try {
-      const { channel: msgChannel, status, entities, amount, executionHash: msgExecutionHash } = JSON.parse(
+      const { channel: msgChannel, status, entities, amount, executionHash: msgExecutionHash, stack } = JSON.parse(
         msg.getData()
       )
       const amountScheduled = await redisGet(`${ordinalKey}_SCHEDULED`)
@@ -49,13 +50,12 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinis
         if (entities.length > 1) {
           await createJobsFromEntities(channel, entities, executionHash, Math.ceil(entities.length / 2))
         } else {
-          // Log error to sentry?
-          console.log('Failed multiple times')
+          logger.error({ message: 'Importing entity failed', meta: stack })
           result = await redisIncrementBy(`${ordinalKey}_UPDATED`, entities.length)
         }
       }
 
-      if (result) console.log(`${result}/${amountScheduled}`)
+      if (result) logger.info({ message: 'Imported', count: amount, done: result, total: amountScheduled, serviceId })
       if (result === Number(amountScheduled)) {
         handleFinish()
         statusChannel.unsubscribe()
@@ -99,7 +99,7 @@ const schedule = async (id, executionHash) => {
         )
       }
 
-      statusChannel = initializeStatusChannel(CHANNEL, REDIS_KEY, executionHash, handleFinish)
+      statusChannel = initializeStatusChannel(CHANNEL, REDIS_KEY, executionHash, handleFinish, id)
 
       const panicTimeout = setTimeout(() => {
         statusChannel.unsubscribe()

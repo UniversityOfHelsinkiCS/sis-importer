@@ -11,6 +11,9 @@ services:
       REDIS_URI: //importer-redis:6380
       NATS_TOKEN: dev
       SONIC: 0
+      # LOG_HOST: host.docker.internal
+      # LOG_HOSTNAME: sis-importer-api
+      # LOG_PORT: 9501
     command: "npm run start:dev"
     volumes:
       - ./importer-api:/usr/src/app
