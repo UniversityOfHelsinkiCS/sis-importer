@@ -6,6 +6,7 @@ const { SONIC, REJECT_UNAUTHORIZED, IS_DEV, CURRENT_EXECUTION_HASH, UPDATE_RETRY
 const { stan } = require('./utils/stan')
 const { schedule: scheduleCron } = require('./utils/cron')
 const { sleep } = require('./utils')
+const { logger } = require('./utils/logger')
 
 let isImporting = false
 
@@ -25,6 +26,7 @@ const updateHash = async () => {
 }
 
 const update = async (current, attempt = 1) => {
+  const start = new Date()
   if (IS_DEV && !SONIC) {
     await sleep(1000)
   }
@@ -46,9 +48,10 @@ const update = async (current, attempt = 1) => {
     } else {
       update(current + 1)
     }
+    logger.info({ message: 'Imported batch', timems: new Date() - start })
   } catch (e) {
     if (attempt === UPDATE_RETRY_LIMIT) {
-      console.log('Importing failed', e)
+      logger.error({ message: 'Importing failed', meta: e.stack })
       isImporting = false
       return
     }
