@@ -7,6 +7,7 @@ const { stan } = require('./utils/stan')
 const { schedule: scheduleCron } = require('./utils/cron')
 const { sleep } = require('./utils')
 const { logger } = require('./utils/logger')
+const requestBuffer = require('./utils/requestBuffer')
 
 let isImporting = false
 
@@ -25,11 +26,17 @@ const updateHash = async () => {
   return generatedHash
 }
 
+const updateNext = current => {
+  requestBuffer.flush()
+  update(current + 1)
+}
+
 const update = async (current, attempt = 1) => {
   const start = new Date()
   if (IS_DEV && !SONIC) {
     await sleep(1000)
   }
+
   const generatedHash = await updateHash()
   const serviceId = serviceIds[current]
   if (!serviceId) {
@@ -37,6 +44,7 @@ const update = async (current, attempt = 1) => {
     isImporting = false
     return
   }
+
   console.log(`Importing ${serviceId} (${current + 1}/${Object.keys(serviceIds).length})`)
   try {
     const data = await schedule(serviceId, generatedHash)
@@ -44,12 +52,14 @@ const update = async (current, attempt = 1) => {
       const { greatestOrdinal, hasMore, total, ordinalKey } = data
       console.log(`New ordinal for ${serviceId}: ${greatestOrdinal}`)
       await updateOrdinalFrom(total, ordinalKey, greatestOrdinal)
-      update(hasMore ? current : current + 1)
+      hasMore ? update(current) : updateNext(current)
     } else {
-      update(current + 1)
+      updateNext(current)
     }
+
     logger.info({ message: 'Imported batch', timems: new Date() - start })
   } catch (e) {
+    requestBuffer.flush()
     if (attempt === UPDATE_RETRY_LIMIT) {
       logger.error({ message: 'Importing failed', meta: e.stack })
       isImporting = false
@@ -62,6 +72,7 @@ const update = async (current, attempt = 1) => {
 const run = async () => {
   if (!isImporting) {
     isImporting = true
+    requestBuffer.flush()
     update(0)
   }
 }
