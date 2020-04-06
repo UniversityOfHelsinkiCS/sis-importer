@@ -1,4 +1,5 @@
 const { chunk } = require('lodash')
+const { eachLimit } = require('async')
 const { stan, opts, SCHEDULER_STATUS_CHANNEL } = require('./utils/stan')
 const { oriRequest } = require('./utils/oriApi')
 const { koriRequest } = require('./utils/koriApi')
@@ -7,6 +8,7 @@ const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./ut
 const { services } = require('./services')
 const { FETCH_AMOUNT, DEFAULT_CHUNK_SIZE, APIS, PANIC_TIMEOUT } = require('./config')
 const { logger } = require('./utils/logger')
+const requestBuffer = require('./utils/requestBuffer')
 
 const fetchBy = async (api, url, ordinal, customRequest, limit = 1000) => {
   if (api === APIS.urn) return urnRequest(url)
@@ -21,11 +23,17 @@ const updateServiceStatus = async (key, { updated = undefined, scheduled = undef
   if (scheduled !== undefined) await redisSet(`${key}_SCHEDULED`, scheduled)
 }
 
-const createJobsFromEntities = async (channel, entities, executionHash, chunks = DEFAULT_CHUNK_SIZE) => {
-  chunk(entities, chunks).forEach(c => {
-    stan.publish(channel, JSON.stringify({ entities: c, executionHash }), err => {
-      if (err) console.log('failed publishing', err)
+const createJobs = async (channel, entities, executionHash) =>
+  new Promise((res, rej) => {
+    stan.publish(channel, JSON.stringify({ entities, executionHash }), err => {
+      if (err) return rej(err)
+      res()
     })
+  })
+
+const createJobsFromEntities = async (channel, entities, executionHash, chunks = DEFAULT_CHUNK_SIZE) => {
+  await eachLimit(chunk(entities, chunks), 5, async e => {
+    await createJobs(channel, e, executionHash)
   })
 }
 
@@ -77,13 +85,9 @@ const schedule = async (id, executionHash) => {
     const latestOrdinal = (await redisGet(REDIS_KEY)) || 0
 
     try {
-      const { hasMore, entities, greatestOrdinal } = await fetchBy(
-        API,
-        API_URL,
-        latestOrdinal,
-        customRequest,
-        FETCH_AMOUNT
-      )
+      const { hasMore, entities, greatestOrdinal } =
+        (await requestBuffer.read()) || (await fetchBy(API, API_URL, latestOrdinal, customRequest, FETCH_AMOUNT))
+
       if (!entities || !entities.length) return resolve(null)
 
       await updateServiceStatus(REDIS_KEY, {
@@ -114,7 +118,8 @@ const schedule = async (id, executionHash) => {
         clearTimeout(panicTimeout)
       })
 
-      createJobsFromEntities(CHANNEL, entities, executionHash)
+      await createJobsFromEntities(CHANNEL, entities, executionHash)
+      requestBuffer.fill(() => fetchBy(API, API_URL, greatestOrdinal, customRequest, FETCH_AMOUNT))
     } catch (e) {
       if (statusChannel) statusChannel.unsubscribe()
       reject(e)
