@@ -119,7 +119,9 @@ const schedule = async (id, executionHash) => {
       })
 
       await createJobsFromEntities(CHANNEL, entities, executionHash)
-      requestBuffer.fill(() => fetchBy(API, API_URL, greatestOrdinal, customRequest, FETCH_AMOUNT))
+      if (![APIS.urn, APIS.custom].includes(API)) {
+        requestBuffer.fill(() => fetchBy(API, API_URL, greatestOrdinal, customRequest, FETCH_AMOUNT))
+      }
     } catch (e) {
       if (statusChannel) statusChannel.unsubscribe()
       reject(e)
