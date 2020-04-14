@@ -39,6 +39,10 @@ const { onCurrentExecutionHashChange } = require('./utils/redis')
 const { connection } = require('./db/connection')
 const { REJECT_UNAUTHORIZED, NATS_GROUP } = require('./config')
 
+if ( process.env.NODE_ENV === 'development') {
+  require('./explorer')
+}
+
 if (!REJECT_UNAUTHORIZED) {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 }
