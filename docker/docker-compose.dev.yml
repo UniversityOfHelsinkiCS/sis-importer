@@ -11,12 +11,19 @@ services:
       REDIS_URI: //importer-redis:6380
       NATS_TOKEN: dev
       SONIC: 0
+      DB_USERNAME: dev
+      DB_PASSWORD: dev
+      DB_PORT: 5432
+      DB_HOST: importer-db
+      DB_DATABASE: importer-db
       # LOG_HOST: host.docker.internal
       # LOG_HOSTNAME: sis-importer-api
       # LOG_PORT: 9501
     command: "npm run start:dev"
     volumes:
       - ./importer-api:/usr/src/app
+    ports:
+      - 3002:3002 # explorer at http://localhost:3002/
 
   importer-mankeli:
     build:
@@ -32,8 +39,6 @@ services:
     command: "npm run start:dev"
     volumes:
       - ./importer-mankeli:/usr/src/app
-    ports:
-      - 3002:3002 # explorer at http://localhost:3002/
 
   importer-db:
     environment:
