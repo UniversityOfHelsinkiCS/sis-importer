@@ -11,6 +11,10 @@ const requestBuffer = require('./utils/requestBuffer')
 
 let isImporting = false
 
+if (process.env['NODE_ENV'] === 'development') {
+  require('./explorer')
+}
+
 if (!REJECT_UNAUTHORIZED) {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 }
