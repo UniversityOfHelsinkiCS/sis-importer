@@ -15,8 +15,11 @@
   "dependencies": {
     "axios": "^0.19.0",
     "cron": "^1.8.1",
+    "express": "^4.17.1",
+    "knex": "^0.20.14",
     "lodash": "^4.17.15",
     "node-nats-streaming": "^0.2.6",
+    "pg": "^8.0.2",
     "redis": "^2.8.0",
     "winston": "^3.2.1",
     "winston-log2gelf": "^2.1.0"
