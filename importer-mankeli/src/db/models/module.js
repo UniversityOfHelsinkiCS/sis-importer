@@ -88,8 +88,8 @@ Module.init(
       {
         fields: ['group_id']
       }
-    ],
-  },
+    ]
+  }
 )
 
 module.exports = Module

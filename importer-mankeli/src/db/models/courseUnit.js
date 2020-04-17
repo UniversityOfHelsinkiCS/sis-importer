@@ -70,7 +70,7 @@ CourseUnit.init(
       {
         fields: ['group_id']
       }
-    ],
+    ]
   }
 )
 

@@ -1,4 +1,3 @@
-
 module.exports = {
   up: async queryInterface => {
     await Promise.all([
