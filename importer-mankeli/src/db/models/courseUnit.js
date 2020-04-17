@@ -65,7 +65,12 @@ CourseUnit.init(
     underscored: true,
     sequelize: connection.sequelize,
     modelName: 'course_unit',
-    tableName: 'course_units'
+    tableName: 'course_units',
+    indexes: [
+      {
+        fields: ['group_id']
+      }
+    ],
   }
 )
 

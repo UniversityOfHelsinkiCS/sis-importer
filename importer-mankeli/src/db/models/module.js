@@ -83,8 +83,13 @@ Module.init(
     underscored: true,
     sequelize: connection.sequelize,
     modelName: 'module',
-    tableName: 'modules'
-  }
+    tableName: 'modules',
+    indexes: [
+      {
+        fields: ['group_id']
+      }
+    ],
+  },
 )
 
 module.exports = Module
