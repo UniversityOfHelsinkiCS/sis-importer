@@ -62,6 +62,11 @@ CourseUnit.init(
     },
   },
   {
+    indexes: [
+      {
+        fields: ['group_id'],
+      },
+    ],
     underscored: true,
     sequelize,
     modelName: 'course_unit',

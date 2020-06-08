@@ -4,6 +4,7 @@ require('express-async-errors');
 
 const courseUnitsRouter = require('./routes/courseUnits')
 const courseUnitRealisationsRouter = require('./routes/courseUnitRealisations')
+const coursesRouter = require('./routes/coursesRouter')
 
 const app = express()
 
@@ -20,6 +21,7 @@ app.use((req, res, next) => {
 
 app.use('/course_units', courseUnitsRouter)
 app.use('/course_unit_realisations', courseUnitRealisationsRouter)
+app.use('/courses', coursesRouter)
 
 app.use((error, req, res, next) => {
   res.status(500).json({ error: error.message })

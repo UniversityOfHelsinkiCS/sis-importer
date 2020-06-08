@@ -4,8 +4,7 @@ const router = express.Router()
 
 router.get('/', async (req, res) => {
   const courseUnitRealisations = await models.CourseUnitRealisation.findOne()
-  const safe = [{ name: courseUnitRealisations.name }] // safe when testing ci
-  res.send(safe)
+  res.send(courseUnitRealisations)
 })
 
 module.exports = router
