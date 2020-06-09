@@ -1,0 +1,46 @@
+name: importer-db-api
+
+on:
+  push:
+    branches:
+      - master
+      - trunk 
+    paths:
+      - importer-db-api/**
+
+jobs:
+  build-test-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Pull images
+      run: |
+        docker pull toska/sis-importer-api:$TAG
+        docker pull toska/sis-importer-mankeli:$TAG
+        docker pull toska/sis-importer-db-api:$TAG
+      env:
+        TAG: staging
+
+    - name: Build 
+      run: npm run dco:ci -- build importer-db-api
+      env:
+        TAG: staging
+    
+    - name: Start
+      run: npm run dco:ci -- up -d
+      env:
+        TAG: staging
+    
+    - name: Test
+      run: docker exec -t sis-importer-db-api npm run test 
+    
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1.1.0 
+      with:
+        repository: toska/sis-importer-db-api
+        path: importer-db-api
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        tag_with_ref: true
