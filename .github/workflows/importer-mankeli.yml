@@ -43,4 +43,4 @@ jobs:
         path: importer-mankeli
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-        tags: staging
+        tag_with_ref: true
