@@ -18,9 +18,11 @@ jobs:
     
     - name: Pull images
       run: |
-        docker pull toska/sis-importer-api:trunk
-        docker pull toska/sis-importer-mankeli:trunk
-        docker pull toska/sis-importer-db-api:staging
+        docker pull toska/sis-importer-api:$TAG
+        docker pull toska/sis-importer-mankeli:$TAG
+        docker pull toska/sis-importer-db-api:$TAG
+      env:
+        TAG: staging
 
     - name: Build 
       run: npm run dco:ci -- build importer-api
