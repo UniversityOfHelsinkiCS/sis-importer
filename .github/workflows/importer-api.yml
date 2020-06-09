@@ -3,8 +3,7 @@ name: importer-api
 on:
   push:
     branches:
-      - master
-      - trunk
+      - ci-mayhem
 #    paths:
 #      - importer-api/**
 
@@ -24,7 +23,7 @@ jobs:
         docker pull toska/sis-importer-db-api:staging
 
     - name: Build 
-      run: npm run dco:ci -- build
+      run: npm run dco:ci -- build importer-api
     
     - name: Start
       run: npm run dco:ci -- up -d
