@@ -26,6 +26,8 @@ jobs:
 
     - name: Build 
       run: npm run dco:ci -- build importer-api
+      env:
+        TAG: staging
     
     - name: Start
       run: npm run dco:ci -- up -d
