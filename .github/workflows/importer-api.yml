@@ -31,6 +31,8 @@ jobs:
     
     - name: Start
       run: npm run dco:ci -- up -d
+      env:
+        TAG: staging
     
     - name: Test
       run: docker exec -t sis-importer-api npm run test 
