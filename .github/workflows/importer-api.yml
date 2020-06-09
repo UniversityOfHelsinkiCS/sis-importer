@@ -5,8 +5,8 @@ on:
     branches:
       - master
       - trunk
-    paths:
-      - importer-api/**
+#    paths:
+#      - importer-api/**
 
 jobs:
   build-test-push:
@@ -16,6 +16,12 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+    
+    - name: Pull images
+      run: |
+        docker pull toska/sis-importer-api
+        docker pull toska/sis-importer-mankeli
+        docker pull toska/sis-importer-db-api
 
     - name: Build 
       run: npm run dco:ci -- build
