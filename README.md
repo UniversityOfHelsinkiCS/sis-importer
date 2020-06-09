@@ -29,3 +29,11 @@ http://localhost:8282/
 
 In dev mode see http://localhost:3002/structure/:code (eg KH50_005 for Computer sciencebachelor  ) for decree structures. The (shitty) code is in importer-mankeli
 
+## CI
+
+All three services (api, mankeli and db-api) go through individual github actions workflows, defined in .github/workflows.
+Master branch docker images are tagged as `latest`, trunk branch as `trunk`. oodikone-staging automatically pulls new `latest` -images.
+
+### TODO
+Make a release pipeline when this goes to production.
+
