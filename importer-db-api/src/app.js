@@ -12,8 +12,10 @@ app.use(logger('short'))
 app.use(express.json())
 
 app.use((req, res, next) => {
+  const { TOKEN } = process.env
   const { query, headers } = req
-  if (query.token !== process.env.TOKEN && headers['token'] !== process.env.TOKEN) {
+  
+  if (query.token !== TOKEN && headers['token'] !== TOKEN) {
     console.log('no token', query.token, headers['token'])
     return res.status(401).end()
   }
