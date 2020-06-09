@@ -3,17 +3,16 @@ name: importer-api
 on:
   push:
     branches:
-      - ci-mayhem
-#    paths:
-#      - importer-api/**
+      - master
+      - trunk 
+    paths:
+      - importer-api/**
 
 jobs:
   build-test-push:
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
     
     - name: Pull images
@@ -44,4 +43,4 @@ jobs:
         path: importer-api
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-        tags: ci_testing       
+        tags: staging       
