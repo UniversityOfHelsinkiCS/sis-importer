@@ -5,6 +5,7 @@ const { request } = require('./index')
 const { SIS_API_URL, PROXY_TOKEN, KEY_PATH, CERT_PATH } = process.env
 
 const hasCerts = CERT_PATH && KEY_PATH
+
 const agent = hasCerts
   ? new https.Agent({
       cert: fs.readFileSync(CERT_PATH, 'utf8'),
