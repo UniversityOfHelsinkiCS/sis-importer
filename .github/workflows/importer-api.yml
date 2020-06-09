@@ -21,7 +21,7 @@ jobs:
       run: |
         docker pull toska/sis-importer-api:trunk
         docker pull toska/sis-importer-mankeli:trunk
-        docker pull toska/sis-importer-db-api:trunk
+        docker pull toska/sis-importer-db-api:staging
 
     - name: Build 
       run: npm run dco:ci -- build
