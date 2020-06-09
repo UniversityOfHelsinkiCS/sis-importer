@@ -49,6 +49,22 @@ services:
       - oodikone_default
       - default
 
+  importer-db-api:
+    build:
+      args:
+        NODE_ENV: "development"
+    ports:
+      - 3000:3000
+    environment:
+      DB_USERNAME: dev
+      DB_PASSWORD: dev
+      DB_PORT: 5432
+      DB_HOST: importer-db
+      DB_DATABASE: importer-db
+    command: "npm run start:dev"
+    volumes:
+      - ./importer-db-api:/usr/src/app
+
   importer-nats:
     ports:
       - 8223:8222 # Monitoring at http://localhost:8223/

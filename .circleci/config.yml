@@ -34,12 +34,12 @@ jobs:
           name: logs
           background: true
           command: npm run dco:ci -- logs
-      - run: docker exec -t sis-importer-api npm run test && docker exec -t sis-importer-mankeli npm run test
+      - run: docker exec -t sis-importer-api npm run test && docker exec -t sis-importer-mankeli npm run test && docker exec -t sis-importer-db-api npm run test
       - run: |
           if [ "${DEPLOY}" == "true" ]; then
             echo "$DOCKER_PASS" > DOCKER_PASS
             cat DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-            npm run dco:ci -- push importer-api importer-mankeli
+            npm run dco:ci -- push importer-api importer-mankeli importer-db-api
           fi
 
 workflows:

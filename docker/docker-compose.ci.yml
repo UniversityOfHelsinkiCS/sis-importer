@@ -13,3 +13,7 @@ services:
       REDIS_URI: //importer-redis:6380
       NATS_TOKEN: dev
     container_name: sis-importer-mankeli
+
+  importer-db-api:
+    image: toska/sis-importer-db-api:${TAG}
+    container_name: sis-importer-db-api
