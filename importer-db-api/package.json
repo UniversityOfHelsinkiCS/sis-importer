@@ -11,8 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "es6-error": "^4.1.1",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
+    "lodash": "^4.17.15",
     "morgan": "^1.10.0",
     "pg": "^8.2.1",
     "sequelize": "^5.21.12"
