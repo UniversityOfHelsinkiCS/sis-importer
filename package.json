@@ -12,7 +12,7 @@
     "dco:setup_network": "docker network ls |grep \"oodikone_default\" || docker network create oodikone_default",
     "start": "npm run dco:setup_network && npm run dco:up -- --scale importer-mankeli=3 && npm run dco:logs",
     "start:db": "npm run dco:setup_network && npm run dco:up:db && npm run dco:logs",
-    "build": "npm i && npm i --prefix ./importer-api && npm i --prefix ./importer-mankeli && npm run dco -- build",
+    "build": "npm i && npm i --prefix ./importer-api && npm i --prefix ./importer-mankeli && npm i --prefix ./importer-db-api && npm run dco -- build",
     "test": "npm test --prefix ./importer-api && npm test --prefix ./importer-mankeli",
     "lintfix": "npm run lintfix --prefix ./importer-api && npm run lintfix --prefix ./importer-mankeli",
     "reset": "docker volume rm sis-importer_sis-importer-datastore && docker volume rm sis-importer_sis-importer-pgdata && docker volume rm sis-importer_sis-importer-redis",
