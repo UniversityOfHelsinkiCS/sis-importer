@@ -13,6 +13,11 @@
 ./populate-db.sh
 ```
 
+### Starting specific service groups ###
+
+1. To inspect the db with adminer `npm run start:db`
+2. To develop the db-api with db and adminer `npm run start:api`
+
 ### SONIC mode
 If one wants to increase the speed of the importer when developing, set the flag `SONIC` to `1` [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/docker/docker-compose.dev.yml#L13)
 
