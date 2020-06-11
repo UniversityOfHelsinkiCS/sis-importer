@@ -3,7 +3,7 @@ const { Op } = require('sequelize')
 const _ = require('lodash')
 
 const models = require('../models')
-const { NotFoundError } = require('../errors');
+const { NotFoundError } = require('../errors')
 
 const router = express.Router()
 
@@ -17,7 +17,7 @@ router.get('/:code/course_unit_realisations', async (req, res) => {
   })
 
   if (!courseUnit) {
-    throw new NotFoundError(`Course unit with code ${code} is not found`);
+    throw new NotFoundError(`Course unit with code ${code} is not found`)
   }
 
   const { groupId } = courseUnit
@@ -65,11 +65,13 @@ router.get('/', async (req, res) => {
 
   const groupedCourseUnits = _.groupBy(courseUnits, ({ code }) => code)
 
-  const uniqueCourseUnits = _.mapValues(groupedCourseUnits, courseUnitsByCode =>
+  const groupedUniqueCourseUnits = _.mapValues(groupedCourseUnits, courseUnitsByCode =>
     _.maxBy(courseUnitsByCode, ({ validityPeriod }) =>
       validityPeriod && validityPeriod.endDate ? new Date(validityPeriod.endDate) : undefined
     )
   )
+
+  const uniqueCourseUnits = _.values(groupedUniqueCourseUnits);
 
   res.send(uniqueCourseUnits)
 })
