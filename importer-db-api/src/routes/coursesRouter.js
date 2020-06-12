@@ -36,4 +36,21 @@ router.get('/', async (req, res) => {
   res.send(courseUnitRealisations)
 })
 
+// KH50_005
+router.get('/programme/:programmeCode', async (req, res) => {
+  const { Module } = models
+  const { query } = req
+  const programmeCode = query.programmeCode // 'KH50_005' = CS kandi
+  const module = await Module.findOne({
+    where: {
+      code: programmeCode,
+    },
+  })
+  const courses = await module.getCourses()
+
+  res.send({
+    courses,
+  })
+})
+
 module.exports = router
