@@ -38,19 +38,25 @@ router.get('/programme/:programmeCode', async (req, res) => {
       code: programmeCode,
     },
   })
-  const courses = await module.getCourses()
-  const searchedCourses = Object.values(courses).map(course => ({
-    id: course.id,
-    code: course.code,
-    name: course.name
-  })).filter(course => {
-    const searchString = query.search || ""
-    const searchFields = [course.id, course.code, ...Object.values(course.name)]
-    return searchFields.find(f => f.includes(searchString))
-  })
+  let courses = {}
+
+  if (module) courses = await module.getCourses()
+
+  if (!module) {
+    const organisation = await models.Organisation.findOne({
+      where: {
+        code: programmeCode,
+      },
+    })
+    courses = await organisation.getCourses()
+  }
 
   res.send({
-    course_units: searchedCourses,
+    course_units: courses.filter(course => {
+      const searchString = query.search || ''
+      const searchFields = [course.id, course.code, ...Object.values(course.name)]
+      return searchFields.find(f => f.includes(searchString))
+    }),
   })
 })
 

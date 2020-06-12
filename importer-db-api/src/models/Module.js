@@ -117,11 +117,10 @@ const resolver = async (rule, n) => {
 }
 
 class Module extends Model {
-
   async getCourses() {
     let courses = {}
 
-    const recursiveWrite = async (module) => {
+    const recursiveWrite = async module => {
       if (Array.isArray(module)) {
         module.forEach(recursiveWrite)
       }
@@ -134,7 +133,7 @@ class Module extends Model {
       }
 
       if (module.type === 'course') courses[module.code] = newModule
-    
+
       if (!module.children) return
       for (const child of module.children) {
         await recursiveWrite(child)
@@ -145,7 +144,12 @@ class Module extends Model {
     for (const submod of submodules) {
       recursiveWrite(submod, this.groupId)
     }
-    return courses
+
+    return Object.values(courses).map(course => ({
+      id: course.id,
+      code: course.code,
+      name: course.name,
+    }))
   }
 }
 
