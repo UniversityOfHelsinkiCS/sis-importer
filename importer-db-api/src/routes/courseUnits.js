@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/programme/:programmeCode', async (req, res) => {
-  const { params } = req
+  const { params, query } = req
   const programmeCode = params.programmeCode // 'KH50_005' = CS kandi
   const module = await models.Module.findOne({
     where: {
@@ -39,9 +39,18 @@ router.get('/programme/:programmeCode', async (req, res) => {
     },
   })
   const courses = await module.getCourses()
+  const searchedCourses = Object.values(courses).map(course => ({
+    id: course.id,
+    code: course.code,
+    name: course.name
+  })).filter(course => {
+    const searchString = query.search || ""
+    const searchFields = [course.id, course.code, ...Object.values(course.name)]
+    return searchFields.find(f => f.includes(searchString))
+  })
 
   res.send({
-    courses,
+    course_units: searchedCourses,
   })
 })
 
