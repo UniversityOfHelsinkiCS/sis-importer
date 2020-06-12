@@ -1,45 +1,9 @@
 const express = require('express')
 const { Op } = require('sequelize')
-const _ = require('lodash')
 
 const models = require('../models')
-const { NotFoundError } = require('../errors')
 
 const router = express.Router()
-
-router.get('/:code/course_unit_realisations', async (req, res) => {
-  const { code } = req.params
-
-  const courseUnit = await models.CourseUnit.findOne({
-    where: {
-      code,
-    },
-  })
-
-  if (!courseUnit) {
-    throw new NotFoundError(`Course unit with code ${code} is not found`)
-  }
-
-  const { groupId } = courseUnit
-
-  const assessmentItem = await models.AssessmentItem.findOne({
-    where: {
-      primary_course_unit_group_id: groupId,
-    },
-  })
-
-  const { id: assessmentItemId } = assessmentItem
-
-  const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
-    where: {
-      assessmentItemIds: {
-        [Op.contains]: [assessmentItemId],
-      },
-    },
-  })
-
-  res.send(courseUnitRealisations)
-})
 
 router.get('/', async (req, res) => {
   const { codes: codesString } = req.query
@@ -63,17 +27,22 @@ router.get('/', async (req, res) => {
     },
   })
 
-  const groupedCourseUnits = _.groupBy(courseUnits, ({ code }) => code)
+  res.send(courseUnits)
+})
 
-  const groupedUniqueCourseUnits = _.mapValues(groupedCourseUnits, courseUnitsByCode =>
-    _.maxBy(courseUnitsByCode, ({ validityPeriod }) =>
-      validityPeriod && validityPeriod.endDate ? new Date(validityPeriod.endDate) : undefined
-    )
-  )
+router.get('/programme/:programmeCode', async (req, res) => {
+  const { params } = req
+  const programmeCode = params.programmeCode // 'KH50_005' = CS kandi
+  const module = await models.Module.findOne({
+    where: {
+      code: programmeCode,
+    },
+  })
+  const courses = await module.getCourses()
 
-  const uniqueCourseUnits = _.values(groupedUniqueCourseUnits);
-
-  res.send(uniqueCourseUnits)
+  res.send({
+    courses,
+  })
 })
 
 module.exports = router
