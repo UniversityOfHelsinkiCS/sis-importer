@@ -1,7 +1,6 @@
 const { Model, ARRAY, STRING, DATE, BIGINT, JSONB } = require('sequelize')
 const { sequelize } = require('../config/db')
 const CourseUnit = require('./CourseUnit')
-const { Op } = require('sequelize')
 
 class Organisation extends Model {
   async getCourses() {
@@ -16,6 +15,7 @@ class Organisation extends Model {
       id: unit.id,
       code: unit.code,
       name: unit.name,
+      validityPeriod: unit.validityPeriod
     }))
   }
 }

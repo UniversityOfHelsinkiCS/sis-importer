@@ -32,24 +32,14 @@ router.get('/', async (req, res) => {
 
 router.get('/programme/:programmeCode', async (req, res) => {
   const { params, query } = req
-  const programmeCode = params.programmeCode // 'KH50_005' = CS kandi
-  const module = await models.Module.findOne({
+  const programmeCode = params.programmeCode // '500-K005' = CS kandi
+  const organisation = await models.Organisation.findOne({
     where: {
       code: programmeCode,
     },
   })
-  let courses = {}
-
-  if (module) courses = await module.getCourses()
-
-  if (!module) {
-    const organisation = await models.Organisation.findOne({
-      where: {
-        code: programmeCode,
-      },
-    })
-    courses = await organisation.getCourses()
-  }
+  if (!organisation) return res.status(404).send('No such organization, use different code e.g. 500-K005')
+  const courses = await organisation.getCourses()
 
   res.send({
     course_units: courses.filter(course => {
