@@ -3,6 +3,7 @@ const { Op } = require('sequelize')
 
 const models = require('../models')
 const { NotFoundError } = require('../errors')
+const sisClient = require('../utils/sisClient');
 
 const router = express.Router()
 
@@ -39,5 +40,13 @@ router.get('/', async (req, res) => {
 
   res.send(courseUnitRealisations)
 })
+
+router.get('/:id/enrolments', async (req, res) => {
+  const { id } = req.params;
+
+  const enrolments = await sisClient.getEnrolments(id);
+
+  res.send(enrolments);
+});
 
 module.exports = router
