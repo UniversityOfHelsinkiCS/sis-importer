@@ -11,7 +11,7 @@ class SisClient {
     })
   }
 
-  async getEnrolments(courseUnitRealisationId) {
+  async getEnrolmentsByCourseUnitRealisationId(courseUnitRealisationId) {
     const cacheKey = `enrolments.${courseUnitRealisationId}`;
 
     const cacheData = this.cache.get(cacheKey);
