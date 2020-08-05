@@ -7,35 +7,64 @@ class SisClient {
 
     this.cache = new LRU({
       max: 20,
-      maxAge: 1800000 // 30 minutes
+      maxAge: 1800000, // 30 minutes
     })
   }
 
-  async getEnrolmentsByCourseUnitRealisationId(courseUnitRealisationId) {
-    const cacheKey = `enrolments.${courseUnitRealisationId}`;
-
-    const cacheData = this.cache.get(cacheKey);
+  async getWithCache(cacheKey, fn) {
+    const cacheData = this.cache.get(cacheKey)
 
     if (cacheData) {
-      return cacheData;
+      return cacheData
     }
 
-    const query = `
-      query getCourseUnitRealisation($id: ID!) {
-        course_unit_realisation(id: $id) {
-          enrolments {
-            id
+    const data = await fn()
+
+    this.cache.set(cacheKey, data)
+
+    return data
+  }
+
+  async getEnrolmentsByCourseUnitRealisationId(courseUnitRealisationId) {
+    const cacheKey = `courseUnitRealisationEnrolments.${courseUnitRealisationId}`
+
+    return this.getWithCache(cacheKey, async () => {
+      const query = `
+        query getCourseUnitRealisation($id: ID!) {
+          course_unit_realisation(id: $id) {
+            enrolments {
+              id
+            }
           }
         }
-      }
-    `
+      `
 
-    const result = await this.graphqlClient.query(query, { id: courseUnitRealisationId })
-    const enrolments = _.get(result, 'data.course_unit_realisation.enrolments') || [];
+      const result = await this.graphqlClient.query(query, { id: courseUnitRealisationId })
+      const enrolments = _.get(result, 'data.course_unit_realisation.enrolments') || []
 
-    this.cache.set(cacheKey, enrolments);
+      return enrolments
+    })
+  }
 
-    return enrolments;
+  async getEnrolmentsByStudentNumber(studentNumber) {
+    const cacheKey = `studentNumberEnrolments.${studentNumber}`
+
+    return this.getWithCache(cacheKey, async () => {
+      const query = `
+        query getPrivatePerson($id: ID!) {
+          private_person_by_student_number(id: $id) {
+            enrolments {
+              id
+            }
+          }
+        }
+      `
+
+      const result = await this.graphqlClient.query(query, { id: studentNumber })
+      const enrolments = _.get(result, 'data.private_person_by_student_number.enrolments') || []
+
+      return enrolments
+    })
   }
 }
 
