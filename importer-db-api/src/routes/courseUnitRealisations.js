@@ -97,4 +97,12 @@ router.get('/:id/study_group_sets', async (req, res) => {
   res.send(studyGroupSetsWithTeachers)
 })
 
+router.get('/:id/responsibility_infos', async (req, res) => {
+  const { id } = req.params
+
+  const responsibilityInfos = await sisClient.getCourseUnitRealisationResponsibilityInfos(id)
+
+  res.send(responsibilityInfos)
+})
+
 module.exports = router

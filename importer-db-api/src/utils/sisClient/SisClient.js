@@ -6,7 +6,7 @@ class SisClient {
     this.graphqlClient = graphqlClient
 
     this.cache = new LRU({
-      max: 20,
+      max: 30,
       maxAge: 1800000, // 30 minutes
     })
   }
@@ -65,6 +65,29 @@ class SisClient {
 
       return enrolments
     })
+  }
+
+  async getCourseUnitRealisationResponsibilityInfos(id) {
+    const query = `
+      query getCourseUnitRealisation($id: ID!) {
+        course_unit_realisation(id: $id) {
+          responsibilityInfos {
+            role {
+              urn
+            }
+            person {
+              id
+              firstName
+              lastName
+            }
+          }
+        }
+      }
+    `
+
+    const result = await this.graphqlClient.query(query, { id })
+
+    return _.get(result, 'data.course_unit_realisation.responsibilityInfos') || []
   }
 }
 
