@@ -1,5 +1,6 @@
 const express = require('express')
 const { Op } = require('sequelize')
+const _ = require('lodash')
 
 const models = require('../models')
 const { NotFoundError } = require('../errors')
@@ -47,6 +48,53 @@ router.get('/:id/enrolments', async (req, res) => {
   const enrolments = await sisClient.getEnrolmentsByCourseUnitRealisationId(id)
 
   res.send(enrolments)
+})
+
+router.get('/:id/study_group_sets', async (req, res) => {
+  const { id } = req.params
+
+  const courseUnitRealisation = await models.CourseUnitRealisation.findOne({
+    where: {
+      id,
+    },
+  })
+
+  if (!courseUnitRealisation) {
+    throw new NotFoundError(`Course unit realisation with id ${id} is not found`)
+  }
+
+  const { studyGroupSets = [] } = courseUnitRealisation
+
+  const teacherIds = _.flatMap(studyGroupSets, group => {
+    return _.flatMap(group.studySubGroups || [], subGroup => subGroup.teacherIds || [])
+  })
+
+  const persons =
+    teacherIds.length > 0
+      ? await models.Person.findAll({
+          where: {
+            id: {
+              [Op.in]: teacherIds,
+            },
+          },
+        })
+      : []
+
+  const studyGroupSetsWithTeachers = studyGroupSets.map(group => {
+    return {
+      ...group,
+      studySubGroups: (group.studySubGroups || []).map(subGroup => {
+        const { teacherIds = [] } = subGroup
+
+        return {
+          ...subGroup,
+          teachers: teacherIds.map(teacherId => persons.find(({ id }) => id === teacherId)),
+        }
+      }),
+    }
+  })
+
+  res.send(studyGroupSetsWithTeachers)
 })
 
 module.exports = router
