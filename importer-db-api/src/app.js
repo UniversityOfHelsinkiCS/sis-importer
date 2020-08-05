@@ -5,7 +5,8 @@ require('express-async-errors')
 
 const courseUnitsRouter = require('./routes/courseUnits')
 const courseUnitRealisationsRouter = require('./routes/courseUnitRealisations')
-const { ApplicationError } = require('./errors');
+const studentsRouter = require('./routes/students')
+const { ApplicationError } = require('./errors')
 
 const app = express()
 
@@ -25,6 +26,7 @@ app.use((req, res, next) => {
 
 app.use('/course_units', courseUnitsRouter)
 app.use('/course_unit_realisations', courseUnitRealisationsRouter)
+app.use('/students', studentsRouter)
 
 app.use((error, req, res, next) => {
   console.log(error)
