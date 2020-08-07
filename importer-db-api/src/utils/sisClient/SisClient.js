@@ -54,7 +54,20 @@ class SisClient {
         query getPrivatePerson($id: ID!) {
           private_person_by_student_number(id: $id) {
             enrolments {
-              id
+              courseUnitRealisation {
+                activityPeriod {
+                  endDate
+                }
+              }
+              courseUnit {
+                code
+                universityOrgs {
+                  code
+                  name {
+                    fi
+                  }
+                }
+              }
             }
           }
         }

@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const { Op } = require('sequelize')
 const models = require('../models')
+const sisClient = require('../utils/sisClient')
 
 router.get('/:studentId/study_rights', async (req, res) => {
   try {
@@ -94,9 +95,9 @@ router.get('/:studentId/fuksi_year_credits/:startYear', async (req, res) => {
   }
 })
 
-router.get('/:studentId/semester_enrollments', async (req, res) => {
+router.get('/:studentId/enrollment_statuses/:year', async (req, res) => {
   try {
-    const { studentId } = req.params
+    const { studentId, year } = req.params
 
     const { id: acualId } = await models.Person.findOne({
       where: {
@@ -104,31 +105,74 @@ router.get('/:studentId/semester_enrollments', async (req, res) => {
       },
     })
 
-    const semesterEnrollments = await models.TermRegistrations.findAll({
+    const { termRegistrations } = await models.TermRegistrations.findOne({
       where: {
         studentId: acualId,
       },
     })
 
-    res.status(200).send(semesterEnrollments)
+    const relevantRegistrations = termRegistrations
+      .filter(({ studyTerm }) => {
+        return studyTerm.studyYearStartYear === Number(year)
+      })
+      .reduce(
+        (acc, cur) => {
+          return {
+            ...acc,
+            [cur.studyTerm.termIndex === 0 ? 'fall' : 'spring']: {
+              statutoryAbsence: cur.statutoryAbsence,
+              termRegistrationType: cur.termRegistrationType,
+            },
+          }
+        },
+        { year }
+      )
+
+    res.status(200).send(relevantRegistrations)
   } catch (e) {
     console.log(e)
     res.status(500).send(e)
   }
 })
 
-router.get('/:studentId/enrolled/:studytrackId', async (req, res) => {
+router.get('/:studentId/enrolled/course/:courseId', async (req, res) => {
   try {
-    res.status(500).send('TODO')
+    const { studentId, courseId } = req.params
+    if (!studentId) return res.status(403).send('StudentId required')
+    if (!courseId) return res.status(403).send('CourseId required')
+
+    const enrolledCourses = await sisClient.getEnrolmentsByStudentNumber(studentId)
+
+    const enrollmentOK = !!enrolledCourses.find(({ courseUnitRealisation, courseUnit }) => {
+      return (
+        new Date(courseUnitRealisation.activityPeriod.endDate).getTime() > new Date().getTime() &&
+        courseUnit.code === courseId
+      )
+    })
+
+    res.json({ enrollmentOK })
   } catch (e) {
     console.log(e)
     res.status(500).send(e)
   }
 })
 
-router.get('/:studentId/enrolled/:studytrackId/:courseId', async (req, res) => {
+router.get('/:studentId/enrolled/study_track/:studyTrackId', async (req, res) => {
   try {
-    res.status(500).send('TODO')
+    const { studentId, studyTrackId } = req.params
+    if (!studentId) return res.status(403).send('StudentId required')
+    if (!studyTrackId) return res.status(403).send('StudyTrackId required')
+
+    const enrolledCourses = await sisClient.getEnrolmentsByStudentNumber(studentId)
+
+    const studyTrackEnrollmentOK = !!enrolledCourses.find(({ courseUnitRealisation, courseUnit }) => {
+      return (
+        new Date(courseUnitRealisation.activityPeriod.endDate).getTime() > new Date().getTime() &&
+        courseUnit.universityOrgs.find(o => o.code === studyTrackId)
+      )
+    })
+
+    res.json({ studyTrackEnrollmentOK })
   } catch (e) {
     console.log(e)
     res.status(500).send(e)
