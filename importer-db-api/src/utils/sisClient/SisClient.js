@@ -61,10 +61,12 @@ class SisClient {
               }
               courseUnit {
                 code
-                universityOrgs {
-                  code
-                  name {
-                    fi
+                organisations {
+                  organisation {
+                    code
+                    name {
+                      fi
+                    }
                   }
                 }
               }

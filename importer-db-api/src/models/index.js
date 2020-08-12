@@ -8,6 +8,12 @@ const Attainment = require('./Attainment')
 const StudyYear = require('./StudyYear')
 const Person = require('./Person')
 const TermRegistrations = require('./TermRegistrations')
+const Education = require('./Education')
+
+StudyRight.belongsTo(Organisation, { foreignKey: 'organisationId', targetKey: 'id' })
+Organisation.hasMany(StudyRight, { foreignKey: 'id', targetKey: 'organisationId' })
+
+StudyRight.hasOne(Education, { sourceKey: 'educationId', foreignKey: 'id' })
 
 const models = {
   CourseUnit,
@@ -20,6 +26,7 @@ const models = {
   StudyYear,
   Person,
   TermRegistrations,
+  Education,
 }
 
 module.exports = models
