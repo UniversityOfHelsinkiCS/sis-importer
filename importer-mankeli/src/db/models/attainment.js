@@ -120,6 +120,9 @@ Attainment.init(
       },
       {
         fields: ['module_id']
+      },
+      {
+        fields: ['person_student_number']
       }
     ]
   }
