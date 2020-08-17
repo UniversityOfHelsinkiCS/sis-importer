@@ -16,27 +16,23 @@ const isBachelorsStudyRight = urn => {
   return educationType === 'degree-education' && ['bachelors-and-masters-degree', 'bachelors-degree'].includes(degree)
 }
 
-const studentNumberToPersonId = async studentNumber => {
-  const person = await models.Person.findOne({
+router.use('/:studentNumber', async (req, res, next) => {
+  const student = await models.Person.findOne({
     where: {
-      studentNumber,
+      studentNumber: req.params.studentNumber,
     },
   })
 
-  if (!person) throw new Error('Person not found')
+  if (!student) return res.status(500).send({ error: 'student not found' })
+  req.student = student
+  next()
+})
 
-  return person.id
-}
-
-router.get('/:studentId/studyrights', async (req, res) => {
+router.get('/:studentNumber/studyrights', async (req, res) => {
   try {
-    const { studentId } = req.params
-    if (!studentId) return res.status(403).send('StudentId required')
-
-    const personId = await studentNumberToPersonId(studentId)
     const matluStudyRights = await models.StudyRight.findAll({
       where: {
-        personId,
+        personId: req.student.id,
         '$organisation.code$': MATLU,
       },
       include: [Organisation, Education],
@@ -75,15 +71,13 @@ router.get('/:studentId/studyrights', async (req, res) => {
   }
 })
 
-router.get('/:studentId/enrollment_statuses/:year', async (req, res) => {
+router.get('/:studentNumber/enrollment_statuses/:year', async (req, res) => {
   try {
-    const { studentId, year } = req.params
-
-    const personId = await studentNumberToPersonId(studentId)
+    const { year } = req.params
 
     const { termRegistrations } = await models.TermRegistrations.findOne({
       where: {
-        studentId: personId,
+        studentId: req.student.id,
       },
     })
 
@@ -108,15 +102,11 @@ router.get('/:studentId/enrollment_statuses/:year', async (req, res) => {
   }
 })
 
-router.get('/:studentId/semester_enrollments', async (req, res) => {
+router.get('/:studentNumber/semester_enrollments', async (req, res) => {
   try {
-    const { studentId } = req.params
-
-    const personId = await studentNumberToPersonId(studentId)
-
     const { termRegistrations } = await models.TermRegistrations.findOne({
       where: {
-        studentId: personId,
+        studentId: req.student.id,
       },
     })
 
@@ -142,10 +132,9 @@ router.get('/:studentId/semester_enrollments', async (req, res) => {
   }
 })
 
-router.get('/:studentId/has_passed_course/:code', async (req, res) => {
+router.get('/:studentNumber/has_passed_course/:code', async (req, res) => {
   try {
-    const { studentId, code } = req.params
-    if (!studentId) return res.status(403).send('StudentId required')
+    const { code } = req.params
     if (!code) return res.status(403).send('CourseCode required')
 
     const courseUnitIds = await models.CourseUnit.findAll({
@@ -157,7 +146,7 @@ router.get('/:studentId/has_passed_course/:code', async (req, res) => {
 
     const courseAttainments = await models.Attainment.findAll({
       where: {
-        personStudentNumber: studentId,
+        personStudentNumber: req.student.studentNumber,
         state: 'ATTAINED',
         courseUnitId: {
           [Op.in]: courseUnitIds,
@@ -176,10 +165,9 @@ router.get('/:studentId/has_passed_course/:code', async (req, res) => {
  * Check how many credits student obtained during a specific academic year.
  * @startYear Example: 2020, means whole 2020 academic year.
  */
-router.get('/:studentId/fuksi_year_credits/:startYear', async (req, res) => {
+router.get('/:studentNumber/fuksi_year_credits/:startYear', async (req, res) => {
   try {
-    const { studentId, startYear } = req.params
-    if (!studentId) return res.status(403).send('StudentId required')
+    const { startYear } = req.params
     if (!startYear) return res.status(403).send('StartYear required')
 
     const semesterInfo = await models.StudyYear.findOne({
@@ -193,7 +181,7 @@ router.get('/:studentId/fuksi_year_credits/:startYear', async (req, res) => {
 
     const fuksiYearAttainments = await models.Attainment.findAll({
       where: {
-        personStudentNumber: studentId,
+        personStudentNumber: req.student.studentNumber,
         state: 'ATTAINED',
         type: 'CourseUnitAttainment',
         misregistration: false,
@@ -216,13 +204,12 @@ router.get('/:studentId/fuksi_year_credits/:startYear', async (req, res) => {
   }
 })
 
-router.get('/:studentId/enrolled/course/:courseId', async (req, res) => {
+router.get('/:studentNumber/enrolled/course/:courseId', async (req, res) => {
   try {
-    const { studentId, courseId } = req.params
-    if (!studentId) return res.status(403).send('StudentId required')
+    const { courseId } = req.params
     if (!courseId) return res.status(403).send('CourseId required')
 
-    const enrolledCourses = await sisClient.getEnrolmentsByStudentNumber(studentId)
+    const enrolledCourses = await sisClient.getEnrolmentsByStudentNumber(req.student.studentNumber)
 
     const enrollmentOK = !!enrolledCourses.find(({ courseUnitRealisation, courseUnit }) => {
       return (
@@ -239,16 +226,15 @@ router.get('/:studentId/enrolled/course/:courseId', async (req, res) => {
 })
 
 /**
- * Checks if student with @studentId has enrolled for a course, under organisation @studyTrackId
+ * Checks if student with @studentNumber has enrolled for a course, under organisation @studyTrackId
  * organisation example; organisation: { code: '570-K001', name: { fi: 'Biologian kandiohjelma' } }
  */
-router.get('/:studentId/enrolled/study_track/:studyTrackId', async (req, res) => {
+router.get('/:studentNumber/enrolled/study_track/:studyTrackId', async (req, res) => {
   try {
-    const { studentId, studyTrackId } = req.params
-    if (!studentId) return res.status(403).send('StudentId required')
+    const { studyTrackId } = req.params
     if (!studyTrackId) return res.status(403).send('StudyTrackId required')
 
-    const enrolledCourses = await sisClient.getEnrolmentsByStudentNumber(studentId)
+    const enrolledCourses = await sisClient.getEnrolmentsByStudentNumber(req.student.studentNumber)
 
     const studyTrackEnrollmentOK = !!enrolledCourses.find(({ courseUnitRealisation, courseUnit }) => {
       return (
@@ -258,26 +244,6 @@ router.get('/:studentId/enrolled/study_track/:studyTrackId', async (req, res) =>
     })
 
     res.send(studyTrackEnrollmentOK)
-  } catch (e) {
-    console.log(e)
-    res.status(500).send(e)
-  }
-})
-
-router.get('/min_max_semesters', async (req, res) => {
-  try {
-    const now = new Date().getTime()
-    const all = await models.StudyYear.findAll()
-    const min = '2008-08-01'
-
-    const max = all.find(({ valid }) => {
-      return new Date(valid.endDate).getTime() > now && new Date(valid.startDate).getTime() <= now
-    }).valid.startDate
-
-    res.status(200).json({
-      min,
-      max,
-    })
   } catch (e) {
     console.log(e)
     res.status(500).send(e)
