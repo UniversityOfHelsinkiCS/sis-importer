@@ -48,13 +48,20 @@ router.get('/:studentId/studyrights', async (req, res) => {
       isBachelorsStudyRight(studyRight.education.educationType)
     )
 
-    const elements = matluBachelorsStudyrights.map(({ valid, education }) => {
-      return {
-        code: education.code,
+    let elements = []
+    for (let { valid, education } of matluBachelorsStudyrights) {
+      const module = await models.Module.findOne({
+        where: {
+          groupId: education.groupId.replace('EDU', 'DP'), // nice nice
+        },
+      })
+
+      elements.push({
+        code: module.code,
         start_date: valid.startDate,
         end_date: valid.endDate,
-      }
-    })
+      })
+    }
 
     res.json([
       {
