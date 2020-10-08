@@ -8,6 +8,7 @@ const parsePerson = person => {
     dateOfBirth: person.dateOfBirth,
     firstNames: person.firstNames,
     lastName: person.lastName,
+    eduPersonPrincipalName: person.eduPersonPrincipalName,
     employeeNumber: person.employeeNumber,
     primaryEmail: person.primaryEmail,
     oppijaId: person.oppijaID,

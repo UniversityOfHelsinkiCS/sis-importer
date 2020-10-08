@@ -21,6 +21,9 @@ Person.init(
     lastName: {
       type: STRING
     },
+    eduPersonPrincipalName: {
+      type: String
+    },
     employeeNumber: {
       type: STRING
     },
