@@ -42,6 +42,9 @@ CourseUnitRealisation.init(
     enrolmentPeriod: {
       type: JSONB
     },
+    responsibilityInfos: {
+      type: ARRAY(JSONB)
+    },
     createdAt: {
       type: DATE
     },
