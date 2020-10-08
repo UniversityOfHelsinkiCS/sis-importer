@@ -32,7 +32,7 @@ http://localhost:8282/
 
 ### Degree structure
 
-In dev mode see http://localhost:3002/structure/:code (eg KH50_005 for Computer sciencebachelor  ) for decree structures. The (shitty) code is in importer-mankeli
+In dev mode see http://localhost:3002/structure/:code (eg KH50_005 for Computer sciencebachelor) for decree structures.
 
 ## CI
 
