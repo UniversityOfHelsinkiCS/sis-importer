@@ -3,7 +3,7 @@ const SONIC = process.env.SONIC === '1'
 const CURRENT_EXECUTION_HASH = 'CURRENT_EXECUTION_HASH'
 const IS_DEV = process.env.NODE_ENV === 'development'
 const FETCH_AMOUNT = IS_DEV && !SONIC ? 15 : 1000
-const DEFAULT_CHUNK_SIZE = IS_DEV && !SONIC ? 5 : 50
+const DEFAULT_CHUNK_SIZE = IS_DEV && !SONIC ? 5 : 40 // 50 lead to TERM_REGISTRATION maximum payload exceeded: 1052958 vs 1048576
 const APIS = {
   ori: 'ORI',
   kori: 'KORI',
