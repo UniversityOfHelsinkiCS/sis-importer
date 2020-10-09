@@ -1,4 +1,3 @@
-const { chunk } = require('lodash')
 const { eachLimit } = require('async')
 const { stan, opts, SCHEDULER_STATUS_CHANNEL } = require('./utils/stan')
 const { oriRequest } = require('./utils/oriApi')
@@ -6,8 +5,9 @@ const { koriRequest } = require('./utils/koriApi')
 const { urnRequest } = require('./utils/urnApi')
 const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./utils/redis')
 const { services } = require('./services')
-const { FETCH_AMOUNT, DEFAULT_CHUNK_SIZE, APIS, PANIC_TIMEOUT } = require('./config')
+const { FETCH_AMOUNT, MAX_CHUNK_SIZE, APIS, PANIC_TIMEOUT } = require('./config')
 const { logger } = require('./utils/logger')
+const chunkify = require('./utils/chunkify')
 const requestBuffer = require('./utils/requestBuffer')
 
 const fetchBy = async (api, url, ordinal, customRequest, limit = 1000) => {
@@ -15,7 +15,7 @@ const fetchBy = async (api, url, ordinal, customRequest, limit = 1000) => {
   if (api === APIS.custom) return customRequest(url)
 
   const targetUrl = `${url}?since=${ordinal}&limit=${limit}`
-  return await (api === APIS.ori ? oriRequest(targetUrl) : koriRequest(targetUrl))
+  return api === APIS.ori ? oriRequest(targetUrl) : koriRequest(targetUrl)
 }
 
 const updateServiceStatus = async (key, { updated = undefined, scheduled = undefined }) => {
@@ -31,11 +31,10 @@ const createJobs = async (channel, entities, executionHash) =>
     })
   })
 
-const createJobsFromEntities = async (channel, entities, executionHash, chunks = DEFAULT_CHUNK_SIZE) => {
-  await eachLimit(chunk(entities, chunks), 5, async e => {
+const createJobsFromEntities = async (channel, entities, executionHash, chunks = MAX_CHUNK_SIZE) =>
+  eachLimit(chunkify(entities, chunks), 5, async e => {
     await createJobs(channel, e, executionHash)
   })
-}
 
 const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinish, serviceId) => {
   const statusChannel = stan.subscribe(SCHEDULER_STATUS_CHANNEL, opts)
