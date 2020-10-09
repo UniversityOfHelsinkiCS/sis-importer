@@ -100,9 +100,37 @@ router.get('/:id/study_group_sets', async (req, res) => {
 router.get('/:id/responsibility_infos', async (req, res) => {
   const { id } = req.params
 
-  const responsibilityInfos = await sisClient.getCourseUnitRealisationResponsibilityInfos(id)
+  const courseUnitRealisation = await models.CourseUnitRealisation.findOne({ where: { id } })
 
-  res.send(responsibilityInfos)
+  if (!courseUnitRealisation) {
+    throw new NotFoundError(`Course unit realisation with id ${id} is not found`)
+  }
+
+  const { responsibilityInfos } = courseUnitRealisation
+
+  if (!_.isArray(responsibilityInfos)) {
+    return res.send([])
+  }
+
+  const personIds = responsibilityInfos.map(({ personId }) => personId).filter(Boolean)
+
+  const persons =
+    personIds.length > 0
+      ? await models.Person.findAll({
+          where: {
+            id: {
+              [Op.in]: personIds,
+            },
+          },
+        })
+      : []
+
+  const responsibilityInfosWithPersons = responsibilityInfos.map(info => ({
+    ...info,
+    person: persons.find(({ id }) => id === info.personId),
+  }))
+
+  res.send(responsibilityInfosWithPersons)
 })
 
 module.exports = router
