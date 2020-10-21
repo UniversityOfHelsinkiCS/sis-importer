@@ -170,14 +170,15 @@ router.get('/:studentNumber/fuksi_year_credits/:startYear', async (req, res) => 
     const { startYear } = req.params
     if (!startYear) return res.status(403).send('StartYear required')
 
-    const semesterInfo = await models.StudyYear.findOne({
-      where: {
-        startYear: startYear,
-      },
-    })
+    // Dont have this data:
+    // const semesterInfo = await models.StudyYear.findOne({
+    //   where: {
+    //     startYear: startYear,
+    //   },
+    // })
 
-    const semesterStart = new Date(semesterInfo.valid.startDate)
-    const semesterEnd = new Date(semesterInfo.valid.endDate)
+    const semesterStart = new Date(`${startYear}-08-01`)
+    const semesterEnd = new Date(`${startYear+1}-08-01`)
 
     const fuksiYearAttainments = await models.Attainment.findAll({
       where: {
