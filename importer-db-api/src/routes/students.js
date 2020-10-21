@@ -41,7 +41,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
     if (!matluStudyRights.length) return res.json([])
 
     const matluBachelorsStudyrights = matluStudyRights.filter(studyRight =>
-      isBachelorsStudyRight(studyRight.education.educationType)
+      studyRight.education && isBachelorsStudyRight(studyRight.education.educationType)
     )
 
     let elements = []
