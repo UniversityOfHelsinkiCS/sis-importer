@@ -178,7 +178,7 @@ router.get('/:studentNumber/fuksi_year_credits/:startYear', async (req, res) => 
     // })
 
     const semesterStart = new Date(`${startYear}-08-01`)
-    const semesterEnd = new Date(`${startYear+1}-08-01`)
+    const semesterEnd = new Date(`${parseInt(startYear)+1}-08-01`)
 
     const fuksiYearAttainments = await models.Attainment.findAll({
       where: {
