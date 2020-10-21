@@ -146,7 +146,7 @@ router.get('/:studentNumber/has_passed_course/:code', async (req, res) => {
 
     const courseAttainments = await models.Attainment.findAll({
       where: {
-        personStudentNumber: req.student.studentNumber,
+        personId: req.student.id,
         state: 'ATTAINED',
         courseUnitId: {
           [Op.in]: courseUnitIds,
@@ -182,7 +182,7 @@ router.get('/:studentNumber/fuksi_year_credits/:startYear', async (req, res) => 
 
     const fuksiYearAttainments = await models.Attainment.findAll({
       where: {
-        personStudentNumber: req.student.studentNumber,
+        personId: req.student.id,
         state: 'ATTAINED',
         type: 'CourseUnitAttainment',
         misregistration: false,
