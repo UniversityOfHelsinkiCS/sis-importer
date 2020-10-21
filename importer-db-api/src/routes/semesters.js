@@ -1,24 +1,17 @@
 const router = require('express').Router()
-const models = require('../models')
 
 router.get('/min_max_semesters', async (req, res) => {
-  try {
-    const now = new Date().getTime()
-    const all = await models.StudyYear.findAll()
-    const min = '2008-08-01' // fuksilaiterekisteri specific
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const min = '2008-08-01' // fuksilaiterekisteri specific
 
-    const max = all.find(({ valid }) => {
-      return new Date(valid.endDate).getTime() > now && new Date(valid.startDate).getTime() <= now
-    }).valid.startDate
+  // Incicates when the *current* semester started
+  const max = now < new Date(`${currentYear}-08-01`) ? `${currentYear-1}-08-01` : `${currentYear}-08-01`
 
-    res.status(200).json({
-      min,
-      max,
-    })
-  } catch (e) {
-    console.log(e)
-    res.status(500).send(e)
-  }
+  res.json({
+    min,
+    max,
+  })
 })
 
 module.exports = router
