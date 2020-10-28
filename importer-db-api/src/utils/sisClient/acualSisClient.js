@@ -16,7 +16,7 @@ const instance = axios.create({
 
 const sendRequest = async studentNumber => { 
   console.log('ASKING FOR ENROLMENTS FOR', studentNumber)
-  return instance.post("", {
+  return instance.post("/", {
     query: `{ private_person_by_student_number(id: \"${studentNumber}\") {
         enrolments {
           courseUnitRealisation {
