@@ -212,7 +212,7 @@ router.get('/:studentNumber/enrolled/course/:courseId', async (req, res) => {
     if (!courseId) return res.status(403).send('CourseId required')
 
     const enrolledCourses = await acualSisClient(studentNumber)
-    console.log('VOITTO')
+    console.log('VOITTO', enrolledCourses)
 
     const enrollmentOK = !!enrolledCourses.find(({ courseUnitRealisation, courseUnit }) => {
       return (

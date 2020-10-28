@@ -9,13 +9,14 @@ const agent = new https.Agent({
   key: fs.readFileSync(KEY_PATH, 'utf8'),
 })
 
-const instance = axios.create()
-
-instance.defaults.httpsAgent = agent
+const instance = axios.create({
+  baseURL: SIS_GRAPHQL_API_URL,
+  httpsAgent: agent
+})
 
 const sendRequest = async studentNumber => { 
   console.log('ASKING FOR ENROLMENTS FOR', studentNumber)
-  return instance.post(SIS_GRAPHQL_API_URL, {
+  return instance.post("", {
     query: `{ private_person_by_student_number(id: \"${studentNumber}\") {
         enrolments {
           courseUnitRealisation {
