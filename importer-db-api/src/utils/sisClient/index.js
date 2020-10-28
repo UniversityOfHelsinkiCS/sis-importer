@@ -19,15 +19,10 @@ const createGraphqlHttpClient = () => {
       : 'SIS certs not found, using the unauthorized HTTPS Agent'
   )
 
-  const certFile = fs.readFileSync(CERT_PATH, 'utf8')
-  const keyFile = fs.readFileSync(KEY_PATH, 'utf8')
-  console.log(certFile.substr(0,20))
-  console.log(keyFile.substr(0,20))
-
   const agent = hasCerts
     ? new https.Agent({
-        cert: certFile,
-        key: keyFile,
+        cert: fs.readFileSync(CERT_PATH, 'utf8'),
+        key: fs.readFileSync(KEY_PATH, 'utf8'),
       })
     : new https.Agent({
         rejectUnauthorized: false,

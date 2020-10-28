@@ -2,7 +2,6 @@ const router = require('express').Router()
 const { Op } = require('sequelize')
 const models = require('../models')
 const sisClient = require('../utils/sisClient')
-const acualSisClient = require('../utils/sisClient/acualSisClient')
 const { Organisation, Education } = require('../models')
 
 const MATLU = 'H50'
@@ -211,8 +210,7 @@ router.get('/:studentNumber/enrolled/course/:courseId', async (req, res) => {
     const { studentNumber, courseId } = req.params
     if (!courseId) return res.status(403).send('CourseId required')
 
-    const enrolledCourses = await acualSisClient(studentNumber)
-    console.log('VOITTO', enrolledCourses)
+    const enrolledCourses = await sisClient.getEnrolmentsByStudentNumber(studentNumber)
 
     const enrollmentOK = !!enrolledCourses.find(({ courseUnitRealisation, courseUnit }) => {
       return (

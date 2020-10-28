@@ -16,7 +16,7 @@ class SisGraphqlClient {
   }
 
   query(query, variables = {}) {
-    const path = '/'
+    const path = ''
     const payload = {
       query,
       variables,
