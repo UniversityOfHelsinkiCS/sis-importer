@@ -16,16 +16,19 @@ class SisGraphqlClient {
   }
 
   query(query, variables = {}) {
-    return this.httpClient
-      .post(
-        '/',
-        {
-          query,
-          variables,
-        },
-        this.getAuthorizedRequestOptions()
-      )
-      .then(({ data }) => data)
+    const path = '/'
+    const payload = {
+      query,
+      variables,
+    }
+    const options = this.getAuthorizedRequestOptions()
+    console.log('Doing a query with httpClient and...')
+    console.log(path)
+    console.log(payload)
+    console.log(options)
+    console.log('---------------------')
+
+    return this.httpClient.post(path, payload, options).then(({ data }) => data)
   }
 }
 
