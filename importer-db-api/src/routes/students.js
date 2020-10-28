@@ -222,9 +222,9 @@ router.get('/:studentNumber/enrolled/course/:courseId', async (req, res) => {
     })
 
     res.send(enrollmentOK)
-  } catch (e) {
-    console.log(e)
-    res.status(500).send(e)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.response)
   }
 })
 
