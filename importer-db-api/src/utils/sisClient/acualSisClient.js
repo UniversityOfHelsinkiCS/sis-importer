@@ -11,13 +11,14 @@ const agent = new https.Agent({
 
 const instance = axios.create({
   baseURL: SIS_GRAPHQL_API_URL,
-  httpsAgent: agent
+  httpsAgent: agent,
 })
 
-const sendRequest = async studentNumber => { 
+const sendRequest = async studentNumber => {
   console.log('ASKING FOR ENROLMENTS FOR', studentNumber)
-  return instance.post("/", {
-    query: `{ private_person_by_student_number(id: \"${studentNumber}\") {
+  return instance.post('', {
+    query: `query getPrivatePerson($id: ID!) {
+      private_person_by_student_number(id: $id) {
         enrolments {
           courseUnitRealisation {
             activityPeriod {
@@ -37,7 +38,8 @@ const sendRequest = async studentNumber => {
           }
         }
       }
-    }`
+    }`,
+    variables: { id: studentNumber },
   })
 }
 
