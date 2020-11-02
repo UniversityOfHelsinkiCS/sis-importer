@@ -30,6 +30,10 @@ router.get('/', async (req, res) => {
     },
   })
 
+  if (!assessmentItem) {
+    return res.send([])
+  }
+
   const { id: assessmentItemId } = assessmentItem
 
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
