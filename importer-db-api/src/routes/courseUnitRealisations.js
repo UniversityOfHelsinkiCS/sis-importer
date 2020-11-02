@@ -1,6 +1,7 @@
 const express = require('express')
 const { Op } = require('sequelize')
 const _ = require('lodash')
+const dateFns = require('date-fns')
 
 const models = require('../models')
 const { NotFoundError } = require('../errors')
@@ -9,7 +10,7 @@ const sisClient = require('../utils/sisClient')
 const router = express.Router()
 
 router.get('/', async (req, res) => {
-  const { code } = req.query
+  const { code, activityPeriodEndDateAfter } = req.query
 
   const courseUnit = await models.CourseUnit.findOne({
     where: {
@@ -36,6 +37,18 @@ router.get('/', async (req, res) => {
       assessmentItemIds: {
         [Op.contains]: [assessmentItemId],
       },
+      ...(activityPeriodEndDateAfter && {
+        [Op.and]: [
+          { activityPeriod: { endDate: { [Op.ne]: null } } },
+          {
+            activityPeriod: {
+              endDate: {
+                [Op.gt]: dateFns.format(new Date(activityPeriodEndDateAfter), 'yyyy-MM-dd'),
+              },
+            },
+          },
+        ],
+      }),
     },
   })
 
