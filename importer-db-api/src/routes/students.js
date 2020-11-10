@@ -7,7 +7,7 @@ const { Organisation, Education } = require('../models')
 const MATLU = 'H50'
 
 const getFallSemesterCode = year => (year - 1950) * 2 + 1
-const getSpringSemesterCode = year => (year - 1950) * 2
+const getSpringSemesterCode = year => (year - 1950) * 2 + 2
 
 const isBachelorsStudyRight = urn => {
   const splitted = urn.split(':')
