@@ -39,8 +39,9 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
 
     if (!studyRights.length) return res.json([])
 
-    const result = studyRights.reduce(async (pre,cur) => {
-      const {valid,education,organisation} = cur
+
+    let result = {}
+    for(const {valid,education,organisation} of studyRights){
 
       const module = await models.Module.findOne({
         where: {
@@ -54,17 +55,17 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
         end_date: valid.endDate,
       }
 
-      const oldElements = pre[organisation.code] && pre[organisation.code].elements || []
+      const oldElements = result[organisation.code] && result[organisation.code].elements || []
 
-      return {
-        ...pre,
+      result = {
+        ...result,
         [organisation.code] : {
           faculty_code: organisation.code,
           elements: oldElements.concat(element)
         }
-      }      
+      }    
+    }
 
-    },{})
 
     res.json(Object.values(result))
 
