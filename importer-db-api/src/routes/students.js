@@ -42,6 +42,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
 
     let result = {}
     for(const {valid,education,organisation} of studyRights){
+      if(!education) continue // Sometimes theres no education
 
       const module = await models.Module.findOne({
         where: {
