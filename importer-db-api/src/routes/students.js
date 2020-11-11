@@ -39,32 +39,35 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
 
     if (!studyRights.length) return res.json([])
 
-    let elements = []
-    for (let { valid, education } of studyRights) {
+    const result = studyRights.reduce((pre,cur) => {
+      const {valid,education,organisation} = cur
+
       const module = await models.Module.findOne({
         where: {
           groupId: education.groupId.replace('EDU', 'DP'), // nice nice
         },
       })
 
-      elements.push({
+      const element = {
         code: module.code,
         start_date: valid.startDate,
         end_date: valid.endDate,
-      })
-    }
+      }
 
-    res.json({
-      studyRights,
-      elements
-    })
+      const oldElements = pre[organisation.code] && pre[organisation.code].elements || []
 
-    // res.json([
-    //   {
-    //     faculty_code: MATLU,
-    //     elements,
-    //   },
-    // ])
+      return {
+        ...pre,
+        [organisation.code] : {
+          faculty_code: organisation.code,
+          elements: oldElements.concat(element)
+        }
+      }      
+
+    },{})
+
+    res.json(Object.values(result))
+
   } catch (e) {
     console.log(e)
     res.status(500).json(e.toString())
