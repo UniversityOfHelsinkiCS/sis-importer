@@ -30,22 +30,17 @@ router.use('/:studentNumber', async (req, res, next) => {
 
 router.get('/:studentNumber/studyrights', async (req, res) => {
   try {
-    const matluStudyRights = await models.StudyRight.findAll({
+    const studyRights = await models.StudyRight.findAll({
       where: {
-        personId: req.student.id,
-        '$organisation.code$': MATLU,
+        personId: req.student.id
       },
       include: [Organisation, Education],
     })
 
-    if (!matluStudyRights.length) return res.json([])
-
-    const matluBachelorsStudyrights = matluStudyRights.filter(studyRight =>
-      studyRight.education && isBachelorsStudyRight(studyRight.education.educationType)
-    )
+    if (!studyRights.length) return res.json([])
 
     let elements = []
-    for (let { valid, education } of matluBachelorsStudyrights) {
+    for (let { valid, education } of studyRights) {
       const module = await models.Module.findOne({
         where: {
           groupId: education.groupId.replace('EDU', 'DP'), // nice nice
@@ -59,12 +54,17 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
       })
     }
 
-    res.json([
-      {
-        faculty_code: MATLU,
-        elements,
-      },
-    ])
+    res.json({
+      studyRights,
+      elements
+    })
+
+    // res.json([
+    //   {
+    //     faculty_code: MATLU,
+    //     elements,
+    //   },
+    // ])
   } catch (e) {
     console.log(e)
     res.status(500).json(e.toString())
