@@ -39,7 +39,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
 
     if (!studyRights.length) return res.json([])
 
-    const result = studyRights.reduce((pre,cur) => {
+    const result = studyRights.reduce(async (pre,cur) => {
       const {valid,education,organisation} = cur
 
       const module = await models.Module.findOne({
