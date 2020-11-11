@@ -3,6 +3,7 @@ const { stan, opts, SCHEDULER_STATUS_CHANNEL } = require('./utils/stan')
 const { oriRequest } = require('./utils/oriApi')
 const { koriRequest } = require('./utils/koriApi')
 const { urnRequest } = require('./utils/urnApi')
+const { ilmoRequest } = require('./utils/ilmoApi')
 const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./utils/redis')
 const { services } = require('./services')
 const { FETCH_AMOUNT, MAX_CHUNK_SIZE, APIS, PANIC_TIMEOUT } = require('./config')
@@ -10,12 +11,18 @@ const { logger } = require('./utils/logger')
 const chunkify = require('./utils/chunkify')
 const requestBuffer = require('./utils/requestBuffer')
 
-const fetchBy = async (api, url, ordinal, customRequest, limit = 1000) => {
-  if (api === APIS.urn) return urnRequest(url)
-  if (api === APIS.custom) return customRequest(url)
+const API_MAPPING = {
+  [APIS.ori]: oriRequest,
+  [APIS.kori]: koriRequest,
+  [APIS.ilmo]: ilmoRequest,
+  [APIS.urn]: urnRequest
+}
 
-  const targetUrl = `${url}?since=${ordinal}&limit=${limit}`
-  return api === APIS.ori ? oriRequest(targetUrl) : koriRequest(targetUrl)
+const fetchBy = async (api, url, ordinal, customRequest, limit = 1000) => {
+  const targetUrl = api == APIS.urn || api == APIS.custom ? url : `${url}?since=${ordinal}&limit=${limit}`
+
+  if (api === APIS.custom) return customRequest(url)
+  return API_MAPPING[api](targetUrl)
 }
 
 const updateServiceStatus = async (key, { updated = undefined, scheduled = undefined }) => {
