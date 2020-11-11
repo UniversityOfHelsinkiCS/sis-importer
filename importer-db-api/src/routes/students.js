@@ -117,7 +117,9 @@ router.get('/:studentNumber/semester_enrollments', async (req, res) => {
           : getSpringSemesterCode(studyTerm.studyYearStartYear)
 
       let semester_enrollment_type_code = 1 // present
-      if (statutoryAbsence) semester_enrollment_type_code = 2
+      if (statutoryAbsence || termRegistrationType === "MISSING" || termRegistrationType === "NONATTENDING"){
+        semester_enrollment_type_code = 2 // absent
+      }
 
       return {
         semester_enrollment_type_code,
