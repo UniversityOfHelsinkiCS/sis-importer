@@ -32,7 +32,8 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
   try {
     const studyRights = await models.StudyRight.findAll({
       where: {
-        personId: req.student.id
+        personId: req.student.id,
+        '$organisation.code$': MATLU,
       },
       include: [Organisation, Education],
     })
@@ -42,13 +43,15 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
 
     let result = {}
     for(const {valid,education,organisation} of studyRights){
-      if(!education) continue // Sometimes theres no education
 
-      const module = await models.Module.findOne({
+      // Most old studyrights dont have educations
+      const module = education ? await models.Module.findOne({
         where: {
           groupId: education.groupId.replace('EDU', 'DP'), // nice nice
         },
-      })
+      }) : {
+        code : undefined
+      }
 
       const element = {
         code: module.code,
