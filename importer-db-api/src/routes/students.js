@@ -41,7 +41,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
     if (!studyRights.length) return res.json([])
 
 
-    let result = {}
+    let result = []
     for(const {valid,education,organisation} of studyRights){
 
       // Most old studyrights dont have educations
@@ -53,21 +53,17 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
         code : undefined
       }
 
-      const element = {
+      const elements = [{
         code: module.code,
         start_date: valid.startDate,
         end_date: valid.endDate,
-      }
+      }]
 
-      const oldElements = result[organisation.code] && result[organisation.code].elements || []
-
-      result = {
-        ...result,
-        [organisation.code] : {
-          faculty_code: organisation.code,
-          elements: oldElements.concat(element)
-        }
-      }    
+      result.push({
+        "faculty_code": organisation.code,
+        elements
+      })
+  
     }
 
 
