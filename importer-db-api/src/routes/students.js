@@ -116,7 +116,7 @@ router.get('/:studentNumber/semester_enrollments', async (req, res) => {
       where: {
         studentId: req.student.id,
       },
-    })).map(termReg => termReg.termRegistrations)
+    })).map(termReg => termReg.termRegistrations).reduce((pre,cur) => pre.concat(cur),[])
 
     const mankeled = termRegistrations.map(({ studyTerm, statutoryAbsence, termRegistrationType }) => {
       const semester_code =
