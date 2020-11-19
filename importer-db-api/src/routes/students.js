@@ -112,7 +112,7 @@ router.get('/:studentNumber/enrollment_statuses/:year', async (req, res) => {
 
 router.get('/:studentNumber/semester_enrollments', async (req, res) => {
   try {
-    const { termRegistrations } = await models.TermRegistrations.findOne({
+    const { termRegistrations } = await models.TermRegistrations.findAll({
       where: {
         studentId: req.student.id,
       },
