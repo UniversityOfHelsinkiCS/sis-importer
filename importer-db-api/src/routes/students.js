@@ -66,8 +66,9 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
   
     }
 
-
-    res.json(Object.values(result))
+    // might be possible to sort earlier by studyright
+    const sortedResults = result.sort((a,b) => new Date(a.elements[0].start_date)- new Date(b.elements[0].start_date))
+    res.json(Object.values(sortedResults))
 
   } catch (e) {
     console.log(e)
