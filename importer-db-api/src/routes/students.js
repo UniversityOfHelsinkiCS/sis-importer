@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const sequelize = require("sequelize")
 const { Op } = require('sequelize')
 const models = require('../models')
 const sisClient = require('../utils/sisClient')
@@ -35,12 +36,16 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
         personId: req.student.id,
         '$organisation.code$': MATLU,
       },
+      attributes: [
+        sequelize.literal('DISTINCT ON (studyright.id) *'),
+      ].concat(Object.keys(models.StudyRight.rawAttributes)),
+      order: [["id", "DESC"],['modificationOrdinal','DESC']],
       include: [Organisation, Education],
     })
 
     if (!studyRights.length) return res.json([])
 
-
+    
     let result = []
     for(const {valid,education,organisation} of studyRights){
 
