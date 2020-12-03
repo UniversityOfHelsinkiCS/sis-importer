@@ -2,8 +2,7 @@ const router = require('express').Router()
 const sequelize = require("sequelize")
 const { Op } = require('sequelize')
 const models = require('../models')
-const sisClient = require('../utils/sisClient')
-const { Organisation, Education } = require('../models')
+const { Organisation, Education, CourseUnitRealisation } = require('../models')
 
 const MATLU = 'H50'
 
@@ -233,27 +232,6 @@ router.get('/:studentNumber/fuksi_year_credits/:startYear', async (req, res) => 
   }
 })
 
-router.get('/:studentNumber/enrolled/course/:courseId', async (req, res) => {
-  try {
-    const { studentNumber, courseId } = req.params
-    if (!courseId) return res.status(403).send('CourseId required')
-
-    const enrolledCourses = await sisClient.getEnrolmentsByStudentNumber(studentNumber)
-
-    const enrollmentOK = !!enrolledCourses.find(({ courseUnitRealisation, courseUnit }) => {
-      return (
-        new Date(courseUnitRealisation.activityPeriod.endDate).getTime() > new Date().getTime() &&
-        courseUnit.code === courseId
-      )
-    })
-
-    res.send(enrollmentOK)
-  } catch (err) {
-    console.log(err)
-    res.status(500).send(err.response)
-  }
-})
-
 /**
  * Checks if student with @studentNumber has enrolled for a course, under organisation @studyTrackId
  * organisation example; organisation: { code: '570-K001', name: { fi: 'Biologian kandiohjelma' } }
@@ -263,16 +241,32 @@ router.get('/:studentNumber/enrolled/study_track/:studyTrackId', async (req, res
     const { studyTrackId } = req.params
     if (!studyTrackId) return res.status(403).send('StudyTrackId required')
 
-    const enrolledCourses = await sisClient.getEnrolmentsByStudentNumber(req.student.studentNumber)
-
-    const studyTrackEnrollmentOK = !!enrolledCourses.find(({ courseUnitRealisation, courseUnit }) => {
-      return (
-        new Date(courseUnitRealisation.activityPeriod.endDate).getTime() > new Date().getTime() &&
-        courseUnit.organisations.find(({ organisation }) => organisation.code === studyTrackId)
-      )
+    const enrolledCourses = await models.Enrollment.findAll({
+      where: {
+        personId: req.student.id,
+        state: "ENROLLED"
+      },
+      include: [CourseUnitRealisation]
     })
 
-    res.send(studyTrackEnrollmentOK)
+    for(const {course_unit_realisation} of enrolledCourses){
+      const organisationIds = course_unit_realisation.organisations.map(e => e.organisationId)
+      
+      const responsibleOrganisations = await models.Organisation.findAll({
+        where: {
+          id :{
+            [Op.in] : organisationIds
+          }
+        }
+      })
+
+      const organisationIsValid = responsibleOrganisations.map(({code}) => code).includes(studyTrackId)
+      const registrationIsActive = new Date(course_unit_realisation.activityPeriod.endDate).getTime() > new Date().getTime()
+
+      if(organisationIsValid && registrationIsActive) return res.send(true)
+    }
+
+    return res.send(false)
   } catch (e) {
     console.log(e)
     res.status(500).send(e)
