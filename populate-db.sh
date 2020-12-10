@@ -14,8 +14,11 @@ retry () {
 
 mkdir -p backups
 
+
+echo "Enter your Uni Helsinki username:"
+read username
 echo "Fetching latest staging backup data"
-scp -r -o ProxyCommand="ssh -W %h:%p melkinpaasi.cs.helsinki.fi" oodikone-staging:/home/tkt_oodi/backups/sis-importer-staging.sqz $BACKUP
+scp -r -o ProxyCommand="ssh -W %h:%p $username@melkinpaasi.cs.helsinki.fi" $username@oodikone-staging:/home/tkt_oodi/backups/sis-importer-staging.sqz $BACKUP
 
 echo "Setting up db"
 npm run dco:setup_network --prefix $DIR_PATH
