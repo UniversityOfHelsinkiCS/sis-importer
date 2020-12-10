@@ -62,7 +62,11 @@ router.get('/', async (req, res) => {
 router.get('/:id/enrolments', async (req, res) => {
   const { id } = req.params
 
-  const enrolments = await sisClient.getEnrolmentsByCourseUnitRealisationId(id)
+  const enrolments = await models.Enrollment.findAll({
+    where: {
+      courseUnitRealisationId: id,
+    },
+  })
 
   res.send(enrolments)
 })
