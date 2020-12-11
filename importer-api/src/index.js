@@ -71,6 +71,7 @@ const update = async (current, attempt = 1) => {
     const canStillRetry = attempt <= UPDATE_RETRY_LIMIT
     if (forbiddenResource) {
       console.log('Added resource to list of forbidden resources')
+      logger.error({ message: `Forbidden service: ${serviceId}}`, serviceId })
       forbiddenServiceIds.push(serviceId)
       return updateNext(current)
     }
