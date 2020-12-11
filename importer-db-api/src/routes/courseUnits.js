@@ -33,21 +33,25 @@ router.get('/', async (req, res) => {
 router.get('/programme/:programmeCode', async (req, res) => {
   const { params, query } = req
   const programmeCode = params.programmeCode // '500-K005' = CS kandi
+
   const organisation = await models.Organisation.findOne({
     where: {
       code: programmeCode,
     },
   })
+
   if (!organisation) return res.status(404).send('No such organization, use different code e.g. 500-K005')
+
   const courses = await organisation.getCourses()
 
-  res.send({
-    course_units: courses.filter(course => {
-      const searchString = query.search || ''
-      const searchFields = [course.id, course.code, ...Object.values(course.name)]
-      return searchFields.find(f => f.includes(searchString))
-    }),
+  const searchString = query.search || ''
+
+  const filteredCourses = courses.filter(course => {
+    const searchFields = [course.id, course.code, ...Object.values(course.name)]
+    return searchFields.find(f => f.includes(searchString))
   })
+
+  res.send(filteredCourses)
 })
 
 module.exports = router
