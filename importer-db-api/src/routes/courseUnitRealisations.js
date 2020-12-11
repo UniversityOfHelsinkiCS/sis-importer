@@ -5,7 +5,6 @@ const dateFns = require('date-fns')
 
 const models = require('../models')
 const { NotFoundError } = require('../errors')
-const sisClient = require('../utils/sisClient')
 
 const router = express.Router()
 

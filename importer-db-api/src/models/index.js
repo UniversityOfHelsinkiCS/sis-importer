@@ -16,8 +16,11 @@ Organisation.hasMany(StudyRight, { foreignKey: 'id', targetKey: 'organisationId'
 
 StudyRight.hasOne(Education, { sourceKey: 'educationId', foreignKey: 'id' })
 
-Enrollment.belongsTo(CourseUnitRealisation, {sourceKey: "courseUnitRealisationId", targetKey:"id"})
-Enrollment.belongsTo(CourseUnit, {sourceKey: "courseUnitId", targetKey:"id"})
+Enrollment.belongsTo(CourseUnitRealisation, { sourceKey: 'courseUnitRealisationId', targetKey: 'id' })
+Enrollment.belongsTo(CourseUnit, { sourceKey: 'courseUnitId', targetKey: 'id' })
+
+Person.hasMany(StudyRight, { sourceKey: 'id', foreignKey: 'personId' })
+StudyRight.belongsTo(Person, { foreignKey: 'personId', targetKey: 'id' })
 
 const models = {
   CourseUnit,
@@ -31,7 +34,7 @@ const models = {
   Person,
   TermRegistrations,
   Education,
-  Enrollment
+  Enrollment,
 }
 
 module.exports = models
