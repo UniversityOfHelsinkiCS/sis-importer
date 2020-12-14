@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, BIGINT } = require('sequelize')
+const { Model, STRING, ARRAY, JSONB, DATE, BIGINT } = require('sequelize')
 const { connection } = require('../connection')
 
 class Enrolment extends Model {}
@@ -41,6 +41,15 @@ Enrolment.init(
     },
     state: {
       type: STRING
+    },
+    studySubGroups: {
+      type: ARRAY(JSONB)
+    },
+    confirmedStudySubGroupIds: {
+      type: ARRAY(STRING)
+    },
+    tentativeStudySubGroupIds: {
+      type: ARRAY(STRING)
     }
   },
   {
