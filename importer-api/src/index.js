@@ -9,6 +9,7 @@ const { sleep } = require('./utils')
 const { logger } = require('./utils/logger')
 const requestBuffer = require('./utils/requestBuffer')
 
+let forbiddenServiceIds = []
 let isImporting = false
 
 if (process.env['NODE_ENV'] === 'development') {
@@ -51,34 +52,44 @@ const update = async (current, attempt = 1) => {
 
   console.log(`Importing ${serviceId} (${current + 1}/${Object.keys(serviceIds).length})`)
   try {
-    const data = await schedule(serviceId, generatedHash)
-    if (data) {
-      const { greatestOrdinal, hasMore, total, ordinalKey } = data
-      console.log(`New ordinal for ${serviceId}: ${greatestOrdinal}`)
-      await updateOrdinalFrom(total, ordinalKey, greatestOrdinal)
-      hasMore ? update(current) : updateNext(current)
-    } else {
-      updateNext(current)
+    if (forbiddenServiceIds.includes(serviceId)) {
+      console.log(`Skipping forbidden serviceId ${serviceId}`)
+      return updateNext(current)
     }
+    const data = await schedule(serviceId, generatedHash)
+    if (!data) return updateNext(current)
+
+    const { greatestOrdinal, hasMore, total, ordinalKey } = data
+    console.log(`New ordinal for ${serviceId}: ${greatestOrdinal}`)
+    await updateOrdinalFrom(total, ordinalKey, greatestOrdinal)
+    hasMore ? update(current) : updateNext(current)
 
     logger.info({ message: 'Imported batch', timems: new Date() - start })
-  } catch (e) {
+  } catch (err) {
     requestBuffer.flush()
-    if (attempt === UPDATE_RETRY_LIMIT) {
-      logger.error({ message: 'Importing failed', meta: e.stack })
-      isImporting = false
-      return
+    const forbiddenResource = ((err || {}).response || {}).status === 403
+    const canStillRetry = attempt <= UPDATE_RETRY_LIMIT
+    if (forbiddenResource) {
+      console.log('Added resource to list of forbidden resources')
+      logger.error({ message: `Forbidden service: ${serviceId}}`, serviceId })
+      forbiddenServiceIds.push(serviceId)
+      return updateNext(current)
     }
-    update(current, ++attempt)
+    if (canStillRetry) {
+      return update(current, ++attempt)
+    }
+
+    logger.error({ message: 'Importing failed', meta: err.stack })
+    return updateNext(current)
   }
 }
 
 const run = async () => {
-  if (!isImporting) {
-    isImporting = true
-    requestBuffer.flush()
-    update(0)
-  }
+  if (isImporting) return
+
+  isImporting = true
+  requestBuffer.flush()
+  update(0)
 }
 
 stan.on('connect', ({ clientID }) => {

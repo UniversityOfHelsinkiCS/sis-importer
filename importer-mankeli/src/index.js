@@ -16,7 +16,8 @@ const {
   CUSTOM_GRADE_SCALE_CHANNEL,
   URN_COUNTRY_CHANNEL,
   URN_EDUCATION_TYPE_CHANNEL,
-  ORI_STUDY_RIGHT_PRIMALITY_CHANNEL
+  ORI_STUDY_RIGHT_PRIMALITY_CHANNEL,
+  ILMO_ENROLMENT_CHANNEL
 } = require('./utils/stan')
 const personHandler = require('./messageHandlers/person')
 const attainmentHandler = require('./messageHandlers/attainment')
@@ -33,6 +34,7 @@ const gradeScaleHandler = require('./messageHandlers/gradeScale')
 const countryHandler = require('./messageHandlers/country')
 const educationTypeHandler = require('./messageHandlers/educationType')
 const studyRightPrimalityHandler = require('./messageHandlers/studyRightPrimality')
+const enrolmentHandler = require('./messageHandlers/enrolment')
 const { sleep } = require('./utils')
 const { createTransaction } = require('./utils/db')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
@@ -58,7 +60,8 @@ const channels = {
   [CUSTOM_GRADE_SCALE_CHANNEL]: gradeScaleHandler,
   [URN_COUNTRY_CHANNEL]: countryHandler,
   [URN_EDUCATION_TYPE_CHANNEL]: educationTypeHandler,
-  [ORI_STUDY_RIGHT_PRIMALITY_CHANNEL]: studyRightPrimalityHandler
+  [ORI_STUDY_RIGHT_PRIMALITY_CHANNEL]: studyRightPrimalityHandler,
+  [ILMO_ENROLMENT_CHANNEL]: enrolmentHandler
 }
 
 let currentExecutionHash = null

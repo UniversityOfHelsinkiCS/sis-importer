@@ -1,6 +1,6 @@
 const { flatten } = require('lodash')
 const { Organisation, StudyYear } = require('../db/models')
-const { bulkCreate } = require('../utils/db')
+const { bulkCreate, createTransaction } = require('../utils/db')
 const { koriRequest } = require('../utils/koriApi')
 
 const parseOrganisation = organisation => {
@@ -37,15 +37,23 @@ module.exports = async ({ active, deleted }, transaction) => {
   await bulkCreate(Organisation, parsedOrganisations, transaction, ['id', 'modificationOrdinal', 'autoId'])
 
   // Fetch and write all universities' study years into the db.
-  const uniqueUniversityOrganisations = await Organisation.aggregate('university_org_id', 'DISTINCT', { plain: false })
-  const studyYears = await Promise.all(
-    uniqueUniversityOrganisations.map(async ({ DISTINCT: orgId }) => {
-      const orgStudyYears = await koriRequest(
-        `/study-years/v1?&organisationId=${orgId}&firstYear=1950&numberOfYears=1000`
-      )
-      return orgStudyYears.map(parseStudyYears)
+  const studyYearTransaction = await createTransaction()
+  try {
+    const uniqueUniversityOrganisations = await Organisation.aggregate('university_org_id', 'DISTINCT', {
+      plain: false
     })
-  )
+    const studyYears = await Promise.all(
+      uniqueUniversityOrganisations.map(async ({ DISTINCT: orgId }) => {
+        const orgStudyYears = await koriRequest(
+          `/study-years/v1?&organisationId=${orgId}&firstYear=1950&numberOfYears=1000`
+        )
+        return orgStudyYears.map(parseStudyYears)
+      })
+    )
 
-  await bulkCreate(StudyYear, flatten(studyYears), transaction, ['startYear'])
+    await bulkCreate(StudyYear, flatten(studyYears), studyYearTransaction, ['startYear'])
+    studyYearTransaction.commit()
+  } catch (err) {
+    if (studyYearTransaction) studyYearTransaction.rollback()
+  }
 }

@@ -29,6 +29,13 @@ services:
       - sis-importer-pgdata:/var/lib/postgresql/data
     container_name: sis-importer-db
 
+  importer-db-api:
+    build:
+      context: importer-db-api
+    container_name: sis-importer-db-api
+    depends_on:
+      - importer-db
+
   importer-redis:
     image: redis:5.0.7
     command: ["redis-server", "--appendonly", "yes", "--port", "6380"]

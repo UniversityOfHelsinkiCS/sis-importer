@@ -14,7 +14,8 @@ const parseCourseUnitRealisation = courseUnitRealisation => {
     courseUnitRealisationTypeUrn: courseUnitRealisation.courseUnitRealisationTypeUrn,
     studyGroupSets: courseUnitRealisation.studyGroupSets,
     organisations: courseUnitRealisation.organisations,
-    enrolmentPeriod: courseUnitRealisation.enrolmentPeriod
+    enrolmentPeriod: courseUnitRealisation.enrolmentPeriod,
+    responsibilityInfos: courseUnitRealisation.responsibilityInfos
   }
 }
 

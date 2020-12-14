@@ -3,10 +3,11 @@ const SONIC = process.env.SONIC === '1'
 const CURRENT_EXECUTION_HASH = 'CURRENT_EXECUTION_HASH'
 const IS_DEV = process.env.NODE_ENV === 'development'
 const FETCH_AMOUNT = IS_DEV && !SONIC ? 15 : 1000
-const DEFAULT_CHUNK_SIZE = IS_DEV && !SONIC ? 5 : 50
+const MAX_CHUNK_SIZE = IS_DEV && !SONIC ? 5 : 100
 const APIS = {
   ori: 'ORI',
   kori: 'KORI',
+  ilmo: 'ILMO',
   urn: 'URN',
   custom: 'CUSTOM'
 }
@@ -18,7 +19,7 @@ module.exports = {
   SONIC,
   CURRENT_EXECUTION_HASH,
   FETCH_AMOUNT,
-  DEFAULT_CHUNK_SIZE,
+  MAX_CHUNK_SIZE,
   IS_DEV,
   APIS,
   UPDATE_RETRY_LIMIT,
