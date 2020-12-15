@@ -20,14 +20,16 @@ router.get('/', async (req, res) => {
   if (!courseUnit) {
     throw new NotFoundError(`Course unit with code ${code} is not found`)
   }
-
+  
   const { groupId } = courseUnit
 
-  const assessmentItem = await models.AssessmentItem.findOne({
+  const assessmentItems = await models.AssessmentItem.findAll({
     where: {
       primary_course_unit_group_id: groupId,
     },
   })
+
+  const assessmentItem = assessmentItems.find(item => item.id.includes('default-teaching-participation'))
 
   if (!assessmentItem) {
     return res.send([])
