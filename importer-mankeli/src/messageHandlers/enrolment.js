@@ -10,6 +10,9 @@ const parseEnrolment = ({
   courseUnitRealisationId,
   courseUnitId,
   enrolmentDateTime,
+  studySubGroups,
+  confirmedStudySubGroupIds,
+  tentativeStudySubGroupIds,
   state,
   metadata
 }) => ({
@@ -21,6 +24,9 @@ const parseEnrolment = ({
   courseUnitRealisationId,
   courseUnitId,
   enrolmentDateTime,
+  studySubGroups,
+  confirmedStudySubGroupIds,
+  tentativeStudySubGroupIds,
   state,
   modificationOrdinal: metadata.modificationOrdinal
 })

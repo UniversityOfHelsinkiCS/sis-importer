@@ -9,14 +9,15 @@ module.exports = (entities, maxChunkSize) => {
   let chunkSizeNow = 0
 
   for (const entity of entities) {
-    if (currentChunk.length >= maxChunkSize || chunkSizeNow >= SIZE_LIMIT) {
+    const wouldBeChunkSize = chunkSizeNow + Buffer.byteLength(JSON.stringify(entity), 'utf8')
+    if (currentChunk.length >= maxChunkSize || wouldBeChunkSize >= SIZE_LIMIT) {
       chunkified.push(currentChunk)
-      currentChunk = []
-      chunkSizeNow = 0
+      currentChunk = [entity]
+      chunkSizeNow = Buffer.byteLength(JSON.stringify(entity), 'utf8')
+    } else {
+      currentChunk.push(entity)
+      chunkSizeNow = wouldBeChunkSize
     }
-
-    chunkSizeNow += Buffer.byteLength(JSON.stringify(entity), 'utf8')
-    currentChunk.push(entity)
   }
 
   chunkified.push(currentChunk)
