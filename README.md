@@ -1,5 +1,7 @@
 # SIS-IMPORTER
 
+https://version.helsinki.fi/toska/dokumentaatio/-/blob/master/guides/how_to_sis-importer_locally.md
+
 ### Local development
 1. Create `.env` files into `importer-api`, `importer-db-api` and `importer-mankeli` with [contents](https://github.com/UniversityOfHelsinkiCS/dokumentaatio/blob/master/sis/sis-mint.md#env-content) `SIS_API_URL=x` and `PROXY_TOKEN=y`
 2. `npm run build`
