@@ -1,46 +1,80 @@
 # SIS-IMPORTER
 
-https://version.helsinki.fi/toska/dokumentaatio/-/blob/master/guides/how_to_sis-importer_locally.md
-
 ### Local development
-1. Create `.env` files into `importer-api`, `importer-db-api` and `importer-mankeli` with [contents](https://github.com/UniversityOfHelsinkiCS/dokumentaatio/blob/master/sis/sis-mint.md#env-content) `SIS_API_URL=x` and `PROXY_TOKEN=y`
-2. `npm run build`
-3. [Start node proxy](https://github.com/UniversityOfHelsinkiCS/node-proxy/blob/master/README.md#installing-and-running) in oodikone-staging
-4. `npm start`
-5.
+1. See initial setup in https://version.helsinki.fi/toska/dokumentaatio/-/blob/master/guides/how_to_sis-importer_locally.md - contains too much secret data to have here
+2.
+
 ![catto](http://i.imgur.com/1uYroRF.gif)
 
 ### Populate db
+
+Can't wait? Populate db with
+
 ```bash
 ./populate-db.sh
 ```
+
+The script downloads a manually created dump! It may not be the most recent. Go to importer and run the backup script if you need the edgest of the edge.
 
 ### Starting specific service groups ###
 
 1. To inspect the db with adminer `npm run start:db`
 2. To develop the db-api with db and adminer `npm run start:api`
 
+Shutting down: `npm run dco:down`
+
+### Connecting other services (kurki, updater) during local development ###
+
+Importer uses docker network called `importer_network` - you can get it by running `npm run start:api`.
+
+Add the following to your non-importer project to include it in the importer network! May require further config with the individual project.
+
+**docker-compose.yaml**
+```yaml
+...
+networks:
+  default:
+    external: 
+      name: importer_network
+```
+
+Now accessing importer-db will work from the other project. If it's too much work you can change the default network of importer similarly to the other projects. In that case plz do not commit the change here.
+
+### How to skip or reimport already imported data ###
+
+Importer is idempotent. You can delete data, run it multiple times, whatever, and after you run it it'll always generate the same db.
+
+It keeps the status of individual data in redis (see reset-ordinals). You can connect to the redis instance when it's running with
+
+```console
+$ docker exec -it <redis-container> redis-cli -p 6380
+```
+
+By setting the LATEST_XXXX_ORDINAL to 0 (e.g. set LATEST_ENROLMENT_ORDINAL "0") you can refresh data. Or similarly skip data by setting the value *high enough*. Depends on the data what is a good number.
+
+You can use reset-ordinals.sh as the example. It resets all of the ordinals to 0.
+
 ### SONIC mode
+
 If one wants to increase the speed of the importer when developing, set the flag `SONIC` to `1` [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/docker/docker-compose.dev.yml#L13)
 
 ### Adminer
+
 http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public
 
-### NATS-streaming-console
+### NATS-streaming-console ###
+
 http://localhost:8282/  
 
-### Shutting down
-`npm run dco:down`
-
-### Degree structure
+### Degree structure ###
 
 In dev mode see http://localhost:3002/structure/:code (eg KH50_005 for Computer sciencebachelor) for decree structures.
 
-## CI
+## CI ##
 
 All three services (api, mankeli and db-api) go through individual github actions workflows, defined in .github/workflows.
-Master branch docker images are tagged as `latest`, trunk branch as `trunk`. oodikone-staging automatically pulls new `latest` -images.
+Master branch docker images are tagged as `latest` importer automatically pulls new `latest` -images.
 
-### TODO
-Make a release pipeline when this goes to production.
+Trunk branch is also built with tag `trunk`. But is not currently used.
+
 

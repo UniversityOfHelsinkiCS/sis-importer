@@ -3,7 +3,7 @@ DIR_PATH=$(dirname "$0")
 DB=importer-db
 CONTAINER=sis-importer-db
 SERVICE=importer-db
-BACKUP=$DIR_PATH/backups/sis-importer-staging.sqz
+BACKUP=$DIR_PATH/backups/importer-db.sqz
 
 retry () {
     for i in {1..60}
@@ -17,11 +17,10 @@ mkdir -p backups
 
 echo "Enter your Uni Helsinki username:"
 read username
-echo "Fetching latest staging backup data"
-scp -r -o ProxyCommand="ssh -W %h:%p $username@melkinpaasi.cs.helsinki.fi" $username@oodikone-staging:/home/tkt_oodi/backups/sis-importer-staging.sqz $BACKUP
+echo "Fetching backup data"
+scp -r -o ProxyCommand="ssh -W %h:%p $username@melkinpaasi.cs.helsinki.fi" $username@importer.cs.helsinki.fi:/home/importer_user/importer-db/backup/importer-db.sqz $BACKUP
 
 echo "Setting up db"
-npm run dco:setup_network --prefix $DIR_PATH
 npm run dco:down --prefix $DIR_PATH
 npm run dco:up --prefix $DIR_PATH -- $SERVICE
 
@@ -33,12 +32,14 @@ echo "Creating $DB"
 retry docker exec -u postgres $CONTAINER pg_isready --dbname=$DB
 docker exec -u postgres $CONTAINER psql -c "CREATE DATABASE \"$DB\"" || echo "container $CONTAINER DB $DB already exists"
 
-echo "Populating $DB"
+echo "Copying $DB to the container"
 docker cp $BACKUP $CONTAINER:/asd.sqz
+
+echo "Running pg_restore $DB inside the container"
 docker exec $CONTAINER pg_restore -U postgres --no-owner -F c --dbname="$DB" -j4 /asd.sqz
 
 echo "Restarting db and adminer"
 npm run dco:up:db --prefix $DIR_PATH
 
 echo "View adminer here: http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public (password = dev)"
-echo "Run npm start to restart other services"
+echo "Run npm start to restart other importer services"

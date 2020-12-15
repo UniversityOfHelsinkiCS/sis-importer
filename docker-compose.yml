@@ -54,3 +54,7 @@ volumes:
   sis-importer-redis:
   sis-importer-datastore:
   sis-importer-pgdata:
+
+networks:
+  default:
+    name: importer_network
