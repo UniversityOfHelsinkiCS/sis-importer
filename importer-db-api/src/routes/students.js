@@ -43,6 +43,27 @@ router.use('/:studentNumber', async (req, res, next) => {
   next()
 })
 
+/**
+ * Batch convert list of student numbers to person objects.
+ * Note: For now no warnings raised if some invalid student numbers found...
+ */
+router.post('/', async (req, res) => {
+  try {
+      const studentNumbers = req.body
+      if (!Array.isArray(studentNumbers))
+          return res.status(400).send({error: 'Input should be an array'})
+      const persons = await models.Person.findAll({
+          where: {
+              studentNumber: { [Op.in]: studentNumbers }
+          }
+      })
+      return res.send(persons)
+  } catch (e) {
+      console.log(e)
+      res.status(500).json(e.toString())
+  }
+})
+
 router.get('/:studentNumber/studyrights', async (req, res) => {
   try {
     const studyRights = await models.StudyRight.findAll({
