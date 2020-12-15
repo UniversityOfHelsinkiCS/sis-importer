@@ -14,28 +14,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
-    - name: Pull images
-      run: |
-        docker pull toska/sis-importer-api:$TAG
-        docker pull toska/sis-importer-mankeli:$TAG
-        docker pull toska/sis-importer-db-api:$TAG
-      env:
-        TAG: staging
 
-    - name: Build 
-      run: npm run dco:ci -- build importer-mankeli
-      env:
-        TAG: staging
-    
-    - name: Start
-      run: npm run dco:ci -- up -d
-      env:
-        TAG: staging
-    
     - name: Test
-      run: docker exec -t sis-importer-mankeli npm run test 
-    
+      run: npm test --prefix ./importer-mankeli
+
     - name: Build and push Docker images
       uses: docker/build-push-action@v1.1.0 
       with:
