@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
   if (!courseUnit) {
     throw new NotFoundError(`Course unit with code ${code} is not found`)
   }
-  
+
   const { groupId } = courseUnit
 
   const assessmentItems = await models.AssessmentItem.findAll({
@@ -61,6 +61,20 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/:id/enrolments', async (req, res) => {
+  const zip = (enrolments, persons) => {
+    const personHash = persons.reduce((acc, p) => {
+      acc[p.id] = p.dataValues
+      return acc
+    }, {})
+
+    return enrolments.map(e => {
+      return {
+        ...e.dataValues,
+        student: personHash[e.personId]
+      }
+    })
+  }
+
   const { id } = req.params
 
   const enrolments = await models.Enrollment.findAll({
@@ -69,7 +83,17 @@ router.get('/:id/enrolments', async (req, res) => {
     },
   })
 
-  res.send(enrolments)
+  const personIds = enrolments.map(e => e.personId)
+
+  const persons = await models.Person.findAll({
+    where: {
+      id: {
+        [Op.in]: personIds
+      }
+    }
+  })
+
+  res.send(zip(enrolments, persons))
 })
 
 router.get('/:id/study_group_sets', async (req, res) => {
