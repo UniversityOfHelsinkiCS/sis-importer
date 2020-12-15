@@ -2,7 +2,6 @@
 DIR_PATH=$(dirname "$0")
 SERVICE=importer-redis
 CONTAINER=sis-redis
-REDIS_PORT=6380
 
 read -p "Are you sure? (y/n) " -n 1 -r
 echo
@@ -24,7 +23,7 @@ then
   )
 
   for key in "${ORDINAL_KEYS[@]}";
-    do docker exec -t $CONTAINER redis-cli -p $REDIS_PORT DEL $key &
+    do docker exec -t $CONTAINER redis-cli DEL $key &
   done
 fi
 

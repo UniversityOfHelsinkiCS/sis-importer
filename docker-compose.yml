@@ -1,54 +1,117 @@
 version: "3.2"
 
 services:
-  importer-mankeli:
+  importer-api:
+    command: "npm run start:dev"
     build:
-      context: importer-mankeli
+      args:
+        NODE_ENV: "development"
+      context: importer-api
+    container_name: sis-importer-api
+    depends_on:
+      - importer-mankeli
+    env_file:
+      - importer-api/.env
     environment:
-      NATS_URI: importer-nats://importer-nats:4223
+      DB_USERNAME: dev
+      DB_PASSWORD: dev
       DB_PORT: 5432
       DB_HOST: importer-db
       DB_DATABASE: importer-db
+      NATS_URI: nats://importer-nats:4222
+      NATS_TOKEN: dev
+      REDIS_URI: redis://importer-redis:6379
+      SONIC: 0
+    ports:
+      - 3002:3002 # explorer at http://localhost:3002/
+    volumes:
+      - ./importer-api:/usr/src/app
+
+  importer-mankeli:
+    build:
+      args:
+        NODE_ENV: "development"
+      context: importer-mankeli
+    command: "npm run start:dev"
     depends_on:
       - importer-db
       - importer-redis
       - importer-nats
-
-  importer-api:
-    build:
-      context: importer-api
     environment:
-      NATS_URI: importer-nats://importer-nats:4223
-    container_name: sis-importer-api
-    depends_on:
-      - importer-mankeli
+      DB_USERNAME: dev
+      DB_PASSWORD: dev
+      DB_PORT: 5432
+      DB_HOST: importer-db
+      DB_DATABASE: importer-db
+      NATS_URI: nats://importer-nats:4222
+      NATS_TOKEN: dev
+      REDIS_URI: redis://importer-redis:6379
+    volumes:
+      - ./importer-mankeli:/usr/src/app
 
   importer-db:
+    container_name: sis-importer-db
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: importer-db
     image: postgres:9.6.3
     volumes:
       - sis-importer-pgdata:/var/lib/postgresql/data
-    container_name: sis-importer-db
 
   importer-db-api:
     build:
+      args:
+        NODE_ENV: "development"
       context: importer-db-api
+    command: "npm run start:dev"
     container_name: sis-importer-db-api
     depends_on:
       - importer-db
+    environment:
+      DB_USERNAME: dev
+      DB_PASSWORD: dev
+      DB_PORT: 5432
+      DB_HOST: importer-db
+      DB_DATABASE: importer-db
+    ports:
+      - 3000:3000
+    volumes:
+      - ./importer-db-api:/usr/src/app
 
   importer-redis:
-    image: redis:5.0.7
-    command: ["redis-server", "--appendonly", "yes", "--port", "6380"]
+    command: ["redis-server", "--appendonly", "yes", "--port", "6379"]
     container_name: sis-redis
+    image: redis:5.0.7
     volumes:
       - sis-importer-redis:/data
 
   importer-nats:
-    image: nats-streaming:0.16.2
-    command: -cid sis-importer-nats -m 8222 -p 4223 --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 5000 -store file -dir datastore
+    command: -cid sis-importer-nats -m 8222 --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 5000 -store file -dir datastore
     container_name: sis-importer-nats
+    image: nats-streaming:0.16.2
+    ports:
+      - 8223:8222 # Monitoring at http://localhost:8223/
     volumes:
       - sis-importer-datastore:/datastore
+
+  importer-nats-streaming-console:
+    container_name: sis-nats-streaming-console
+    environment:
+      - STAN_URL=nats://importer-nats:4222
+      - STAN_MONITOR_URL=http://importer-nats:8222
+    image: mozgoo/nats-streaming-console:latest
+    ports:
+      - 8282:8282 # http://localhost:8282/
+
+  importer-adminer:
+    container_name: importer-adminer
+    environment:
+      - ADMINER_DESIGN=pepa-linha
+      - ADMINER_DEFAULT_SERVER=importer-db
+    image: adminer:4.7.5
+    ports:
+      - 5051:8080 # http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public
 
 volumes:
   sis-importer-redis:

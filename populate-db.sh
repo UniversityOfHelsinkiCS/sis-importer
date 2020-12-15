@@ -14,15 +14,14 @@ retry () {
 
 mkdir -p backups
 
-
 echo "Enter your Uni Helsinki username:"
 read username
 echo "Fetching backup data"
 scp -r -o ProxyCommand="ssh -W %h:%p $username@melkinpaasi.cs.helsinki.fi" $username@importer.cs.helsinki.fi:/home/importer_user/importer-db/backup/importer-db.sqz $BACKUP
 
 echo "Setting up db"
-npm run dco:down --prefix $DIR_PATH
-npm run dco:up --prefix $DIR_PATH -- $SERVICE
+docker-compose down
+docker-compose up -d $SERVICE
 
 echo "Dropping $DB"
 retry docker exec -u postgres $CONTAINER pg_isready --dbname=$DB
@@ -35,11 +34,11 @@ docker exec -u postgres $CONTAINER psql -c "CREATE DATABASE \"$DB\"" || echo "co
 echo "Copying $DB to the container"
 docker cp $BACKUP $CONTAINER:/asd.sqz
 
-echo "Running pg_restore $DB inside the container"
+echo "Running pg_restore $DB inside the container. Run \"docker stats\" to see processing."
 docker exec $CONTAINER pg_restore -U postgres --no-owner -F c --dbname="$DB" -j4 /asd.sqz
 
-echo "Restarting db and adminer"
-npm run dco:up:db --prefix $DIR_PATH
+echo "Restarting db, db-api and adminer"
+./run.sh db up
 
 echo "View adminer here: http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public (password = dev)"
-echo "Run npm start to restart other importer services"
+echo "Run ./run.sh up to restart other importer services"
