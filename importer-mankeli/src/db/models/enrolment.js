@@ -42,6 +42,12 @@ Enrolment.init(
     state: {
       type: STRING
     },
+    documentState: {
+      type: STRING
+    },
+    lastModifiedOn: {
+      type: DATE
+    },
     studySubGroups: {
       type: ARRAY(JSONB)
     },

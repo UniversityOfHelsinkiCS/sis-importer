@@ -4,6 +4,7 @@ const { bulkCreate } = require('../utils/db')
 const parseEnrolment = ({
   id,
   personId,
+  documentState,
   verifierPersonId,
   studyRightId,
   assessmentItemId,
@@ -28,6 +29,8 @@ const parseEnrolment = ({
   confirmedStudySubGroupIds,
   tentativeStudySubGroupIds,
   state,
+  documentState,
+  lastModifiedOn: metadata.lastModifiedOn,
   modificationOrdinal: metadata.modificationOrdinal
 })
 
