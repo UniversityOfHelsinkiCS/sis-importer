@@ -1,13 +1,14 @@
 const  { apiHealthCheck, axiosInstance, wait } = require('./lib')
 
 const SLOW = false
-const START_ORDINAL = 0
+const START_ORDINAL = 807695
 const CHUNK_SIZE = 10000
 
-const testPath = "ori/api/study-rights/v1/export";
+const testPath = "ilmo/api/enrolments/v1/export";
 
 const loopEntities = (entity) => {
-  if (entity.studentId !== 'XXXXXX') return false
+  if (entity.personId !== 'XXXXX') return false
+  if (entity.assessmentItemId !== 'XXXXXX') return false
 
   return true
 }
