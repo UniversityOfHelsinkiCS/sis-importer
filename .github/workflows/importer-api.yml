@@ -16,8 +16,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Build
-      run: npm run build
+    - name: Install packages
+      run: npm ci --prefix ./importer-api
       
     - name: Test
       run: npm test --prefix ./importer-api
