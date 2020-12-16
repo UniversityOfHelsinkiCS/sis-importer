@@ -3,21 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dco": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml",
-    "dco:ci": "docker-compose -f docker-compose.yml -f ./docker/docker-compose.ci.yml",
-    "dco:up": "npm run dco -- up -d",
-    "dco:up:db": "npm run dco:up -- importer-db importer-adminer",
-    "dco:up:api": "npm run dco:up -- importer-db importer-adminer importer-db-api",
-    "dco:down": "npm run dco -- down",
-    "dco:logs": "npm run dco -- logs -f",
-    "start": "npm run dco:up -- --scale importer-mankeli=3 && npm run dco:logs",
-    "start:db": "npm run dco:up:db && npm run dco:logs",
-    "start:api": "npm run dco:up:api && npm run dco:logs",
-    "build": "npm i && npm i --prefix ./importer-api && npm i --prefix ./importer-mankeli && npm i --prefix ./importer-db-api && npm run dco -- build",
+    "dco": "./run.sh",
+    "start": "./run.sh up --scale importer-mankeli=3 && ./run.sh logs -f",
+    "build": "npm i && npm i --prefix ./importer-api && npm i --prefix ./importer-mankeli && npm i --prefix ./importer-db-api && ./run.sh build",
     "test": "npm test --prefix ./importer-api && npm test --prefix ./importer-mankeli",
     "lintfix": "npm run lintfix --prefix ./importer-api && npm run lintfix --prefix ./importer-mankeli",
-    "reset": "docker volume rm sis-importer_sis-importer-datastore && docker volume rm sis-importer_sis-importer-pgdata && docker volume rm sis-importer_sis-importer-redis",
-    "restart": "npm run dco:down && npm run reset && npm start"
+    "reset": "./run.sh morning",
+    "restart": "./run.sh morning && npm start"
   },
   "husky": {
     "hooks": {
