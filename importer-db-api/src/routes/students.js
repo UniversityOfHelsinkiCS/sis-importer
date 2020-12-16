@@ -262,7 +262,7 @@ router.get('/:studentNumber/enrolled/study_track/:studyTrackId', async (req, res
     const { studyTrackId } = req.params
     if (!studyTrackId) return res.status(403).send('StudyTrackId required')
 
-    const enrolledCourses = await models.Enrollment.findAll({
+    const enrolledCourses = await models.Enrolment.findAll({
       where: {
         personId: req.student.id,
         state: "ENROLLED"

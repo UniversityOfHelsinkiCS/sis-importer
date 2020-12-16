@@ -9,15 +9,15 @@ const StudyYear = require('./StudyYear')
 const Person = require('./Person')
 const TermRegistrations = require('./TermRegistrations')
 const Education = require('./Education')
-const Enrollment = require('./Enrollment')
+const Enrolment = require('./Enrolment')
 
 StudyRight.belongsTo(Organisation, { foreignKey: 'organisationId', targetKey: 'id' })
 Organisation.hasMany(StudyRight, { foreignKey: 'id', targetKey: 'organisationId' })
 
 StudyRight.hasOne(Education, { sourceKey: 'educationId', foreignKey: 'id' })
 
-Enrollment.belongsTo(CourseUnitRealisation, { sourceKey: 'courseUnitRealisationId', targetKey: 'id' })
-Enrollment.belongsTo(CourseUnit, { sourceKey: 'courseUnitId', targetKey: 'id' })
+Enrolment.belongsTo(CourseUnitRealisation, { sourceKey: 'courseUnitRealisationId', targetKey: 'id' })
+Enrolment.belongsTo(CourseUnit, { sourceKey: 'courseUnitId', targetKey: 'id' })
 
 Person.hasMany(StudyRight, { sourceKey: 'id', foreignKey: 'personId' })
 StudyRight.belongsTo(Person, { foreignKey: 'personId', targetKey: 'id' })
@@ -34,7 +34,7 @@ const models = {
   Person,
   TermRegistrations,
   Education,
-  Enrollment,
+  Enrolment,
 }
 
 module.exports = models

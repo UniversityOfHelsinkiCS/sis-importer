@@ -77,7 +77,7 @@ router.get('/:id/enrolments', async (req, res) => {
 
   const { id } = req.params
 
-  const enrolments = await models.Enrollment.findAll({
+  const enrolments = await models.Enrolment.findAll({
     where: {
       courseUnitRealisationId: id,
     },

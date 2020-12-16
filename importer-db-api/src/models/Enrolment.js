@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, BIGINT, ARRAY, JSONB } = require('sequelize')
+const { Model, STRING, DATE, BIGINT, ARRAY, JSONB, Op } = require('sequelize')
 const { sequelize } = require('../config/db')
 
 class Enrolment extends Model {}
@@ -8,43 +8,46 @@ Enrolment.init(
     auto_id: {
       type: BIGINT,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     id: {
       type: STRING,
-      unique: true
+      unique: true,
     },
     modificationOrdinal: {
       type: BIGINT,
-      unique: true
+      unique: true,
     },
     personId: {
-      type: STRING
+      type: STRING,
     },
     verifierPersonId: {
-      type: STRING
+      type: STRING,
     },
     studyRightId: {
-      type: STRING
+      type: STRING,
     },
     assessmentItemId: {
-      type: STRING
+      type: STRING,
     },
     courseUnitRealisationId: {
-      type: STRING
+      type: STRING,
     },
     courseUnitId: {
-      type: STRING
+      type: STRING,
     },
     enrolmentDateTime: {
-      type: DATE
+      type: DATE,
     },
     state: {
-      type: STRING
+      type: STRING,
+    },
+    documentState: {
+      type: STRING,
     },
     study_sub_groups: {
-      type: ARRAY(JSONB)
-    }
+      type: ARRAY(JSONB),
+    },
   },
   {
     underscored: true,
@@ -54,12 +57,19 @@ Enrolment.init(
     indexes: [
       {
         unique: true,
-        fields: ['id', 'modificationOrdinal']
+        fields: ['id', 'modificationOrdinal'],
       },
       {
-        fields: ['id']
-      }
-    ]
+        fields: ['id'],
+      },
+    ],
+    defaultScope: {
+      where: {
+        documentState: {
+          [Op.not]: 'DELETED',
+        }
+      },
+    }
   }
 )
 
