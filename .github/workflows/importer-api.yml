@@ -7,6 +7,7 @@ on:
       - trunk 
     paths:
       - importer-api/**
+      - .github/workflows/importer-api.yml
 
 jobs:
   build-test-push:
@@ -15,6 +16,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
+    - name: Build
+      run: npm run build
+      
     - name: Test
       run: npm test --prefix ./importer-api
     
