@@ -1,8 +1,10 @@
 # SIS-IMPORTER
 
 ### Local development
+
 1. See initial setup in https://version.helsinki.fi/toska/dokumentaatio/-/blob/master/guides/how_to_sis-importer_locally.md - contains too much secret data to have here
-2.
+2. `npm start` will start the application scaled to 3 mankelis.
+3.
 
 ![catto](http://i.imgur.com/1uYroRF.gif)
 
@@ -14,18 +16,19 @@ Can't wait? Populate db with
 ./populate-db.sh
 ```
 
-The script downloads a manually created dump! It may not be the most recent. Go to importer and run the backup script if you need the edgest of the edge.
+The script downloads a daily dump. Go to importer and run the backup script if you need the edgest of the edge.
 
-### Starting specific service groups ###
+### Starting specific service groups and ./run.sh ###
 
-1. To inspect the db with adminer `npm run start:db`
-2. To develop the db-api with db and adminer `npm run start:api`
+1. To start db, adminer and db-api `./run.sh db up`
 
-Shutting down: `npm run dco:down`
+Shutting down: `./run.sh down`
+
+Clearing everything: `./run.sh morning`
 
 ### Connecting other services (kurki, updater) during local development ###
 
-Importer uses docker network called `importer_network` - you can get it by running `npm run start:api`.
+Importer uses docker network called `importer_network` - you can get it by running `./run.sh db up`.
 
 Add the following to your non-importer project to include it in the importer network! May require further config with the individual project.
 
@@ -47,7 +50,7 @@ Importer is idempotent. You can delete data, run it multiple times, whatever, an
 It keeps the status of individual data in redis (see reset-ordinals). You can connect to the redis instance when it's running with
 
 ```console
-$ docker exec -it <redis-container> redis-cli -p 6380
+$ docker exec -it <redis-container> redis-cli
 ```
 
 By setting the LATEST_XXXX_ORDINAL to 0 (e.g. set LATEST_ENROLMENT_ORDINAL "0") you can refresh data. Or similarly skip data by setting the value *high enough*. Depends on the data what is a good number.
@@ -56,7 +59,7 @@ You can use reset-ordinals.sh as the example. It resets all of the ordinals to 0
 
 ### SONIC mode
 
-If one wants to increase the speed of the importer when developing, set the flag `SONIC` to `1` [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/docker/docker-compose.dev.yml#L13)
+If one wants to increase the speed of the importer when developing, set the flag `SONIC` to `1` [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/docker-compose.yml#L24)
 
 ### Adminer
 

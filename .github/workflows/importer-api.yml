@@ -7,6 +7,7 @@ on:
       - trunk 
     paths:
       - importer-api/**
+      - .github/workflows/importer-api.yml
 
 jobs:
   build-test-push:
@@ -15,26 +16,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Pull images
-      run: |
-        docker pull toska/sis-importer-api:$TAG
-        docker pull toska/sis-importer-mankeli:$TAG
-        docker pull toska/sis-importer-db-api:$TAG
-      env:
-        TAG: staging
-
-    - name: Build 
-      run: npm run dco:ci -- build importer-api
-      env:
-        TAG: staging
-    
-    - name: Start
-      run: npm run dco:ci -- up -d
-      env:
-        TAG: staging
-    
+    - name: Install packages
+      run: npm ci --prefix ./importer-api
+      
     - name: Test
-      run: docker exec -t sis-importer-api npm run test 
+      run: npm test --prefix ./importer-api
     
     - name: Build and push Docker images
       uses: docker/build-push-action@v1.1.0 

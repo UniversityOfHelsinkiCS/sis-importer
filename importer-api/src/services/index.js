@@ -9,7 +9,6 @@ const { MODULE_SCHEDULE_ID, info: moduleInfo } = require('./module')
 const { ORGANISATION_SCHEDULE_ID, info: organisationInfo } = require('./organisation')
 const { TERM_REGISTRATION_SCHEDULE_ID, info: termRegistrationInfo } = require('./termRegistration')
 const { STUDY_LEVEL_SCHEDULE_ID, info: studyLevelInfo } = require('./studyLevel')
-const { GRADE_SCALE_SCHEDULE_ID, info: gradeScaleInfo } = require('./gradeScale')
 const { COUNTRY_SCHEDULE_ID, info: countryInfo } = require('./country')
 const { EDUCATION_TYPE_SCHEDULE_ID, info: educationTypeInfo } = require('./educationType')
 const { STUDY_RIGHT_PRIMALITY_SCHEDULE_ID, info: studyRightPrimalityInfo } = require('./studyRightPrimality')
@@ -27,7 +26,6 @@ const services = {
   [ORGANISATION_SCHEDULE_ID]: organisationInfo,
   [TERM_REGISTRATION_SCHEDULE_ID]: termRegistrationInfo,
   [STUDY_LEVEL_SCHEDULE_ID]: studyLevelInfo,
-  [GRADE_SCALE_SCHEDULE_ID]: gradeScaleInfo,
   [COUNTRY_SCHEDULE_ID]: countryInfo,
   [EDUCATION_TYPE_SCHEDULE_ID]: educationTypeInfo,
   [STUDY_RIGHT_PRIMALITY_SCHEDULE_ID]: studyRightPrimalityInfo,
@@ -48,7 +46,6 @@ const serviceIds = [
   MODULE_SCHEDULE_ID,
   STUDY_RIGHT_PRIMALITY_SCHEDULE_ID,
   STUDY_LEVEL_SCHEDULE_ID,
-  GRADE_SCALE_SCHEDULE_ID,
   COUNTRY_SCHEDULE_ID,
   EDUCATION_TYPE_SCHEDULE_ID,
   ENROLMENT_SCHEDULE_ID
