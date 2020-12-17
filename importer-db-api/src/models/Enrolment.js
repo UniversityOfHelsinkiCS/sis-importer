@@ -5,13 +5,9 @@ class Enrolment extends Model {}
 
 Enrolment.init(
   {
-    auto_id: {
-      type: BIGINT,
-      primaryKey: true,
-      autoIncrement: true,
-    },
     id: {
       type: STRING,
+      primaryKey: true,
       unique: true,
     },
     modificationOrdinal: {
@@ -67,9 +63,9 @@ Enrolment.init(
       where: {
         documentState: {
           [Op.not]: 'DELETED',
-        }
+        },
       },
-    }
+    },
   }
 )
 
