@@ -1,14 +1,13 @@
 const  { apiHealthCheck, axiosInstance, wait } = require('./lib')
 
 const SLOW = false
-const START_ORDINAL = 807695
+const START_ORDINAL = 1025800
 const CHUNK_SIZE = 10000
 
 const testPath = "ilmo/api/enrolments/v1/export";
 
 const loopEntities = (entity) => {
-  if (entity.personId !== 'XXXXX') return false
-  if (entity.assessmentItemId !== 'XXXXXX') return false
+  if (entity.metadata.modificationOrdinal !== 0000) return false
 
   return true
 }
@@ -42,9 +41,17 @@ const main = async () => {
     hasMore = data.hasMore;
     currentOrdinal = data.greatestOrdinal;
     entities = data.entities
-
+    
     if (SLOW) await wait(1000);
   }
+  const newEntities = entities.filter(loopEntities)
+  if (newEntities.length) {
+    dataIWasLookingFor = dataIWasLookingFor.concat(newEntities)
+    console.log(dataIWasLookingFor)
+  }
+
+  console.log('HELPER HAS ENDED. FINAL DATA HERE')
+
   console.log(dataIWasLookingFor)
 };
 
