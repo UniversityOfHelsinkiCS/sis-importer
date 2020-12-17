@@ -5,14 +5,10 @@ class Enrolment extends Model {}
 
 Enrolment.init(
   {
-    auto_id: {
-      type: BIGINT,
-      primaryKey: true,
-      autoIncrement: true
-    },
     id: {
       type: STRING,
-      unique: true
+      unique: true,
+      primaryKey: true
     },
     modificationOrdinal: {
       type: BIGINT,
@@ -64,10 +60,6 @@ Enrolment.init(
     modelName: 'enrolment',
     tableName: 'enrolments',
     indexes: [
-      {
-        unique: true,
-        fields: ['id', 'modificationOrdinal']
-      },
       {
         fields: ['id']
       }
