@@ -27,7 +27,7 @@ const apiHealthCheck = async () => {
       break;
     } catch (err) {
       console.log("Is the node-proxy running? Retrying in 2 seconds");
-      wait(2000);
+      await wait(2000);
     }
   }
 };
