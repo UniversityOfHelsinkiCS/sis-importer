@@ -11,8 +11,7 @@ Enrolment.init(
       primaryKey: true
     },
     modificationOrdinal: {
-      type: BIGINT,
-      unique: true
+      type: BIGINT
     },
     personId: {
       type: STRING
@@ -61,6 +60,7 @@ Enrolment.init(
     tableName: 'enrolments',
     indexes: [
       {
+        unique: true,
         fields: ['id']
       }
     ]
