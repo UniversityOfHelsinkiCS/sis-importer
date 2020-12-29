@@ -9,6 +9,7 @@ const studentsRouter = require('./routes/students')
 const semestersRouter = require('./routes/semesters')
 const kurkiRouter = require('./routes/kurki')
 const employeesRouter = require('./routes/employees')
+const suotarRouter = require('./routes/suotar')
 const { ApplicationError } = require('./errors')
 
 const app = express()
@@ -33,6 +34,7 @@ app.use('/students', studentsRouter)
 app.use('/semesters', semestersRouter)
 app.use('/kurki', kurkiRouter)
 app.use('/employees', employeesRouter)
+app.use('/suotar', suotarRouter)
 
 app.use((error, req, res, next) => {
   console.log(error)

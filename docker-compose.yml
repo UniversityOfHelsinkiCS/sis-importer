@@ -68,6 +68,8 @@ services:
     container_name: sis-importer-db-api
     depends_on:
       - importer-db
+    env_file:
+      - importer-db-api/.env
     environment:
       DB_USERNAME: dev
       DB_PASSWORD: dev
