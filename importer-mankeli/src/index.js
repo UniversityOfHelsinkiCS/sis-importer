@@ -13,11 +13,11 @@ const {
   KORI_ORGANISATION_CHANNEL,
   ORI_TERM_REGISTRATION_CHANNEL,
   URN_STUDY_LEVEL_CHANNEL,
-  CUSTOM_GRADE_SCALE_CHANNEL,
   URN_COUNTRY_CHANNEL,
   URN_EDUCATION_TYPE_CHANNEL,
   ORI_STUDY_RIGHT_PRIMALITY_CHANNEL,
-  ILMO_ENROLMENT_CHANNEL
+  ILMO_ENROLMENT_CHANNEL,
+  GRAPHQL_GRADE_SCALES_CHANNEL
 } = require('./utils/stan')
 const personHandler = require('./messageHandlers/person')
 const attainmentHandler = require('./messageHandlers/attainment')
@@ -57,11 +57,11 @@ const channels = {
   [KORI_ORGANISATION_CHANNEL]: organisationHandler,
   [ORI_TERM_REGISTRATION_CHANNEL]: termRegistrationHandler,
   [URN_STUDY_LEVEL_CHANNEL]: studyLevelHandler,
-  [CUSTOM_GRADE_SCALE_CHANNEL]: gradeScaleHandler,
   [URN_COUNTRY_CHANNEL]: countryHandler,
   [URN_EDUCATION_TYPE_CHANNEL]: educationTypeHandler,
   [ORI_STUDY_RIGHT_PRIMALITY_CHANNEL]: studyRightPrimalityHandler,
-  [ILMO_ENROLMENT_CHANNEL]: enrolmentHandler
+  [ILMO_ENROLMENT_CHANNEL]: enrolmentHandler,
+  [GRAPHQL_GRADE_SCALES_CHANNEL]: gradeScaleHandler
 }
 
 let currentExecutionHash = null

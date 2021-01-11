@@ -4,6 +4,7 @@ const { oriRequest } = require('./utils/oriApi')
 const { koriRequest } = require('./utils/koriApi')
 const { urnRequest } = require('./utils/urnApi')
 const { ilmoRequest } = require('./utils/ilmoApi')
+const { graphqlRequest } = require('./utils/graphqlApi')
 const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./utils/redis')
 const { services } = require('./services')
 const { FETCH_AMOUNT, MAX_CHUNK_SIZE, APIS, PANIC_TIMEOUT } = require('./config')
@@ -18,7 +19,8 @@ const API_MAPPING = {
   [APIS.urn]: urnRequest
 }
 
-const fetchBy = async (api, url, ordinal, customRequest, limit = 1000) => {
+const fetchBy = async (api, url, ordinal, customRequest, limit = 1000, query) => {
+  if (api === APIS.graphql) return graphqlRequest(query)
   const targetUrl = api == APIS.urn || api == APIS.custom ? url : `${url}?since=${ordinal}&limit=${limit}`
 
   if (api === APIS.custom) return customRequest(url)
@@ -84,7 +86,7 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinis
 }
 
 const schedule = async (id, executionHash) => {
-  const { API, API_URL, REDIS_KEY, CHANNEL, customRequest } = services[id]
+  const { API, API_URL, REDIS_KEY, CHANNEL, customRequest, QUERY, GRAPHQL_KEY } = services[id]
   let statusChannel
 
   return new Promise(async (resolve, reject) => {
@@ -92,8 +94,8 @@ const schedule = async (id, executionHash) => {
 
     try {
       const { hasMore, entities, greatestOrdinal } =
-        (await requestBuffer.read()) || (await fetchBy(API, API_URL, latestOrdinal, customRequest, FETCH_AMOUNT))
-
+        (await requestBuffer.read()) ||
+        (await fetchBy(API, API_URL, latestOrdinal, customRequest, FETCH_AMOUNT, { QUERY, GRAPHQL_KEY }))
       if (!entities || !entities.length) return resolve(null)
 
       await updateServiceStatus(REDIS_KEY, {
@@ -103,7 +105,7 @@ const schedule = async (id, executionHash) => {
 
       const handleFinish = () => {
         resolve(
-          [APIS.urn, APIS.custom].includes(API)
+          [APIS.urn, APIS.custom, APIS.graphql].includes(API)
             ? null
             : { greatestOrdinal, hasMore, total: entities.length, ordinalKey: REDIS_KEY }
         )
@@ -125,7 +127,7 @@ const schedule = async (id, executionHash) => {
       })
 
       await createJobsFromEntities(CHANNEL, entities, executionHash)
-      if (![APIS.urn, APIS.custom].includes(API)) {
+      if (![APIS.urn, APIS.custom, APIS.graphql].includes(API)) {
         requestBuffer.fill(() => fetchBy(API, API_URL, greatestOrdinal, customRequest, FETCH_AMOUNT))
       }
     } catch (e) {
