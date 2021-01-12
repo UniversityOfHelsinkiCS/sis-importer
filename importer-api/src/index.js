@@ -1,7 +1,7 @@
 const { set: redisSet, publish: redisPublish } = require('./utils/redis')
 const { randomBytes } = require('crypto')
 const { serviceIds } = require('./services')
-const { schedule } = require('./scheduler')
+const { schedule, resetOnetimeServices } = require('./scheduler')
 const { SONIC, REJECT_UNAUTHORIZED, IS_DEV, CURRENT_EXECUTION_HASH, UPDATE_RETRY_LIMIT } = require('./config')
 const { stan } = require('./utils/stan')
 const { schedule: scheduleCron } = require('./utils/cron')
@@ -92,8 +92,9 @@ const run = async () => {
   update(0)
 }
 
-stan.on('connect', ({ clientID }) => {
+stan.on('connect', async ({ clientID }) => {
   console.log(`Connected to NATS as ${clientID}...`)
+  await resetOnetimeServices()
   run()
   scheduleCron(IS_DEV || SONIC ? '* * * * * *' : '0 * * * *', run)
 })

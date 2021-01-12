@@ -6,6 +6,7 @@ const info = {
   API: APIS.graphql,
   CHANNEL: GRAPHQL_GRADE_SCALES_CHANNEL,
   REDIS_KEY: GRAPHQL_GRADE_SCALES_SCHEDULE_ID,
+  ONETIME: true,
   GRAPHQL_KEY: 'grade_scales',
   QUERY: `query {
     grade_scales {

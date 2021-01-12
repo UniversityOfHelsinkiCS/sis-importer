@@ -5,8 +5,8 @@ const { koriRequest } = require('./utils/koriApi')
 const { urnRequest } = require('./utils/urnApi')
 const { ilmoRequest } = require('./utils/ilmoApi')
 const { graphqlRequest } = require('./utils/graphqlApi')
-const { get: redisGet, set: redisSet, incrby: redisIncrementBy } = require('./utils/redis')
-const { services } = require('./services')
+const { get: redisGet, set: redisSet, incrby: redisIncrementBy, del: redisDel } = require('./utils/redis')
+const { services, serviceIds } = require('./services')
 const { FETCH_AMOUNT, MAX_CHUNK_SIZE, APIS, PANIC_TIMEOUT } = require('./config')
 const { logger } = require('./utils/logger')
 const chunkify = require('./utils/chunkify')
@@ -86,11 +86,13 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinis
 }
 
 const schedule = async (id, executionHash) => {
-  const { API, API_URL, REDIS_KEY, CHANNEL, customRequest, QUERY, GRAPHQL_KEY } = services[id]
+  const { API, API_URL, REDIS_KEY, CHANNEL, customRequest, QUERY, GRAPHQL_KEY, ONETIME } = services[id]
   let statusChannel
 
   return new Promise(async (resolve, reject) => {
     const latestOrdinal = (await redisGet(REDIS_KEY)) || 0
+
+    if (ONETIME && latestOrdinal > 0) return resolve(null)
 
     try {
       const { hasMore, entities, greatestOrdinal } =
@@ -105,7 +107,7 @@ const schedule = async (id, executionHash) => {
 
       const handleFinish = () => {
         resolve(
-          [APIS.urn, APIS.custom, APIS.graphql].includes(API)
+          [APIS.urn, APIS.custom].includes(API)
             ? null
             : { greatestOrdinal, hasMore, total: entities.length, ordinalKey: REDIS_KEY }
         )
@@ -137,6 +139,12 @@ const schedule = async (id, executionHash) => {
   })
 }
 
+const resetOnetimeServices = async () => {
+  const ids = serviceIds.filter(id => services[id].ONETIME)
+  return Promise.all(ids.map(id => redisDel(services[id].REDIS_KEY)))
+}
+
 module.exports = {
-  schedule
+  schedule,
+  resetOnetimeServices
 }

@@ -26,7 +26,11 @@ const graphqlInstance = axios.create({
 })
 
 const toEntities = (queryResult, queryResultKey) => ({
-  entities: queryResult[queryResultKey]
+  entities: queryResult[queryResultKey],
+  // Provide an ordinal so redis gets populated for the service and onetime
+  // services wont get run again
+  greatestOrdinal: 1,
+  hasMore: false
 })
 
 const graphqlRequest = async ({ QUERY: query, GRAPHQL_KEY, variables = {} }) => {
