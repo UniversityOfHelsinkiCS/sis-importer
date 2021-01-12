@@ -60,6 +60,22 @@ router.get('/', async (req, res) => {
   res.send(courseUnitRealisations)
 })
 
+router.get('/:id', async (req, res) => {
+  const { id } = req.params
+
+  const courseUnitRealisation = await models.CourseUnitRealisation.findOne({
+    where: {
+      id,
+    },
+  })
+
+  if (!courseUnitRealisation) {
+    throw new NotFoundError(`Course unit realisation with id ${id} is not found`)
+  }
+
+  res.send(courseUnitRealisation)
+})
+
 router.get('/:id/enrolments', async (req, res) => {
   const zip = (enrolments, persons) => {
     const personHash = persons.reduce((acc, p) => {
@@ -70,7 +86,7 @@ router.get('/:id/enrolments', async (req, res) => {
     return enrolments.map(e => {
       return {
         ...e.dataValues,
-        student: personHash[e.personId]
+        student: personHash[e.personId],
       }
     })
   }
@@ -88,9 +104,9 @@ router.get('/:id/enrolments', async (req, res) => {
   const persons = await models.Person.findAll({
     where: {
       id: {
-        [Op.in]: personIds
-      }
-    }
+        [Op.in]: personIds,
+      },
+    },
   })
 
   res.send(zip(enrolments, persons))
