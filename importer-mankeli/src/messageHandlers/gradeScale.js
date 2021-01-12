@@ -1,16 +1,14 @@
 const { GradeScale } = require('../db/models')
-const { bulkCreate, bulkDelete } = require('../utils/db')
+const { bulkCreate } = require('../utils/db')
 
 const parseGradeScale = gradeScale => {
   return {
     id: gradeScale.id,
     grades: gradeScale.grades,
-    name: gradeScale.name,
-    validityPeriod: gradeScale.validityPeriod
+    name: gradeScale.name
   }
 }
 
-module.exports = async ({ active, deleted }, transaction) => {
-  await bulkCreate(GradeScale, active.map(parseGradeScale), transaction)
-  await bulkDelete(GradeScale, deleted, transaction)
+module.exports = async ({ entities }, transaction) => {
+  await bulkCreate(GradeScale, entities.map(parseGradeScale), transaction)
 }
