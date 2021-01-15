@@ -1,5 +1,7 @@
 const router = require('express').Router()
 const axios = require('axios').default
+const { Op } = require('sequelize')
+const models = require('../models')
 const fs = require('fs')
 const https = require('https')
 const { SIS_API_URL, PROXY_TOKEN, KEY_PATH, CERT_PATH, API_KEY } = process.env
@@ -14,9 +16,9 @@ const getHeaders = () => {
 
 const agent = hasCerts
   ? new https.Agent({
-      cert: fs.readFileSync(CERT_PATH, 'utf8'),
-      key: fs.readFileSync(KEY_PATH, 'utf8')
-    })
+    cert: fs.readFileSync(CERT_PATH, 'utf8'),
+    key: fs.readFileSync(KEY_PATH, 'utf8')
+  })
   : new https.Agent()
 
 const sisApi = axios.create({
@@ -38,5 +40,69 @@ router.post('/', async (req, res) => {
     res.status(500).json(e.response.data)
   }
 })
+
+
+/**
+ * Get all attainments by course code and student number, including attainments
+ * from substitutions for given course.
+ */
+router.get('/attainments/:courseCode/:studentNumber', async (req, res) => {
+  const { courseCode: code, studentNumber } = req.params
+
+  if (!code || !studentNumber) return res.status(400).send('Missing course code or student number')
+
+  const { id: personId } = await models.Person.findOne({
+    where: {
+      studentNumber
+    },
+    attributes: ['id'],
+    raw: true
+  })
+
+  if (!personId) return res.status(400).send(`No person found with student number ${studentNumber}`)
+
+  const courseUnit = await models.CourseUnit.findOne({
+    where: {
+      code
+    },
+    attributes: ['groupId', 'substitutions'],
+    raw: true
+  })
+
+  if (!courseUnit) return res.status(400).send(`No course found with code ${code}`)
+
+  const groupIds = [courseUnit.groupId].concat(courseUnit.substitutions.map(sub => sub[0].courseUnitGroupId))
+  const allCourseUnits = await models.CourseUnit.findAll({
+    where: {
+      groupId: {
+        [Op.in]: groupIds
+      }
+    }
+  })
+
+  const allAttainments = await models.Attainment.findAll({
+    where: {
+      courseUnitId: {
+        [Op.in]: allCourseUnits.map(({ id }) => id)
+      },
+      personId
+    },
+    raw: true
+  })
+
+  const gradeScales = await models.GradeScale.findAll({ raw: true })
+
+  const data = allAttainments.map(attainment => ({
+    ...attainment,
+    grade: findGrade(gradeScales, attainment.gradeScaleId, attainment.gradeId)
+  }))
+
+  return res.send(data)
+})
+
+const findGrade = (gradeScales, gradeScaleId, gradeId) => gradeScales
+  .find(({id}) => id === gradeScaleId).grades
+  .find(({localId}) => localId === String(gradeId))
+
 
 module.exports = router
