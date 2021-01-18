@@ -26,21 +26,16 @@ router.get('/', async (req, res) => {
   const assessmentItems = await models.AssessmentItem.findAll({
     where: {
       primary_course_unit_group_id: groupId,
+      assessment_item_type: 'urn:code:assessment-item-type:teaching-participation'
     },
+    attributes: ['id'],
+    raw: true
   })
-
-  const assessmentItem = assessmentItems.find(item => item.id.includes('default-teaching-participation'))
-
-  if (!assessmentItem) {
-    return res.send([])
-  }
-
-  const { id: assessmentItemId } = assessmentItem
 
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     where: {
       assessmentItemIds: {
-        [Op.contains]: [assessmentItemId],
+        [Op.overlap]: assessmentItems.map(({id}) => id),
       },
       ...(activityPeriodEndDateAfter && {
         [Op.and]: [
