@@ -32,6 +32,10 @@ router.get('/', async (req, res) => {
     raw: true
   })
 
+  if (!assessmentItems) {
+    return res.send([])
+  }
+
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     where: {
       assessmentItemIds: {
