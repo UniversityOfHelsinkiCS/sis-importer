@@ -87,6 +87,12 @@ Attainment.init(
     type: {
       type: STRING
     },
+    assessmentItemId: {
+      type: STRING
+    },
+    courseUnitRealisationId: {
+      type: STRING
+    },
     courseUnitId: {
       type: STRING
     },
@@ -117,6 +123,12 @@ Attainment.init(
       },
       {
         fields: ['course_unit_id']
+      },
+      {
+        fields: ['course_unit_realisation_id']
+      },
+      {
+        fields: ['assessment_item_id']
       },
       {
         fields: ['module_id']
