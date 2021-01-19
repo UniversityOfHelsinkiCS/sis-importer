@@ -18,6 +18,10 @@ const app = express()
 app.use(logger('short'))
 app.use(express.json())
 
+app.get('/ping', (req, res) => {
+  res.send('pong')
+})
+
 app.use((req, res, next) => {
   const { TOKEN } = process.env
   const { query, headers } = req
