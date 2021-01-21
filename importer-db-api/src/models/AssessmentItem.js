@@ -1,56 +1,73 @@
-const { Model, ARRAY, STRING, DATE, BIGINT, JSONB } = require('sequelize')
+const { Model, ARRAY, STRING, DATE, BIGINT, JSONB, Op } = require('sequelize')
 const { sequelize } = require('../config/db')
 
 class AssessmentItem extends Model {}
+
+const scopes = {
+  typeIsTeachingParticipation: {
+    where: {
+      assessment_item_type: 'urn:code:assessment-item-type:teaching-participation',
+    },
+  },
+  primaryCourseUnitGroupIdIn(ids) {
+    return {
+      where: {
+        primary_course_unit_group_id: {
+          [Op.in]: ids,
+        },
+      },
+    }
+  },
+}
 
 AssessmentItem.init(
   {
     autoId: {
       type: BIGINT,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     id: {
       type: STRING,
-      unique: true
+      unique: true,
     },
     modificationOrdinal: {
       type: BIGINT,
-      unique: true
+      unique: true,
     },
     documentState: {
-      type: STRING
+      type: STRING,
     },
     name: {
-      type: JSONB
+      type: JSONB,
     },
     nameSpecifier: {
-      type: JSONB
+      type: JSONB,
     },
     credits: {
-      type: JSONB
+      type: JSONB,
     },
     gradeScaleId: {
-      type: STRING
+      type: STRING,
     },
     possibleAttainmentLanguages: {
-      type: ARRAY(STRING)
+      type: ARRAY(STRING),
     },
     assessmentItemType: {
-      type: STRING
+      type: STRING,
     },
     organisations: {
-      type: ARRAY(JSONB)
+      type: ARRAY(JSONB),
     },
     primaryCourseUnitGroupId: {
-      type: STRING
+      type: STRING,
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: true,
@@ -60,12 +77,13 @@ AssessmentItem.init(
     indexes: [
       {
         unique: true,
-        fields: ['id', 'modificationOrdinal']
+        fields: ['id', 'modificationOrdinal'],
       },
       {
-        fields: ['id']
-      }
-    ]
+        fields: ['id'],
+      },
+    ],
+    scopes,
   }
 )
 

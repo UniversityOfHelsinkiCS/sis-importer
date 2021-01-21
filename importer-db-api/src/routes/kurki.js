@@ -1,10 +1,8 @@
 const express = require('express')
 const _ = require('lodash')
-const dateFns = require('date-fns');
 
 const models = require('../models')
 const { NotFoundError } = require('../errors')
-const { Op } = require('sequelize')
 
 const router = express.Router()
 
@@ -43,45 +41,42 @@ router.get('/course_unit_realisations/programme/:programmeCode', async (req, res
 
   const courses = await organisation.getCourses()
 
-  const groupIds = courses.map(c => c.groupId)
+  const courseLookup = _.keyBy(courses, ({ groupId }) => groupId)
 
-  const assessmentItems = await models.AssessmentItem.findAll({
-    where: {
-      primary_course_unit_group_id: {
-        [Op.in]: groupIds,
-      },
-    },
-  })
+  const groupIds = courses.map(({ groupId }) => groupId)
 
-  const validAssessmentItems = assessmentItems.filter(item => item.id.includes('default-teaching-participation'))
+  const assessmentItems = await models.AssessmentItem.scope('typeIsTeachingParticipation', {
+    method: ['primaryCourseUnitGroupIdIn', groupIds],
+  }).findAll()
 
-  if (validAssessmentItems.length === 0) {
+  if (assessmentItems.length === 0) {
     return res.send([])
   }
 
-  const assessmentItemIds = _.uniq(validAssessmentItems.map(a => a.id))
+  const assesmentItemLookup = _.keyBy(assessmentItems, ({ id }) => id)
 
-  const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
-    where: {
-      assessmentItemIds: {
-        [Op.overlap]: assessmentItemIds
-      },
-      ...(activityPeriodEndDateAfter && {
-        [Op.and]: [
-          { activityPeriod: { endDate: { [Op.ne]: null } } },
-          {
-            activityPeriod: {
-              endDate: {
-                [Op.gt]: dateFns.format(new Date(activityPeriodEndDateAfter), 'yyyy-MM-dd'),
-              },
-            },
-          },
-        ],
-      }),
-    },
+  const assessmentItemIds = assessmentItems.map(({ id }) => id)
+
+  courseUnitRealisationScopes = [
+    { method: ['assessmentItemIdsOneOf', assessmentItemIds] },
+    activityPeriodEndDateAfter && { method: ['activityPeriodEndDateAfter', new Date(activityPeriodEndDateAfter)] },
+  ].filter(Boolean)
+
+  const courseUnitRealisations = await models.CourseUnitRealisation.scope(courseUnitRealisationScopes).findAll({
+    raw: true,
   })
 
-  res.send(courseUnitRealisations)
+  const courseUnitRealisationsWithCodes = courseUnitRealisations.map(c => {
+    const assesmentItems = c.assessmentItemIds.map(id => assesmentItemLookup[id]).filter(Boolean)
+    const courseUnit = assesmentItems.map(a => courseLookup[a.primaryCourseUnitGroupId]).find(Boolean)
+
+    return {
+      ...c,
+      courseUnitCode: _.get(courseUnit, 'code') || null,
+    }
+  })
+
+  res.send(courseUnitRealisationsWithCodes)
 })
 
 module.exports = router

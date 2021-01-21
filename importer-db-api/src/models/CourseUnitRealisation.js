@@ -1,62 +1,92 @@
-const { Model, STRING, DATE, ARRAY, JSONB } = require('sequelize')
+const { Model, STRING, DATE, ARRAY, JSONB, Op } = require('sequelize')
 const { sequelize } = require('../config/db')
+const dateFns = require('date-fns')
 
 class CourseUnitRealisation extends Model {}
+
+const scopes = {
+  assessmentItemIdsOneOf(ids) {
+    return {
+      where: {
+        assessmentItemIds: {
+          [Op.overlap]: ids,
+        },
+      },
+    }
+  },
+  activityPeriodEndDateAfter(date) {
+    return {
+      where: {
+        [Op.and]: [
+          { activityPeriod: { endDate: { [Op.ne]: null } } },
+          {
+            activityPeriod: {
+              endDate: {
+                [Op.gt]: dateFns.format(new Date(date), 'yyyy-MM-dd'),
+              },
+            },
+          },
+        ],
+      },
+    }
+  },
+}
 
 CourseUnitRealisation.init(
   {
     id: {
       type: STRING,
-      primaryKey: true
+      primaryKey: true,
     },
     universityOrgIds: {
-      type: ARRAY(STRING)
+      type: ARRAY(STRING),
     },
     flowState: {
-      type: STRING
+      type: STRING,
     },
     name: {
-      type: JSONB
+      type: JSONB,
     },
     nameSpecifier: {
-      type: JSONB
+      type: JSONB,
     },
     assessmentItemIds: {
-      type: ARRAY(STRING)
+      type: ARRAY(STRING),
     },
     activityPeriod: {
-      type: JSONB
+      type: JSONB,
     },
     teachingLanguageUrn: {
-      type: STRING
+      type: STRING,
     },
     courseUnitRealisationTypeUrn: {
-      type: STRING
+      type: STRING,
     },
     studyGroupSets: {
-      type: ARRAY(JSONB)
+      type: ARRAY(JSONB),
     },
     organisations: {
-      type: ARRAY(JSONB)
+      type: ARRAY(JSONB),
     },
     enrolmentPeriod: {
-      type: JSONB
+      type: JSONB,
     },
     responsibilityInfos: {
-      type: ARRAY(JSONB)
+      type: ARRAY(JSONB),
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: true,
     sequelize: sequelize,
     modelName: 'course_unit_realisation',
-    tableName: 'course_unit_realisations'
+    tableName: 'course_unit_realisations',
+    scopes,
   }
 )
 
