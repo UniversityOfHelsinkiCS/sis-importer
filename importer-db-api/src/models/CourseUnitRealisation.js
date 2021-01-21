@@ -5,7 +5,7 @@ const dateFns = require('date-fns')
 class CourseUnitRealisation extends Model {}
 
 const scopes = {
-  assessmentItemIdsOneOf(ids) {
+  assessmentItemIdsOverlap(ids) {
     return {
       where: {
         assessmentItemIds: {

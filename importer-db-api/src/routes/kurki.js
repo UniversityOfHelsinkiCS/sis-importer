@@ -57,8 +57,8 @@ router.get('/course_unit_realisations/programme/:programmeCode', async (req, res
 
   const assessmentItemIds = assessmentItems.map(({ id }) => id)
 
-  courseUnitRealisationScopes = [
-    { method: ['assessmentItemIdsOneOf', assessmentItemIds] },
+  const courseUnitRealisationScopes = [
+    { method: ['assessmentItemIdsOverlap', assessmentItemIds] },
     activityPeriodEndDateAfter && { method: ['activityPeriodEndDateAfter', new Date(activityPeriodEndDateAfter)] },
   ].filter(Boolean)
 
