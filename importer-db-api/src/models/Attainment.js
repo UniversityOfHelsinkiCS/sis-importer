@@ -105,6 +105,12 @@ Attainment.init(
     updatedAt: {
       type: DATE,
     },
+    courseUnitRealisationId: {
+      type: STRING
+    },
+    assessmentItemId: {
+      type: STRING
+    },
   },
   {
     underscored: true,

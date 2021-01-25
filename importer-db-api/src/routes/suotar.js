@@ -100,9 +100,43 @@ router.get('/attainments/:courseCode/:studentNumber', async (req, res) => {
   return res.send(data)
 })
 
-const findGrade = (gradeScales, gradeScaleId, gradeId) => gradeScales
-  .find(({id}) => id === gradeScaleId).grades
-  .find(({localId}) => localId === String(gradeId))
+/**
+ * Post array of {personId, courseUnitId, courseUnitRealisationId, assessmentItemId, gradeId} attainments. This endpoint
+ * will return the data with additional field called registered with true/false is the attainment found from Sisu.
+ *
+ * Performance of this is still WIP...
+ */
+router.post('/verify', async (req, res) => {
+  try {
+    const data = req.body
+    if (!Array.isArray(data))
+      return res.status(400).send({ error: 'Input should be an array' })
 
+    const attainments = await models.Attainment.findAll({
+      where: {
+        personId: { [Op.in]: data.map(({ personId }) => personId) }
+      }
+    })
+
+    const output = data.map(entry => {
+      const isRegistered = attainments.find(attainment => (
+        attainment.personId === entry.personId &&
+        attainment.courseUnitId === entry.courseUnitId &&
+        attainment.courseUnitRealisationId === entry.courseUnitRealisationId &&
+        attainment.gradeId === entry.gradeId &&
+        attainment.assessmentItemId === entry.assessmentItemId
+      ))
+      return { ...entry, registered: !!isRegistered }
+    })
+    return res.send(output)
+  } catch (e) {
+    console.log(e)
+    res.status(500).json(e.toString())
+  }
+})
+
+const findGrade = (gradeScales, gradeScaleId, gradeId) => gradeScales
+  .find(({ id }) => id === gradeScaleId).grades
+  .find(({ localId }) => localId === String(gradeId))
 
 module.exports = router
