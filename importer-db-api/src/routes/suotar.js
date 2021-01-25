@@ -123,7 +123,7 @@ router.post('/verify', async (req, res) => {
         attainment.personId === entry.personId &&
         attainment.courseUnitId === entry.courseUnitId &&
         attainment.courseUnitRealisationId === entry.courseUnitRealisationId &&
-        attainment.gradeId === entry.gradeId &&
+        attainment.gradeId === parseInt(entry.gradeId) &&
         attainment.assessmentItemId === entry.assessmentItemId
       ))
       return { ...entry, registered: !!isRegistered }
