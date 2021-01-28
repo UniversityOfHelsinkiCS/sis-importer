@@ -24,13 +24,27 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
 
         const distinctStudyRights = []
         for (const studyRight of studyRights) {
-            if (!distinctStudyRights.find(s => JSON.stringify(s.acceptedSelectionPath) === JSON.stringify(studyRight.acceptedSelectionPath))) {
-                const education = await models.Education.findOne({
-                    where: { id: studyRight.educationId },
+            if (distinctStudyRights.find(s => JSON.stringify(s.acceptedSelectionPath) === JSON.stringify(studyRight.acceptedSelectionPath)))
+                continue
+            const { educationPhase1GroupId, educationPhase2GroupId } = studyRight.acceptedSelectionPath || {}
+            const education = await models.Education.findOne({
+                where: { id: studyRight.educationId },
+                raw: true
+            })
+            const additionalData = { education, person: student  }
+
+            // Probably more than one module with given group id, let's pick one of them
+            if (educationPhase1GroupId)
+                additionalData.educationPhase1 = await models.Module.findOne({
+                    where: { groupId: educationPhase1GroupId },
                     raw: true
                 })
-                distinctStudyRights.push({ ...studyRight, person: student, education })
-            }
+            if (educationPhase2GroupId)
+                additionalData.educationPhase2 = await models.Module.findOne({
+                    where: { groupId: educationPhase2GroupId },
+                    raw: true
+                })
+            distinctStudyRights.push({ ...studyRight, ...additionalData })
         }
         return res.json(distinctStudyRights)
 
