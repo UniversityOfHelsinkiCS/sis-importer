@@ -24,12 +24,12 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
 
         const distinctStudyRights = []
         for (const studyRight of studyRights) {
-            if (!distinctStudyRights.find(s => s.id === studyRight.id)) {
+            if (!distinctStudyRights.find(s => s.educationId === studyRight.educationId)) {
                 const education = await models.Education.findOne({
                     where: { id: studyRight.educationId },
                     raw: true
                 })
-                distinctStudyRights.push({ ...studyRight, education })
+                distinctStudyRights.push({ ...studyRight, person: student, education })
             }
         }
         return res.json(distinctStudyRights)
