@@ -41,6 +41,7 @@ app.use('/semesters', semestersRouter)
 app.use('/kurki', kurkiRouter)
 app.use('/employees', employeesRouter)
 app.use('/suotar', suotarRouter)
+app.use('/grades', gradesRouter)
 app.use('/archeology', archeologyRouter)
 
 
