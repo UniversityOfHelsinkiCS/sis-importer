@@ -41,6 +41,58 @@ router.post('/', async (req, res) => {
   }
 })
 
+/**
+ * Post list of {courseCode, studentNumber} pairs here to get their attainments
+ */
+router.post('/attainments', async (req, res) => {
+  try {
+    const data = req.body
+    if (!Array.isArray(data))
+      return res.status(400).send({ error: 'Input should be an array' })
+
+    const persons = await models.Person.findAll({
+      where: {
+        studentNumber: { [Op.in]: data.map(({ studentNumber }) => studentNumber) }
+      },
+      raw: true
+    })
+    const gradeScales = await models.GradeScale.findAll({ raw: true })
+
+
+    const output = []
+    for (const { studentNumber, courseCode } of data) {
+      const person = persons.find(p => p.studentNumber === studentNumber)
+      if (!person) {
+        output.push({ studentNumber, courseCode, attainments: [] })
+        continue
+      }
+      const courseUnits = await getCourseUnits(courseCode)
+      const allAttainments = await models.Attainment.findAll({
+        where: {
+          courseUnitId: {
+            [Op.in]: courseUnits.map(({ id }) => id)
+          },
+          personId: person.id
+        },
+        raw: true
+      })
+      const attainmentsWithGrade = allAttainments.map(attainment => ({
+        ...attainment,
+        grade: findGrade(gradeScales, attainment.gradeScaleId, attainment.gradeId)
+      }))
+
+      output.push({
+        studentNumber,
+        courseCode,
+        attainments: attainmentsWithGrade
+      })
+    }
+    return res.send(output)
+  } catch (e) {
+    console.log(e)
+    res.status(500).json(e.toString())
+  }
+})
 
 /**
  * Get all attainments by course code and student number, including attainments
@@ -61,24 +113,7 @@ router.get('/attainments/:courseCode/:studentNumber', async (req, res) => {
 
   if (!personId) return res.status(400).send(`No person found with student number ${studentNumber}`)
 
-  const courseUnit = await models.CourseUnit.findOne({
-    where: {
-      code
-    },
-    attributes: ['groupId', 'substitutions'],
-    raw: true
-  })
-
-  if (!courseUnit) return res.status(400).send(`No course found with code ${code}`)
-
-  const groupIds = [courseUnit.groupId].concat(courseUnit.substitutions.map(sub => sub[0].courseUnitGroupId))
-  const allCourseUnits = await models.CourseUnit.findAll({
-    where: {
-      groupId: {
-        [Op.in]: groupIds
-      }
-    }
-  })
+  const allCourseUnits = await getCourseUnits(code)
 
   const allAttainments = await models.Attainment.findAll({
     where: {
@@ -138,5 +173,28 @@ router.post('/verify', async (req, res) => {
 const findGrade = (gradeScales, gradeScaleId, gradeId) => gradeScales
   .find(({ id }) => id === gradeScaleId).grades
   .find(({ localId }) => localId === String(gradeId))
+
+
+/**
+ * Get course units and substitutions by course code
+ */
+const getCourseUnits = async (code) => {
+  const courseUnit = await models.CourseUnit.findOne({
+    where: { code },
+    attributes: ['groupId', 'substitutions'],
+    raw: true
+  })
+  if (!courseUnit) return []
+
+  const groupIds = [courseUnit.groupId].concat(courseUnit.substitutions.map(sub => sub[0].courseUnitGroupId))
+  return await models.CourseUnit.findAll({
+    where: {
+      groupId: {
+        [Op.in]: groupIds
+      },
+    },
+    raw: true
+  }) || []
+}
 
 module.exports = router
