@@ -13,10 +13,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
             return res.status(404).send('Student not found')
 
         const studyRights = await models.StudyRight.findAll({
-            where: {
-                personId: student.id,
-                documentState: 'ACTIVE'
-            },
+            where: { personId: student.id },
             order: [['modificationOrdinal', 'DESC']],
             raw: true
         })
@@ -31,7 +28,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
                 where: { id: studyRight.educationId },
                 raw: true
             })
-            const additionalData = { education, person: student  }
+            const additionalData = { education, person: student }
 
             // Probably more than one module with given group id, let's pick one of them
             if (educationPhase1GroupId)
