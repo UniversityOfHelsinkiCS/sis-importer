@@ -170,6 +170,47 @@ router.post('/verify', async (req, res) => {
   }
 })
 
+/**
+ * Get all enrolments for given person and course code. All enrolments are enriched with
+ * course unit realisation data of the enrolment.
+ * Post list of {courseUnitId, code} objects.
+ */
+router.post('/enrolments', async (req, res) => {
+  try {
+    const data = req.body
+    if (!Array.isArray(data))
+      return res.status(400).send({ error: 'Input should be an array' })
+
+
+    const output = await Promise.all(data.map(async ({ code, personId }) => {
+      const courseUnits = await models.CourseUnit.findAll({
+        where: { code },
+        attributes: ['id'],
+        raw: true
+      })
+      const enrolments = await models.Enrolment.findAll({
+        where: {
+          courseUnitId: { [Op.in]: courseUnits.map(({ id }) => id) },
+          personId
+        },
+        raw: true
+      })
+      const enrolmentsWithRealisations = await Promise.all(enrolments.map(async (enrolment) => ({
+        ...enrolment,
+        courseUnitRealisation: await models.CourseUnitRealisation.findOne({
+          where: { id: enrolment.courseUnitRealisationId },
+          raw: true
+        })
+      })))
+      return { code, personId, enrolments: enrolmentsWithRealisations }
+    }))
+    res.send(output)
+  } catch (e) {
+    console.log(e)
+    res.status(500).json(e.toString())
+  }
+})
+
 const findGrade = (gradeScales, gradeScaleId, gradeId) => gradeScales
   .find(({ id }) => id === gradeScaleId).grades
   .find(({ localId }) => localId === String(gradeId))
