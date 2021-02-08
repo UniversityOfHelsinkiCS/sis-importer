@@ -14,6 +14,7 @@ const { EDUCATION_TYPE_SCHEDULE_ID, info: educationTypeInfo } = require('./educa
 const { STUDY_RIGHT_PRIMALITY_SCHEDULE_ID, info: studyRightPrimalityInfo } = require('./studyRightPrimality')
 const { ENROLMENT_SCHEDULE_ID, info: enrolmentInfo } = require('./enrolments')
 const { GRAPHQL_GRADE_SCALES_SCHEDULE_ID, info: gradeScalesInfo } = require('./gradeScales')
+const { DEGREE_TITLE_SCHEDULE_ID, info: degreeTitleInfo } = require('./degreeTitle')
 
 const services = {
   [ATTAINMENT_SCHEDULE_ID]: attainmentInfo,
@@ -31,7 +32,8 @@ const services = {
   [EDUCATION_TYPE_SCHEDULE_ID]: educationTypeInfo,
   [STUDY_RIGHT_PRIMALITY_SCHEDULE_ID]: studyRightPrimalityInfo,
   [ENROLMENT_SCHEDULE_ID]: enrolmentInfo,
-  [GRAPHQL_GRADE_SCALES_SCHEDULE_ID]: gradeScalesInfo
+  [GRAPHQL_GRADE_SCALES_SCHEDULE_ID]: gradeScalesInfo,
+  [DEGREE_TITLE_SCHEDULE_ID]: degreeTitleInfo
 }
 
 // Imported in this order
@@ -51,7 +53,8 @@ const serviceIds = [
   COUNTRY_SCHEDULE_ID,
   EDUCATION_TYPE_SCHEDULE_ID,
   ENROLMENT_SCHEDULE_ID,
-  GRAPHQL_GRADE_SCALES_SCHEDULE_ID
+  GRAPHQL_GRADE_SCALES_SCHEDULE_ID,
+  DEGREE_TITLE_SCHEDULE_ID
 ]
 
 module.exports = {

@@ -15,6 +15,7 @@ const Country = require('./country')
 const EducationType = require('./educationType')
 const StudyRightPrimality = require('./studyRightPrimality')
 const Enrolment = require('./enrolment')
+const DegreeTitle = require('./degreeTitle')
 
 Person.hasMany(StudyRight)
 Education.hasMany(StudyRight)
@@ -39,5 +40,6 @@ module.exports = {
   Country,
   EducationType,
   StudyRightPrimality,
-  Enrolment
+  Enrolment,
+  DegreeTitle
 }
