@@ -24,7 +24,8 @@ const parseModule = mod => {
     studyRightSelectionType: mod.studyRightSelectionType,
     minorStudyRightAcceptanceType: mod.minorStudyRightAcceptanceType,
     type: mod.type,
-    rule: mod.rule
+    rule: mod.rule,
+    degreeTitleUrns: mod.degreeTitleUrns
   }
 }
 

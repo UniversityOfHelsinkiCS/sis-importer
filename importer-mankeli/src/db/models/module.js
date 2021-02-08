@@ -72,6 +72,9 @@ Module.init(
     rule: {
       type: JSONB
     },
+    degreeTitleUrns: {
+      type: ARRAY(STRING)
+    },
     createdAt: {
       type: DATE
     },
