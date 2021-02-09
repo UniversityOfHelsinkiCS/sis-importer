@@ -81,7 +81,7 @@ router.get('/assessments', async (req, res) => {
             raw: true
         })
         console.log(`GOT ${realisations.length} realisations`)
-        const wat = realisations.filter(r => r.assessmentItemIds.length >= 1)
+        const wat = realisations.filter(r => r.assessmentItemIds.length > 1)
         return res.send(wat)
     } catch (e) {
         console.log(e)
