@@ -173,7 +173,7 @@ router.post('/verify', async (req, res) => {
 /**
  * Get all enrolments for given person and course code. All enrolments are enriched with
  * course unit realisation data of the enrolment.
- * Post list of {courseUnitId, code} objects.
+ * Post list of {personId, code} objects.
  */
 router.post('/enrolments', async (req, res) => {
   try {
@@ -185,7 +185,6 @@ router.post('/enrolments', async (req, res) => {
     const output = await Promise.all(data.map(async ({ code, personId }) => {
       const courseUnits = await models.CourseUnit.findAll({
         where: { code },
-        attributes: ['id'],
         raw: true
       })
       const enrolments = await models.Enrolment.findAll({
@@ -200,7 +199,8 @@ router.post('/enrolments', async (req, res) => {
         courseUnitRealisation: await models.CourseUnitRealisation.findOne({
           where: { id: enrolment.courseUnitRealisationId },
           raw: true
-        })
+        }),
+        courseUnit: courseUnits.find(({id}) => id === enrolment.courseUnitId)
       })))
       return { code, personId, enrolments: enrolmentsWithRealisations }
     }))
