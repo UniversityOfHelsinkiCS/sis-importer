@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const models = require('../models')
+const { Op } = require('sequelize')
 
 router.get('/:studentNumber/studyrights', async (req, res) => {
     try {
@@ -48,6 +49,40 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
         }
         return res.json(distinctStudyRights)
 
+    } catch (e) {
+        console.log(e)
+        res.status(500).json(e.toString())
+    }
+})
+
+// Probably CPU usage > inf
+router.get('/assessments', async (req, res) => {
+    try {
+        const courseUnits = await models.CourseUnit.findAll({
+            where: {
+                code: { [Op.iLike]: '%TKT%' }
+            },
+            raw: true
+        })
+        const assessmentItems = await models.AssessmentItem.findAll({
+            where: {
+                primaryCourseUnitGroupId: {
+                    [Op.in]: courseUnits.map(({groupId}) => groupId)
+                }
+            },
+            raw: true
+        })
+        const realisations = await models.CourseUnitRealisation.findAll({
+            where: {
+                assessmentItemIds: {
+                    [Op.overlap]: assessmentItems.map(({id}) => id)
+                }
+            },
+            raw: true
+        })
+        console.log(`GOT ${realisations.length} realisations`)
+        const wat = realisations.filter(r => r.assessmentItemIds.length >= 1)
+        return res.send(wat)
     } catch (e) {
         console.log(e)
         res.status(500).json(e.toString())
