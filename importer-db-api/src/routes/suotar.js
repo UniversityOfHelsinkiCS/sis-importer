@@ -183,6 +183,8 @@ router.post('/enrolments', async (req, res) => {
 
 
     const output = await Promise.all(data.map(async ({ code, personId }) => {
+      if (!code || !personId)
+        return null
       const courseUnits = await models.CourseUnit.findAll({
         where: { code },
         raw: true
@@ -204,7 +206,8 @@ router.post('/enrolments', async (req, res) => {
       })))
       return { code, personId, enrolments: enrolmentsWithRealisations }
     }))
-    res.send(output)
+    // Filter out possible nulls
+    res.send(output.filter(e => !!e))
   } catch (e) {
     console.log(e)
     res.status(500).json(e.toString())
