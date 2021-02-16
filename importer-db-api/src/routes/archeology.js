@@ -67,7 +67,7 @@ router.get('/assessments', async (req, res) => {
         const assessmentItems = await models.AssessmentItem.findAll({
             where: {
                 primaryCourseUnitGroupId: {
-                    [Op.in]: courseUnits.map(({groupId}) => groupId)
+                    [Op.in]: courseUnits.map(({ groupId }) => groupId)
                 }
             },
             raw: true
@@ -75,7 +75,7 @@ router.get('/assessments', async (req, res) => {
         const realisations = await models.CourseUnitRealisation.findAll({
             where: {
                 assessmentItemIds: {
-                    [Op.overlap]: assessmentItems.map(({id}) => id)
+                    [Op.overlap]: assessmentItems.map(({ id }) => id)
                 }
             },
             raw: true
@@ -83,6 +83,46 @@ router.get('/assessments', async (req, res) => {
         console.log(`GOT ${realisations.length} realisations`)
         const wat = realisations.filter(r => r.assessmentItemIds.length > 1)
         return res.send(wat)
+    } catch (e) {
+        console.log(e)
+        res.status(500).json(e.toString())
+    }
+})
+
+router.get('/:studentNumber/attainments', async (req, res) => {
+    try {
+        const student = await models.Person.findOne({
+            where: {
+                studentNumber: req.params.studentNumber,
+            }
+        })
+
+        if (!student)
+            return res.status(404).send('Student not found')
+
+        const attainments = await models.Attainment.findAll({
+            where: {
+                personId: student.id
+            },
+            raw: true
+        })
+
+        const attainmentsWithCourses = await Promise.all(
+            attainments.map(async (a) => {
+                const courseUnit = await models.CourseUnit.findOne({
+                    where: {
+                        id: a.courseUnitId
+                    }
+                })
+                return Promise.resolve({ ...a, courseUnit })
+            })
+        )
+
+        if (req.query.code)
+            return res.send(attainmentsWithCourses.filter(a =>
+                a.courseUnit && a.courseUnit.code.includes(req.query.code)
+            ))
+        return res.send(attainmentsWithCourses)
     } catch (e) {
         console.log(e)
         res.status(500).json(e.toString())
