@@ -52,7 +52,7 @@ const main = async () => {
 
   console.log('HELPER HAS ENDED. FINAL DATA HERE')
 
-  console.log(dataIWasLookingFor)
+  console.log(JSON.stringify(dataIWasLookingFor))
 };
 
 main();
