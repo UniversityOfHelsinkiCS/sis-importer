@@ -10,6 +10,8 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
             }
         })
 
+        const {openUni: includeOpenUni} = req.query
+
         if (!student)
             return res.status(404).send('Student not found')
 
@@ -20,21 +22,17 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
         })
         if (!studyRights.length) return res.json([])
 
-        // Not distinct??
-        const distinctStudyRights = []
+        const mankeledStudyRights = []
         for (const studyRight of studyRights) {
-            /*
-            if (distinctStudyRights.find(s => JSON.stringify(s.acceptedSelectionPath) === JSON.stringify(studyRight.acceptedSelectionPath)))
-                continue
-            */
             const { educationPhase1GroupId, educationPhase2GroupId } = studyRight.acceptedSelectionPath || {}
             const education = await models.Education.findOne({
                 where: { id: studyRight.educationId },
                 raw: true
             })
+            if (!includeOpenUni && education.educationType.includes('open-university-studies'))
+                continue
             const additionalData = { education, person: student }
 
-            // Probably more than one module with given group id, let's pick one of them
             if (educationPhase1GroupId)
                 additionalData.educationPhase1 = await models.Module.findOne({
                     where: { groupId: educationPhase1GroupId },
@@ -45,9 +43,9 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
                     where: { groupId: educationPhase2GroupId },
                     raw: true
                 })
-            distinctStudyRights.push({ ...studyRight, ...additionalData })
+            mankeledStudyRights.push({ ...studyRight, ...additionalData })
         }
-        return res.json(distinctStudyRights)
+        return res.json(mankeledStudyRights)
 
     } catch (e) {
         console.log(e)
