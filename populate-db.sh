@@ -35,7 +35,7 @@ echo "Copying $DB to the container"
 docker cp $BACKUP $CONTAINER:/asd.sqz
 
 echo "Running pg_restore $DB inside the container. Run \"docker stats\" to see processing."
-docker exec $CONTAINER pg_restore -U postgres --no-owner -F c --dbname="$DB" -j4 /asd.sqz
+docker exec $CONTAINER pg_restore -U dev --no-owner -F c --dbname="$DB" -j4 /asd.sqz
 
 echo "Restarting db, db-api and adminer"
 ./run.sh db up
