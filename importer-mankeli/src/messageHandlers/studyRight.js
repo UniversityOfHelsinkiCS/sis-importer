@@ -36,8 +36,6 @@ const parseStudyRight = studyRight => {
 module.exports = async ({ active, deleted }, transaction) => {
   // eslint-disable-line no-unused-vars
   // eslint-disable-line
-  // Uncomment this when Sisu is master
-  // const parsedStudyRights = [...active, ...deleted].map(parseStudyRight)
-  const parsedStudyRights = [...active].map(parseStudyRight)
+  const parsedStudyRights = [...active, ...deleted].map(parseStudyRight)
   await bulkCreate(StudyRight, parsedStudyRights, transaction, ['id', 'modificationOrdinal', 'autoId'])
 }
