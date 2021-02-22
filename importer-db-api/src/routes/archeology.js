@@ -29,7 +29,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
                 where: { id: studyRight.educationId },
                 raw: true
             })
-            if (!includeOpenUni && education.educationType.includes('open-university-studies'))
+            if (!includeOpenUni && education && education.educationType.includes('open-university-studies'))
                 continue
             const additionalData = { education, person: student }
 
