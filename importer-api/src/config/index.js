@@ -1,3 +1,4 @@
+const PORT = process.env.PORT || 3002
 const REJECT_UNAUTHORIZED = process.env.KEY_PATH && process.env.CERT_PATH
 const SONIC = process.env.SONIC === '1'
 const CURRENT_EXECUTION_HASH = 'CURRENT_EXECUTION_HASH'
@@ -16,6 +17,7 @@ const UPDATE_RETRY_LIMIT = 6
 const PANIC_TIMEOUT = IS_DEV || SONIC ? 60 * 1000 : 60 * 1000 * 5
 
 module.exports = {
+  PORT,
   REJECT_UNAUTHORIZED,
   SONIC,
   CURRENT_EXECUTION_HASH,
