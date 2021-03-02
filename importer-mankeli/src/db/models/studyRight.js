@@ -1,4 +1,4 @@
-const { Model, ARRAY, STRING, DATE, BIGINT, JSONB } = require('sequelize')
+const { Model, ARRAY, STRING, DATE, BIGINT, JSONB, BOOLEAN } = require('sequelize')
 const { connection } = require('../connection')
 
 class StudyRight extends Model {}
@@ -77,6 +77,18 @@ StudyRight.init(
     },
     phase2MinorSelections: {
       type: ARRAY(JSONB)
+    },
+    phase1EducationClassificationUrn: {
+      type: STRING
+    },
+    phase2EducationClassificationUrn: {
+      type: STRING
+    },
+    phase1EducationClassificationLocked: {
+      type: BOOLEAN
+    },
+    phase2EducationClassificationLocked: {
+      type: BOOLEAN
     },
     createdAt: {
       type: DATE

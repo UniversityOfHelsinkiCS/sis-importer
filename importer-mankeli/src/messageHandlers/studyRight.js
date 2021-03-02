@@ -24,6 +24,10 @@ const parseStudyRight = studyRight => {
     requestedSelectionPath: studyRight.requestedSelectionPath,
     phase1MinorSelections: studyRight.phase1MinorSelections,
     phase2MinorSelections: studyRight.phase2MinorSelections,
+    phase1EducationClassificationUrn: studyRight.phase1EducationClassificationUrn,
+    phase2EducationClassificationUrn: studyRight.phase2EducationClassificationUrn,
+    phase1EducationClassificationLocked: studyRight.phase1EducationClassificationLocked,
+    phase2EducationClassificationLocked: studyRight.phase2EducationClassificationLocked,
     modificationOrdinal: studyRight.metadata.modificationOrdinal
   }
 }
@@ -34,8 +38,6 @@ const parseStudyRight = studyRight => {
 // want to delete any studyrights even if their state is deleted.
 // eslint-disable-next-line
 module.exports = async ({ active, deleted }, transaction) => {
-  // eslint-disable-line no-unused-vars
-  // eslint-disable-line
   const parsedStudyRights = [...active, ...deleted].map(parseStudyRight)
   await bulkCreate(StudyRight, parsedStudyRights, transaction, ['id', 'modificationOrdinal', 'autoId'])
 }
