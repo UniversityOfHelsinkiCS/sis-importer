@@ -7,7 +7,7 @@ const info = {
   CHANNEL: URN_STUDY_LEVEL_CHANNEL,
   REDIS_KEY: STUDY_LEVEL_SCHEDULE_ID,
   API_URL: 'https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:study-level',
-  ONETIME: true,
+  ONETIME: true
 }
 
 module.exports = {

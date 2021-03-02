@@ -42,17 +42,17 @@ app.get('/force_update', async (req, res) => {
 })
 
 const tableNameToOrdinalName = {
-  'assessment_items': 'LATEST_ASSESSMENT_ORDINAL',
-  'attainments': 'LATEST_ATTAINMENT_ORDINAL',
-  'course_unit_realisations': 'LATEST_COURSE_UNIT_REALISATION_ORDINAL',
-  'course_units': 'LATEST_COURSE_UNIT_ORDINAL',
-  'educations': 'LATEST_EDUCATION_ORDINAL',
-  'enrolments': 'LATEST_ENROLMENT_ORDINAL',
-  'modules': 'LATEST_MODULE_ORDINAL',
-  'organisations': 'LATEST_ORGANISATION_ORDINAL',
-  'persons': 'LATEST_PERSON_ORDINAL',
-  'studyrights': 'LATEST_STUDY_RIGHT_ORDINAL',
-  'term_registrations': 'LATEST_TERM_REGISTRATION_ORDINAL'
+  assessment_items: 'LATEST_ASSESSMENT_ORDINAL',
+  attainments: 'LATEST_ATTAINMENT_ORDINAL',
+  course_unit_realisations: 'LATEST_COURSE_UNIT_REALISATION_ORDINAL',
+  course_units: 'LATEST_COURSE_UNIT_ORDINAL',
+  educations: 'LATEST_EDUCATION_ORDINAL',
+  enrolments: 'LATEST_ENROLMENT_ORDINAL',
+  modules: 'LATEST_MODULE_ORDINAL',
+  organisations: 'LATEST_ORGANISATION_ORDINAL',
+  persons: 'LATEST_PERSON_ORDINAL',
+  studyrights: 'LATEST_STUDY_RIGHT_ORDINAL',
+  term_registrations: 'LATEST_TERM_REGISTRATION_ORDINAL'
 }
 
 app.get('/reset/:table', async (req, res) => {
@@ -64,16 +64,26 @@ app.get('/reset/:table', async (req, res) => {
     const deletedCount = await knex(table).del()
     const redisResult = await redisDel(ordinalNameInRedis)
     run()
-    res.send({ 
-      'Postgres message:': `Successfully deleted ${deletedCount} rows in table ${table}`,
-      'Redis message': redisResult == 1 ? `Successfully deleted key ${ordinalNameInRedis} from redis` : `Key ${ordinalNameInRedis} wasn't found`,
-      'Status': redisResult == 0 && deletedCount == 0 ? 'Table was empty and no key, did you already delete everything?' : 'Success'
-    }).status(200)
+    res
+      .send({
+        'Postgres message:': `Successfully deleted ${deletedCount} rows in table ${table}`,
+        'Redis message':
+          redisResult == 1
+            ? `Successfully deleted key ${ordinalNameInRedis} from redis`
+            : `Key ${ordinalNameInRedis} wasn't found`,
+        Status:
+          redisResult == 0 && deletedCount == 0
+            ? 'Table was empty and no key, did you already delete everything?'
+            : 'Success'
+      })
+      .status(200)
   } catch (err) {
-    res.send({
-      'Status': 'Something is broken',
-      error: err.message
-    }).status(500)
+    res
+      .send({
+        Status: 'Something is broken',
+        error: err.message
+      })
+      .status(500)
   }
 })
 

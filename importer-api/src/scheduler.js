@@ -105,11 +105,10 @@ const schedule = async (id, executionHash) => {
         updated: 0
       })
 
-      const handleFinish = () => resolve(
-        API === APIS.custom
-          ? null
-          : { greatestOrdinal, hasMore, total: entities.length, ordinalKey: REDIS_KEY }
-      )
+      const handleFinish = () =>
+        resolve(
+          API === APIS.custom ? null : { greatestOrdinal, hasMore, total: entities.length, ordinalKey: REDIS_KEY }
+        )
 
       statusChannel = initializeStatusChannel(CHANNEL, REDIS_KEY, executionHash, handleFinish, id)
 
