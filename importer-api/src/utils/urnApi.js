@@ -3,6 +3,10 @@ const { retry } = require('./index')
 const { get: redisGet, set: redisSet, expire: redisExpire } = require('./redis')
 
 const toEntities = urnResult => ({
+  // Provide an ordinal so redis gets populated for the service and onetime
+  // services wont get run again
+  greatestOrdinal: 1,
+  hasMore: false,
   entities: Object.values(urnResult).map(urnItem => ({
     ...urnItem,
     id: urnItem.urn,

@@ -6,7 +6,8 @@ const info = {
   API: APIS.urn,
   CHANNEL: URN_EDUCATION_TYPE_CHANNEL,
   REDIS_KEY: EDUCATION_TYPE_SCHEDULE_ID,
-  API_URL: 'https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:education-type'
+  API_URL: 'https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:education-type',
+  ONETIME: true,
 }
 
 module.exports = {
