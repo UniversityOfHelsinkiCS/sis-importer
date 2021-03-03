@@ -1,5 +1,5 @@
 const { CourseUnit } = require('../db/models')
-const { bulkCreate, bulkDelete } = require('../utils/db')
+const { bulkCreate /*, bulkDelete */ } = require('../utils/db')
 
 const parseCourse = courseUnit => {
   return {
@@ -23,6 +23,7 @@ const parseCourse = courseUnit => {
 }
 
 module.exports = async ({ active, deleted }, transaction) => {
-  await bulkCreate(CourseUnit, active.map(parseCourse), transaction)
-  await bulkDelete(CourseUnit, deleted, transaction)
+  await bulkCreate(CourseUnit, [...active, ...deleted].map(parseCourse), transaction)
+  // await bulkCreate(CourseUnit, active.map(parseCourse), transaction)
+  // await bulkDelete(CourseUnit, deleted, transaction)
 }
