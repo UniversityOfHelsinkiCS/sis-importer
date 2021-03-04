@@ -4,7 +4,6 @@ const { Op } = require('sequelize')
 const models = require('../models')
 const fs = require('fs')
 const https = require('https')
-const { logger } = require('../utils/logger')
 
 const { SIS_API_URL, PROXY_TOKEN, KEY_PATH, CERT_PATH, API_KEY } = process.env
 
@@ -39,7 +38,7 @@ router.post('/', async (req, res) => {
     return res.status(200).json(resp.data)
   } catch (e) {
     console.log(e)
-    logger.error({message: JSON.stringify(e.response.data), tag: 'suotar'})
+    console.log(e.response.data)
     res.status(500).json(e.response.data)
   }
 })
