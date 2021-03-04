@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
     return res.status(200).json(resp.data)
   } catch (e) {
     console.log(e)
-    console.log(e.response.data)
+    console.log(JSON.stringify(e.response.data))
     res.status(500).json(e.response.data)
   }
 })
