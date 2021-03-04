@@ -10,7 +10,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
             }
         })
 
-        const {openUni: includeOpenUni} = req.query
+        const { openUni: includeOpenUni } = req.query
 
         if (!student)
             return res.status(404).send('Student not found')
@@ -121,6 +121,38 @@ router.get('/:studentNumber/attainments', async (req, res) => {
                 a.courseUnit && a.courseUnit.code.includes(req.query.code)
             ))
         return res.send(attainmentsWithCourses)
+    } catch (e) {
+        console.log(e)
+        res.status(500).json(e.toString())
+    }
+})
+
+router.get('/:studentNumber/enrollments', async (req, res) => {
+    try {
+        const student = await models.Person.findOne({
+            where: {
+                studentNumber: req.params.studentNumber,
+            }
+        })
+        if (!student)
+            return res.status(404).send('Student not found')
+
+        const enrolments = await models.Enrolment.findAll({
+            where: {
+                personId: student.id
+            },
+            order: [['enrolmentDateTime', 'DESC']],
+            limit: req.query.limit || null,
+            raw: true
+        })
+
+        const mankeled = await Promise.all(enrolments.map(async (e) => {
+            const assessmentItem = await models.AssessmentItem.findOne({ where: { id: e.assessmentItemId } })
+            const courseUnit = await models.CourseUnit.findOne({ where: { id: e.courseUnitId } })
+            const courseUnitRealisation = await models.CourseUnitRealisation.findOne({ where: { id: e.courseUnitRealisationId } })
+            return Promise.resolve({ ...e, assessmentItem, courseUnit, courseUnitRealisation })
+        }))
+        return res.send(mankeled)
     } catch (e) {
         console.log(e)
         res.status(500).json(e.toString())
