@@ -13,7 +13,7 @@ stan.on('connect', async ({ clientID }) => {
   console.log(`Connected to NATS as ${clientID}...`)
   await resetOnetimeServices()
   run()
-  scheduleCron(IS_DEV ? '* * * * * *' : '0 * * * *', run)
+  scheduleCron(IS_DEV ? '*/30 * * * * *' : '0 * * * *', run)
 })
 
 stan.on('error', e => {

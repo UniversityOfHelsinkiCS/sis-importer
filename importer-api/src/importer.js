@@ -21,65 +21,76 @@ const updateHash = async () => {
   return generatedHash
 }
 
-const updateNext = current => {
-  requestBuffer.flush()
-  update(current + 1)
+const resourceWasForbidden = (err) => {
+  const forbiddenResource = ((err || {}).response || {}).status === 403
+  if (forbiddenResource) {
+    console.log('Added resource to list of forbidden resources')
+    logger.error({ message: `Forbidden service: ${serviceId}`, serviceId })
+    forbiddenServiceIds.push(serviceId)
+    return true
+  }
+  return false
 }
 
-const update = async (current, attempt = 1) => {
-  const start = new Date()
-  if (IS_DEV && !SONIC) {
-    await sleep(1000)
-  }
+const updateResource = async (serviceId) => {
+  if (IS_DEV && !SONIC) await sleep(1000)
 
   const generatedHash = await updateHash()
-  const serviceId = serviceIds[current]
-  if (!serviceId) {
-    console.log('Importing finished')
-    isImporting = false
-    return
-  }
+  const data = await schedule(serviceId, generatedHash)
+  if (!data) return false
 
-  console.log(`Importing ${serviceId} (${current + 1}/${Object.keys(serviceIds).length})`)
-  try {
+  const { greatestOrdinal, hasMore, total, ordinalKey } = data
+  console.log(`New ordinal for ${serviceId}: ${greatestOrdinal}`)
+  await updateOrdinalFrom(total, ordinalKey, greatestOrdinal)
+  logger.info({ message: 'Imported batch' })
+
+  return hasMore
+}
+
+const serviceUpdateFun = (serviceId) => {
+  const recursivelyUpdateResource = async (attempt = 1) => {
+    try {
+      const hasMore = await updateResource(serviceId)
+      if (!hasMore) return
+    
+      return recursivelyUpdateResource()
+    } catch (err) {
+      logger.error({ message: 'Importing failed', meta: err.stack })
+  
+      if (resourceWasForbidden(err)) return
+      if (attempt > UPDATE_RETRY_LIMIT) return
+  
+      logger.error({ message: `Retrying.. ${attempt} / ${UPDATE_RETRY_LIMIT}` })
+      return recursivelyUpdateResource(attempt + 1)
+    }
+  }
+  return recursivelyUpdateResource
+}
+
+const update = async () => {
+  isImporting = true
+
+  for (const serviceId of serviceIds) {
+    requestBuffer.flush()
     if (forbiddenServiceIds.includes(serviceId)) {
       console.log(`Skipping forbidden serviceId ${serviceId}`)
-      return updateNext(current)
+      continue
     }
-    const data = await schedule(serviceId, generatedHash)
-    if (!data) return updateNext(current)
+    
+    console.log(`Importing ${serviceId} (${serviceIds.indexOf(serviceId) + 1}/${Object.keys(serviceIds).length})`)
 
-    const { greatestOrdinal, hasMore, total, ordinalKey } = data
-    console.log(`New ordinal for ${serviceId}: ${greatestOrdinal}`)
-    await updateOrdinalFrom(total, ordinalKey, greatestOrdinal)
-    hasMore ? update(current) : updateNext(current)
-
-    logger.info({ message: 'Imported batch', timems: new Date() - start })
-  } catch (err) {
-    requestBuffer.flush()
-    const forbiddenResource = ((err || {}).response || {}).status === 403
-    const canStillRetry = attempt <= UPDATE_RETRY_LIMIT
-    if (forbiddenResource) {
-      console.log('Added resource to list of forbidden resources')
-      logger.error({ message: `Forbidden service: ${serviceId}`, serviceId })
-      forbiddenServiceIds.push(serviceId)
-      return updateNext(current)
-    }
-    if (canStillRetry) {
-      return update(current, ++attempt)
-    }
-
-    logger.error({ message: 'Importing failed', meta: err.stack })
-    return updateNext(current)
+    await serviceUpdateFun(serviceId)()
   }
+  isImporting = false
 }
 
 const run = async () => {
   if (isImporting) return
 
   isImporting = true
-  requestBuffer.flush()
-  update(0)
+  await update()
+  await postUpdate()
+  isImporting = false
 }
 
 module.exports = {
