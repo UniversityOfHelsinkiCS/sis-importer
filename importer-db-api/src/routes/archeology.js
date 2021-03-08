@@ -159,4 +159,27 @@ router.get('/:studentNumber/enrollments', async (req, res) => {
     }
 })
 
+router.get('/assessments/:code', async (req, res) => {
+    try {
+        const courseUnit = await models.CourseUnit.findOne({
+            where: {
+                code: req.params.code,
+            },
+            raw: true
+        })
+        if (!courseUnit)
+            return res.status(404).send('Course not found')
+
+        const assessmentItems = await models.AssessmentItem.findAll({
+            where: { primaryCourseUnitGroupId: courseUnit.groupId },
+            raw: true
+
+        })
+        return res.send({ courseUnit, assessmentItems })
+    } catch (e) {
+        console.log(e)
+        res.status(500).json(e.toString())
+    }
+})
+
 module.exports = router
