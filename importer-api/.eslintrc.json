@@ -9,6 +9,7 @@
   "rules": {
     "no-console": 0,
     "prettier/prettier": "error",
-    "no-async-promise-executor": 0
+    "no-async-promise-executor": 0,
+    "require-atomic-updates": 0
   }
 }

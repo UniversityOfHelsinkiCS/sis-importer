@@ -22,7 +22,7 @@ const updateHash = async () => {
   return generatedHash
 }
 
-const resourceWasForbidden = (err) => {
+const resourceWasForbidden = (serviceId, err) => {
   const forbiddenResource = ((err || {}).response || {}).status === 403
   if (forbiddenResource) {
     console.log('Added resource to list of forbidden resources')
@@ -33,7 +33,7 @@ const resourceWasForbidden = (err) => {
   return false
 }
 
-const updateResource = async (serviceId) => {
+const updateResource = async serviceId => {
   if (IS_DEV && !SONIC) await sleep(1000)
 
   const generatedHash = await updateHash()
@@ -48,19 +48,19 @@ const updateResource = async (serviceId) => {
   return hasMore
 }
 
-const serviceUpdateFun = (serviceId) => {
+const serviceUpdateFun = serviceId => {
   const recursivelyUpdateResource = async (attempt = 1) => {
     try {
       const hasMore = await updateResource(serviceId)
       if (!hasMore) return
-    
+
       return recursivelyUpdateResource()
     } catch (err) {
       logger.error({ message: 'Importing failed', meta: err.stack })
-  
-      if (resourceWasForbidden(err)) return
+
+      if (resourceWasForbidden(serviceId, err)) return
       if (attempt > UPDATE_RETRY_LIMIT) return
-  
+
       logger.error({ message: `Retrying.. ${attempt} / ${UPDATE_RETRY_LIMIT}` })
       return recursivelyUpdateResource(attempt + 1)
     }
@@ -69,20 +69,17 @@ const serviceUpdateFun = (serviceId) => {
 }
 
 const update = async () => {
-  isImporting = true
-
   for (const serviceId of serviceIds) {
     requestBuffer.flush()
     if (forbiddenServiceIds.includes(serviceId)) {
       console.log(`Skipping forbidden serviceId ${serviceId}`)
       continue
     }
-    
+
     console.log(`Importing ${serviceId} (${serviceIds.indexOf(serviceId) + 1}/${Object.keys(serviceIds).length})`)
 
     await serviceUpdateFun(serviceId)()
   }
-  isImporting = false
 }
 
 const run = async () => {

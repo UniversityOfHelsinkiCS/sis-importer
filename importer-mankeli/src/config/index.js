@@ -20,6 +20,8 @@ module.exports.DB_CONFIG = {
   logging: false
 }
 
+module.exports.IS_DEV = process.env.NODE_ENV === 'development'
+
 module.exports.DB_CONNECTION_RETRY_LIMIT = process.env.NODE_ENV === 'development' ? 6 : 20
 
 module.exports.REJECT_UNAUTHORIZED = process.env.KEY_PATH && process.env.CERT_PATH
