@@ -44,6 +44,7 @@ const { createTransaction } = require('./utils/db')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
 const { connection } = require('./db/connection')
 const { REJECT_UNAUTHORIZED, NATS_GROUP } = require('./config')
+const initializePostUpdateChannel = require('./lib/postUpdate')
 
 if (!REJECT_UNAUTHORIZED) {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
@@ -127,6 +128,7 @@ stan.on('connect', async ({ clientID }) => {
     }
     currentExecutionHash = hash
   })
+  initializePostUpdateChannel()
 })
 
 stan.on('error', e => {

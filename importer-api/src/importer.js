@@ -4,6 +4,7 @@ const { serviceIds } = require('./services')
 const { schedule } = require('./scheduler')
 const { SONIC, IS_DEV, CURRENT_EXECUTION_HASH, UPDATE_RETRY_LIMIT } = require('./config')
 const { sleep } = require('./utils')
+const postUpdate = require('./utils/postUpdate')
 const { logger } = require('./utils/logger')
 const requestBuffer = require('./utils/requestBuffer')
 
