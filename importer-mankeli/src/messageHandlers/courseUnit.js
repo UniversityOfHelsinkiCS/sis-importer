@@ -6,6 +6,7 @@ const parseCourse = courseUnit => {
     id: courseUnit.id,
     groupId: courseUnit.groupId,
     code: courseUnit.code,
+    credits: courseUnit.credits,
     name: courseUnit.name,
     validityPeriod: courseUnit.validityPeriod,
     gradeScaleId: courseUnit.gradeScaleId,

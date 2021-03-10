@@ -15,6 +15,9 @@ CourseUnit.init(
     code: {
       type: STRING
     },
+    credits: {
+      type: JSONB
+    },
     name: {
       type: JSONB
     },
