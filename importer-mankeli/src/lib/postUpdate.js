@@ -9,7 +9,6 @@ const sendToStan = (channel, message) =>
     })
   })
 
-
 const postUpdate = async () => {
   if (IS_DEV) return console.log('Skipping post update in dev env')
   console.log('Post Update Start')
