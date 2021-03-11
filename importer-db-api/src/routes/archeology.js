@@ -197,7 +197,7 @@ router.get('/:studentNumber/missing', async (req, res) => {
             return res.status(404).send('Student not found')
 
         if (cache[student.id]) {
-            console.log('from cache')
+            console.log('Data from cache')
             return res.send(cache[student.id])
         }
 
@@ -210,6 +210,49 @@ router.get('/:studentNumber/missing', async (req, res) => {
 
         cache[student.id] = data
         return res.send(data)
+    } catch (e) {
+        console.log(e)
+        res.status(500).json(e.toString())
+    }
+})
+
+router.post('/missing', async (req, res) => {
+    try {
+        const reqData = req.body
+        if (!Array.isArray(reqData))
+            return res.status(400).send({ error: 'Input should be an array' })
+        const persons = await models.Person.findAll({
+            where: {
+                studentNumber: { [Op.in]: reqData.map((studentNumber) => studentNumber) }
+            },
+            raw: true
+        })
+        if (!persons.length)
+            return res.status(404).send('Students not found')
+
+        const allPersonIds = persons.map(({ id }) => id)
+        const output = Object.keys(cache)
+            .filter(key => allPersonIds.includes(key))
+            .map(key => cache[key])
+            .flat(1)
+        console.log(`From cache ${output.length} items`)
+
+        const notCachedStudents = persons.filter(({ id }) => !(id in cache))
+        const listOfStudents = notCachedStudents.map(({ id }) => `'${id}'`).join(', ')
+        if (!listOfStudents) return res.send(output)
+        const data = await sequelize.query(`SELECT * FROM attainments
+            WHERE attainments.type = 'CourseUnitAttainment'
+                AND attainments.person_id IN (${listOfStudents})
+                AND NOT EXISTS (SELECT 1 FROM course_units where course_units.id = attainments.course_unit_id)
+            `, { type: QueryTypes.SELECT }
+        )
+
+        // Hecking O(n^inf) way to do cache
+        notCachedStudents.forEach((person) => {
+            const allAttainments = data.filter(attainment => attainment.person_id === person.id)
+            cache[person.id] = allAttainments
+        })
+        return res.send(output.concat(data))
     } catch (e) {
         console.log(e)
         res.status(500).json(e.toString())
