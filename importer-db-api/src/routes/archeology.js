@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const models = require('../models')
-const { Op } = require('sequelize')
+const { Op, QueryTypes } = require('sequelize')
+const { sequelize } = require('../config/db')
 
 router.get('/:studentNumber/studyrights', async (req, res) => {
     try {
@@ -176,6 +177,39 @@ router.get('/assessments/:code', async (req, res) => {
 
         })
         return res.send({ courseUnit, assessmentItems })
+    } catch (e) {
+        console.log(e)
+        res.status(500).json(e.toString())
+    }
+})
+
+// ???
+const cache = {}
+
+router.get('/:studentNumber/missing', async (req, res) => {
+    try {
+        const student = await models.Person.findOne({
+            where: {
+                studentNumber: req.params.studentNumber,
+            }
+        })
+        if (!student)
+            return res.status(404).send('Student not found')
+
+        if (cache[student.id]) {
+            console.log('from cache')
+            return res.send(cache[student.id])
+        }
+
+        const data = await sequelize.query(`SELECT * FROM attainments
+            WHERE attainments.type = 'CourseUnitAttainment'
+                AND attainments.person_id = '${student.id}'
+                AND NOT EXISTS (SELECT 1 FROM course_units where course_units.id = attainments.course_unit_id)
+            `, { type: QueryTypes.SELECT }
+        )
+
+        cache[student.id] = data
+        return res.send(data)
     } catch (e) {
         console.log(e)
         res.status(500).json(e.toString())
