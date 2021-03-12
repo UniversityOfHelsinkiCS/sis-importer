@@ -32,18 +32,52 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
             })
             if (!includeOpenUni && education && education.educationType.includes('open-university-studies'))
                 continue
-            const additionalData = { education, person: student }
 
-            if (educationPhase1GroupId)
-                additionalData.educationPhase1 = await models.Module.findOne({
+
+            delete education.organisations
+            delete education.responsibilityInfos
+            delete education.universityOrgIds
+            delete education.attainmentLanguages
+            delete education.studyFields
+            if (education.structure && education.structure.phase1)
+                education.structure.phase1 = { name: education.structure.phase1.name }
+            if (education.structure && education.structure.phase2)
+                education.structure.phase2 = { name: education.structure.phase2.name }
+            if (education.structure && education.structure.learningOpportunities)
+                delete education.structure.learningOpportunities
+            const additionalData = { education }
+
+            if (educationPhase1GroupId) {
+                const educationPhase1 = await models.Module.findOne({
                     where: { groupId: educationPhase1GroupId },
                     raw: true
                 })
-            if (educationPhase2GroupId)
-                additionalData.educationPhase2 = await models.Module.findOne({
+                if (educationPhase1) {
+                    delete educationPhase1.responsibilityInfos
+                    delete educationPhase1.organisations
+                    delete educationPhase1.universityOrgIds
+                    delete educationPhase1.curriculumPeriodIds
+                    delete educationPhase1.studyFields
+                    delete educationPhase1.rule
+                }
+                additionalData.educationPhase1 = educationPhase1
+            }
+            if (educationPhase2GroupId) {
+                const educationPhase2 = await models.Module.findOne({
                     where: { groupId: educationPhase2GroupId },
                     raw: true
                 })
+                if (educationPhase2) {
+                    delete educationPhase2.responsibilityInfos
+                    delete educationPhase2.organisations
+                    delete educationPhase2.universityOrgIds
+                    delete educationPhase2.curriculumPeriodIds
+                    delete educationPhase2.studyFields
+                    delete educationPhase2.rule
+                }
+                additionalData.educationPhase2 = educationPhase2
+
+            }
             mankeledStudyRights.push({ ...studyRight, ...additionalData })
         }
         return res.json(mankeledStudyRights)
