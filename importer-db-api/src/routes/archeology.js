@@ -298,7 +298,7 @@ router.post('/missing', async (req, res) => {
 // ⊂(◉‿◉)つ
 router.get('/possibleCoursesWithPartAttainments', async (req, res) => {
   const courseUnits = await sequelize.query(`
-  SELECT c_units.code, c_units.name, c_units.completion_methods, sub.id_max as id
+  SELECT c_units.code, c_units.name, c_units.completion_methods, c_units.group_id, sub.id_max as id
     FROM (
         SELECT code, MAX(id) AS id_max
         FROM course_units
