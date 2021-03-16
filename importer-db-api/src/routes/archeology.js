@@ -330,4 +330,46 @@ router.get('/possibleCoursesWithPartAttainments', async (req, res) => {
 
 })
 
+// Archeology monster
+// 	༼ ༎ຶ ෴ ༎ຶ༽
+router.get('/assessmentItemsFromCoursesWithPartAttainments', async (req, res) => {
+  const courseUnits = await sequelize.query(`
+  SELECT c_units.code, c_units.name, c_units.completion_methods, sub.id_max as id
+    FROM (
+        SELECT code, MAX(id) AS id_max
+        FROM course_units
+        GROUP BY code
+    ) sub
+    JOIN course_units c_units ON c_units.code = sub.code AND sub.id_max = c_units.id
+  `, {
+    mapToModel: true,
+    model: models.CourseUnit,
+    raw: true
+  })
+
+  // hy-CM-117766481 <-- IT'S A MATCH!
+  // hy-CM-117766481-default-teaching-participation <-- NO GOOD
+  const re = /hy-CM-(\d*)$/
+
+  const assessmentItemIds = [...new Set(courseUnits
+    .filter(courseUnit => {
+      const theMethod = courseUnit.completionMethods.find(m => !!re.exec(m.localId))
+      if (!theMethod) return false
+      return theMethod.assessmentItemIds.length > 1
+    })
+    .map(courseUnit => ({
+      ...courseUnit,
+      completionMethods: courseUnit.completionMethods.find(m => !!re.exec(m.localId))
+    }))
+    .map(c => c.completionMethods.assessmentItemIds).flat()
+  )]
+
+  const output = await models.AssessmentItem.findAll({
+    where: {id: {[Op.in]: assessmentItemIds}},
+    attributes: ['name', 'credits', 'id', 'primaryCourseUnitGroupId'],
+    raw: true
+  })
+  return res.send(output)
+})
+
 module.exports = router
