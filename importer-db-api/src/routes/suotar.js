@@ -230,7 +230,10 @@ router.post('/acceptors', async (req, res) => {
 
     const acceptors = realisations.reduce((acc, { id, responsibilityInfos }) => {
       acc[id] = responsibilityInfos
-        .filter(({roleUrn}) => roleUrn === 'urn:code:course-unit-realisation-responsibility-info-type:teacher')
+        .filter(({ roleUrn }) => (
+          roleUrn === 'urn:code:course-unit-realisation-responsibility-info-type:teacher' ||
+          roleUrn === 'urn:code:course-unit-realisation-responsibility-info-type:responsible-teacher')
+        )
         .map(({ personId }) => ({
           roleUrn: 'urn:code:attainment-acceptor-type:approved-by',
           personId
