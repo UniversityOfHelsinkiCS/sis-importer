@@ -43,7 +43,7 @@ const updateResource = async serviceId => {
   const { greatestOrdinal, hasMore, total, ordinalKey } = data
   logger.info(`New ordinal for ${serviceId}: ${greatestOrdinal}`)
   await updateOrdinalFrom(total, ordinalKey, greatestOrdinal)
-  logger.info({ message: 'Imported batch' })
+  logger.info({ message: `Imported batch of ${serviceId}, new ordinal ${greatestOrdinal}`, ordinal: greatestOrdinal })
 
   return hasMore
 }

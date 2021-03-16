@@ -71,7 +71,15 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinis
         }
       }
 
-      if (result) logger.info({ message: 'Imported', count: amount, done: result, total: amountScheduled, serviceId })
+      if (result) {
+        logger.info({
+          message: `Imported ${amount} ${serviceId}, ${result}/${amountScheduled}`,
+          count: amount,
+          done: result,
+          total: amountScheduled,
+          serviceId
+        })
+      }
       if (result === Number(amountScheduled)) {
         handleFinish()
         statusChannel.unsubscribe()
