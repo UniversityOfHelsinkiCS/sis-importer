@@ -21,8 +21,7 @@
     "node-nats-streaming": "^0.2.6",
     "pg": "^8.0.2",
     "redis": "^2.8.0",
-    "winston": "^3.2.1",
-    "winston-log2gelf": "^2.1.0"
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",

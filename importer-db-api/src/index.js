@@ -1,4 +1,4 @@
 const app = require('./app')
 const PORT = process.env.PORT || 3000
 
-app.listen(PORT, () => console.log(`Example app listening at ${PORT}`))
+app.listen(PORT, () => console.log(`Importer db api listening at ${PORT}`))

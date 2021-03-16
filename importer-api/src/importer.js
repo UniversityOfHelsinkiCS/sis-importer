@@ -25,7 +25,7 @@ const updateHash = async () => {
 const resourceWasForbidden = (serviceId, err) => {
   const forbiddenResource = ((err || {}).response || {}).status === 403
   if (forbiddenResource) {
-    console.log('Added resource to list of forbidden resources')
+    logger.info('Added resource to list of forbidden resources')
     logger.error({ message: `Forbidden service: ${serviceId}`, serviceId })
     forbiddenServiceIds.push(serviceId)
     return true
@@ -41,7 +41,7 @@ const updateResource = async serviceId => {
   if (!data) return false
 
   const { greatestOrdinal, hasMore, total, ordinalKey } = data
-  console.log(`New ordinal for ${serviceId}: ${greatestOrdinal}`)
+  logger.info(`New ordinal for ${serviceId}: ${greatestOrdinal}`)
   await updateOrdinalFrom(total, ordinalKey, greatestOrdinal)
   logger.info({ message: 'Imported batch' })
 
@@ -72,11 +72,11 @@ const update = async () => {
   for (const serviceId of serviceIds) {
     requestBuffer.flush()
     if (forbiddenServiceIds.includes(serviceId)) {
-      console.log(`Skipping forbidden serviceId ${serviceId}`)
+      logger.info(`Skipping forbidden serviceId ${serviceId}`)
       continue
     }
 
-    console.log(`Importing ${serviceId} (${serviceIds.indexOf(serviceId) + 1}/${Object.keys(serviceIds).length})`)
+    logger.info(`Importing ${serviceId} (${serviceIds.indexOf(serviceId) + 1}/${Object.keys(serviceIds).length})`)
 
     await serviceUpdateFun(serviceId)()
   }

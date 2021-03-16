@@ -41,6 +41,7 @@ const degreeTitleHandler = require('./messageHandlers/degreeTitle')
 const educationClassificationHandler = require('./messageHandlers/educationClassification')
 const { sleep } = require('./utils')
 const { createTransaction } = require('./utils/db')
+const { logger } = require('./utils/logger')
 const { onCurrentExecutionHashChange } = require('./utils/redis')
 const { connection } = require('./db/connection')
 const { REJECT_UNAUTHORIZED, NATS_GROUP } = require('./config')
@@ -100,13 +101,13 @@ const handleMessage = (channel, msgHandler) => async msg => {
     }
     transaction.commit()
   } catch (e) {
-    console.log('Handling message failed', e)
+    logger.error({ message: 'Handling message failed', meta: e.stack })
     response = { ...JSON.parse(msg.getData()), status: 'FAIL', amount: 0, channel, stack: e.stack }
     if (transaction) transaction.rollback()
   }
 
   stan.publish(SCHEDULER_STATUS_CHANNEL, JSON.stringify(response), err => {
-    if (err) console.log('Failed publishing', err)
+    if (err) logger.error({ message: 'Failed publishing', meta: err.stack })
     else msg.ack()
   })
 }

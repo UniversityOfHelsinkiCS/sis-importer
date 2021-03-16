@@ -78,7 +78,7 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinis
       }
       msg.ack()
     } catch (e) {
-      console.log('Failed handling message', e)
+      logger.error({ message: 'Failed handling message', meta: e.stack })
     }
   })
 

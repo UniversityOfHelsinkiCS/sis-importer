@@ -4,6 +4,7 @@ const express = require('express')
 const app = express()
 const { run } = require('../importer')
 const { IS_DEV } = require('../config')
+const { logger } = require('../utils/logger')
 const { del: redisDel } = require('../utils/redis')
 
 const { DB_USERNAME, DB_PASSWORD, DB_PORT, DB_HOST, DB_DATABASE } = process.env
@@ -30,7 +31,8 @@ app.use((req, res, next) => {
   if (!EXPLORER_TOKEN && !IS_DEV) return res.sendStatus(401)
 
   if (req.query.token !== EXPLORER_TOKEN && req.headers['token'] !== EXPLORER_TOKEN) {
-    console.log('No token', req.query.token, req.headers['token'])
+    logger.error({ message: `No token ${req.query.token}, ${req.headers['token']}` })
+
     return res.sendStatus(401)
   }
   next()
