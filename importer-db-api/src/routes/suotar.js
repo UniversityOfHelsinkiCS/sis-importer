@@ -229,11 +229,10 @@ router.post('/acceptors', async (req, res) => {
       return res.status(404).send('Realisation not found')
 
     const acceptors = realisations.reduce((acc, { id, responsibilityInfos }) => {
-      console.log("jjj", responsibilityInfos)
       acc[id] = responsibilityInfos
         .filter(({roleUrn}) => roleUrn === 'urn:code:course-unit-realisation-responsibility-info-type:teacher')
         .map(({ personId }) => ({
-          role: 'urn:code:attainment-acceptor-type:approved-by',
+          roleUrn: 'urn:code:attainment-acceptor-type:approved-by',
           personId
         }))
       return acc
