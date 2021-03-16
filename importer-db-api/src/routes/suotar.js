@@ -204,12 +204,41 @@ router.post('/enrolments', async (req, res) => {
           where: { id: enrolment.courseUnitRealisationId },
           raw: true
         }),
-        courseUnit: courseUnits.find(({id}) => id === enrolment.courseUnitId)
+        courseUnit: courseUnits.find(({ id }) => id === enrolment.courseUnitId)
       })))
       return { code, personId, enrolments: enrolmentsWithRealisations }
     }))
     // Filter out possible nulls
     res.send(output.filter(e => !!e))
+  } catch (e) {
+    console.log(e)
+    res.status(500).json(e.toString())
+  }
+})
+
+router.post('/acceptors', async (req, res) => {
+  try {
+    const data = req.body
+    if (!Array.isArray(data))
+      return res.status(400).send({ error: 'Input should be an array' })
+    const realisations = await models.CourseUnitRealisation.findAll({
+      where: { id: { [Op.in]: data } },
+      raw: true
+    })
+    if (!realisations.length)
+      return res.status(404).send('Realisation not found')
+
+    const acceptors = realisations.reduce((acc, { id, responsibilityInfos }) => {
+      console.log("jjj", responsibilityInfos)
+      acc[id] = responsibilityInfos
+        .filter(({roleUrn}) => roleUrn === 'urn:code:course-unit-realisation-responsibility-info-type:teacher')
+        .map(({ personId }) => ({
+          role: 'urn:code:attainment-acceptor-type:approved-by',
+          personId
+        }))
+      return acc
+    }, {})
+    return res.send(acceptors)
   } catch (e) {
     console.log(e)
     res.status(500).json(e.toString())
