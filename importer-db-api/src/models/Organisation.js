@@ -17,6 +17,7 @@ class Organisation extends Model {
       name: unit.name,
       validityPeriod: unit.validityPeriod,
       groupId: unit.groupId,
+      credits: unit.credits,
     }))
   }
 }
