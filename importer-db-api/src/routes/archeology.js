@@ -12,6 +12,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
     })
 
     const { openUni: includeOpenUni } = req.query
+    const { deleted: includeDeleted } = req.query
 
     if (!student)
       return res.status(404).send('Student not found')
@@ -30,6 +31,8 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
         where: { id: studyRight.educationId },
         raw: true
       })
+      if (!includeDeleted && studyRight.documentState === 'DELETED')
+        continue
       if (!includeOpenUni && education && education.educationType.includes('open-university-studies'))
         continue
 
