@@ -61,7 +61,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
           delete educationPhase1.universityOrgIds
           delete educationPhase1.curriculumPeriodIds
           delete educationPhase1.studyFields
-          //delete educationPhase1.rule
+          delete educationPhase1.rule
         }
         additionalData.educationPhase1 = educationPhase1
       }
@@ -76,7 +76,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
           delete educationPhase2.universityOrgIds
           delete educationPhase2.curriculumPeriodIds
           delete educationPhase2.studyFields
-          //delete educationPhase2.rule
+          delete educationPhase2.rule
         }
         additionalData.educationPhase2 = educationPhase2
 
