@@ -10,11 +10,17 @@ const getEduPersonPrincipalNameFromUsername = username => `${username}@helsinki.
 router.get('/course_unit_realisations/by_enrolments/:username', async (req, res) => {
   const {
     params: { username },
+    query: { startDateAfter, endDateBefore },
   } = req
+
+  const scopes = [
+    startDateAfter && { method: ['activityPeriodStartDateAfter', new Date(startDateAfter)] },
+    endDateBefore && { method: ['activityPeriodEndDateBefore', new Date(endDateBefore)] },
+  ].filter(Boolean)
 
   const enrolments = await models.Enrolment.findAll({
     include: [
-      { model: models.CourseUnitRealisation },
+      { model: models.CourseUnitRealisation.scope(scopes) },
       { model: models.Person, where: { eduPersonPrincipalName: getEduPersonPrincipalNameFromUsername(username) } },
     ],
   })

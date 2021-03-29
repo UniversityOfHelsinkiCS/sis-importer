@@ -4,6 +4,21 @@ const dateFns = require('date-fns')
 
 class CourseUnitRealisation extends Model {}
 
+const getActivityPeriodComparisonWhere = (column, operator, date) => {
+  return {
+    [Op.and]: [
+      { activityPeriod: { [column]: { [Op.ne]: null } } },
+      {
+        activityPeriod: {
+          [column]: {
+            [operator]: dateFns.format(new Date(date), 'yyyy-MM-dd'),
+          },
+        },
+      },
+    ],
+  }
+}
+
 const scopes = {
   assessmentItemIdsOverlap(ids) {
     return {
@@ -16,18 +31,22 @@ const scopes = {
   },
   activityPeriodEndDateAfter(date) {
     return {
-      where: {
-        [Op.and]: [
-          { activityPeriod: { endDate: { [Op.ne]: null } } },
-          {
-            activityPeriod: {
-              endDate: {
-                [Op.gt]: dateFns.format(new Date(date), 'yyyy-MM-dd'),
-              },
-            },
-          },
-        ],
-      },
+      where: getActivityPeriodComparisonWhere('endDate', Op.gt, date),
+    }
+  },
+  activityPeriodEndDateBefore(date) {
+    return {
+      where: getActivityPeriodComparisonWhere('endDate', Op.lt, date),
+    }
+  },
+  activityPeriodStartDateAfter(date) {
+    return {
+      where: getActivityPeriodComparisonWhere('startDate', Op.gt, date),
+    }
+  },
+  activityPeriodStartDateBefore(date) {
+    return {
+      where: getActivityPeriodComparisonWhere('startDate', Op.lt, date),
     }
   },
 }
