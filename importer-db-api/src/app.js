@@ -12,6 +12,7 @@ const employeesRouter = require('./routes/employees')
 const suotarRouter = require('./routes/suotar')
 const gradesRouter = require('./routes/grades')
 const archeologyRouter = require('./routes/archeology')
+const palauteRouter = require('./routes/palaute')
 const { ApplicationError } = require('./errors')
 
 const app = express()
@@ -43,7 +44,7 @@ app.use('/employees', employeesRouter)
 app.use('/suotar', suotarRouter)
 app.use('/grades', gradesRouter)
 app.use('/archeology', archeologyRouter)
-
+app.use('/palaute', palauteRouter)
 
 app.use((error, req, res, next) => {
   console.log(error)

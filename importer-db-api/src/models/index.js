@@ -19,6 +19,7 @@ StudyRight.hasOne(Education, { sourceKey: 'educationId', foreignKey: 'id' })
 
 Enrolment.belongsTo(CourseUnitRealisation, { sourceKey: 'courseUnitRealisationId', targetKey: 'id' })
 Enrolment.belongsTo(CourseUnit, { sourceKey: 'courseUnitId', targetKey: 'id' })
+Enrolment.belongsTo(Person, { sourceKey: 'personId', targetKey: 'id' })
 
 Person.hasMany(StudyRight, { sourceKey: 'id', foreignKey: 'personId' })
 StudyRight.belongsTo(Person, { foreignKey: 'personId', targetKey: 'id' })
