@@ -7,15 +7,15 @@ const router = express.Router()
 
 const getEduPersonPrincipalNameFromUsername = username => `${username}@helsinki.fi`
 
-router.get('/course_unit_realisations/by_enrolments/:username', async (req, res) => {
+router.get('/course_unit_realisations/enrolled/:username', async (req, res) => {
   const {
     params: { username },
-    query: { startDateAfter, endDateBefore },
+    query: { startDateBefore, endDateAfter },
   } = req
 
   const scopes = [
-    startDateAfter && { method: ['activityPeriodStartDateAfter', new Date(startDateAfter)] },
-    endDateBefore && { method: ['activityPeriodEndDateBefore', new Date(endDateBefore)] },
+    startDateBefore && { method: ['activityPeriodStartDateBefore', new Date(startDateBefore)] },
+    endDateAfter && { method: ['activityPeriodEndDateAfter', new Date(endDateAfter)] },
   ].filter(Boolean)
 
   const enrolments = await models.Enrolment.findAll({
