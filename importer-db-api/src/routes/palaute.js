@@ -30,4 +30,16 @@ router.get('/course_unit_realisations/enrolled/:username', async (req, res) => {
   res.send(courseUnitRealisations)
 })
 
+router.get('/course_unit_realisations/responsible/:username', async (req, res) => {
+  const {
+    params: { username },
+  } = req
+
+  const sisuPerson = await models.Person.findOne({ where: { eduPersonPrincipalName: getEduPersonPrincipalNameFromUsername(username) }})
+
+  const [courseUnitRealisations] = await models.CourseUnitRealisation.sequelize.query(`select * from course_unit_realisations where array_to_json(responsibility_infos)::jsonb @> '[{"personId": "${sisuPerson.id}"}]'`);
+
+  res.send(courseUnitRealisations)
+})
+
 module.exports = router
