@@ -35,9 +35,14 @@ router.get('/course_unit_realisations/responsible/:username', async (req, res) =
     params: { username },
   } = req
 
-  const sisuPerson = await models.Person.findOne({ where: { eduPersonPrincipalName: getEduPersonPrincipalNameFromUsername(username) }})
+  const sisuPerson = await models.Person.findOne({
+    where: { eduPersonPrincipalName: getEduPersonPrincipalNameFromUsername(username) },
+  })
 
-  const [courseUnitRealisations] = await models.CourseUnitRealisation.sequelize.query(`select * from course_unit_realisations where array_to_json(responsibility_infos)::jsonb @> '[{"personId": "${sisuPerson.id}"}]'`);
+  const courseUnitRealisations = await models.CourseUnitRealisation.sequelize.query(
+    `select * from course_unit_realisations where array_to_json(responsibility_infos)::jsonb @> '[{"personId": "${sisuPerson.id}"}]'`,
+    { model: models.CourseUnitRealisation, mapToModel: true }
+  )
 
   res.send(courseUnitRealisations)
 })
