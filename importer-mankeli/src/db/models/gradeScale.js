@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, ARRAY, JSONB } = require('sequelize')
+const { Model, STRING, DATE, JSONB } = require('sequelize')
 const { connection } = require('../connection')
 
 class GradeScale extends Model {}
@@ -10,7 +10,7 @@ GradeScale.init(
       type: STRING
     },
     grades: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     name: {
       type: JSONB

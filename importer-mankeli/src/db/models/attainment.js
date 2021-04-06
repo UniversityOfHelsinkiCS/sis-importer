@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, ARRAY, JSONB, BOOLEAN, DOUBLE, INTEGER } = require('sequelize')
+const { Model, STRING, DATE, JSONB, BOOLEAN, DOUBLE, INTEGER } = require('sequelize')
 const { connection } = require('../connection')
 
 class Attainment extends Model {}
@@ -10,9 +10,6 @@ Attainment.init(
       primaryKey: true
     },
     personId: {
-      type: STRING
-    },
-    personStudentNumber: {
       type: STRING
     },
     verifierPersonId: {
@@ -34,10 +31,10 @@ Attainment.init(
       type: STRING
     },
     acceptorPersons: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     organisations: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     state: {
       type: STRING
@@ -103,7 +100,7 @@ Attainment.init(
       type: STRING
     },
     nodes: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     createdAt: {
       type: DATE
@@ -132,9 +129,6 @@ Attainment.init(
       },
       {
         fields: ['module_id']
-      },
-      {
-        fields: ['person_student_number']
       }
     ]
   }

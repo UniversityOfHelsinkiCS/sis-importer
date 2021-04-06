@@ -25,7 +25,7 @@ Education.init(
       type: JSONB,
     },
     organisations: {
-      type: ARRAY(JSONB),
+      type: JSONB,
     },
     universityOrgIds: {
       type: ARRAY(STRING),
@@ -40,7 +40,7 @@ Education.init(
       type: ARRAY(STRING),
     },
     responsibilityInfos: {
-      type: ARRAY(JSONB),
+      type: JSONB,
     },
     createdAt: {
       type: DATE,

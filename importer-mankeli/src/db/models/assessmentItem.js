@@ -40,7 +40,7 @@ AssessmentItem.init(
       type: STRING
     },
     organisations: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     primaryCourseUnitGroupId: {
       type: STRING

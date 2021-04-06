@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, ARRAY, JSONB } = require('sequelize')
+const { Model, STRING, DATE, JSONB } = require('sequelize')
 const { connection } = require('../connection')
 
 class TermRegistration extends Model {}
@@ -14,7 +14,7 @@ TermRegistration.init(
       type: STRING
     },
     termRegistrations: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     createdAt: {
       type: DATE

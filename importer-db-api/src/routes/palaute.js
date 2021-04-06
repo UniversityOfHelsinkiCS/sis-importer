@@ -40,7 +40,7 @@ router.get('/course_unit_realisations/responsible/:username', async (req, res) =
   })
 
   const courseUnitRealisations = await models.CourseUnitRealisation.sequelize.query(
-    `select * from course_unit_realisations where array_to_json(responsibility_infos)::jsonb @> '[{"personId": "${sisuPerson.id}"}]'`,
+    `select * from course_unit_realisations where responsibility_infos @> '[{"personId": "${sisuPerson.id}"}]'`,
     { model: models.CourseUnitRealisation, mapToModel: true }
   )
 

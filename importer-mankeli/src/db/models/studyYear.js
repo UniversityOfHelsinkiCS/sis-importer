@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, JSONB, INTEGER, ARRAY } = require('sequelize')
+const { Model, STRING, DATE, JSONB, INTEGER } = require('sequelize')
 const { connection } = require('../connection')
 
 class StudyYear extends Model {}
@@ -19,7 +19,7 @@ StudyYear.init(
       type: STRING
     },
     studyTerms: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     createdAt: {
       type: DATE

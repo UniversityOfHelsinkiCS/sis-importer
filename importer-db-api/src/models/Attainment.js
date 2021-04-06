@@ -34,10 +34,10 @@ Attainment.init(
       type: STRING,
     },
     acceptorPersons: {
-      type: ARRAY(JSONB),
+      type: JSONB,
     },
     organisations: {
-      type: ARRAY(JSONB),
+      type: JSONB,
     },
     state: {
       type: STRING,
@@ -97,7 +97,7 @@ Attainment.init(
       type: STRING,
     },
     nodes: {
-      type: ARRAY(JSONB),
+      type: JSONB,
     },
     createdAt: {
       type: DATE,
