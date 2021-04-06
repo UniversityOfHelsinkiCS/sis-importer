@@ -82,16 +82,16 @@ CourseUnitRealisation.init(
       type: STRING,
     },
     studyGroupSets: {
-      type: ARRAY(JSONB),
+      type: JSONB,
     },
     organisations: {
-      type: ARRAY(JSONB),
+      type: JSONB,
     },
     enrolmentPeriod: {
       type: JSONB,
     },
     responsibilityInfos: {
-      type: ARRAY(JSONB),
+      type: JSONB,
     },
     createdAt: {
       type: DATE,

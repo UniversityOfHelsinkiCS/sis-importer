@@ -46,7 +46,7 @@ StudyRight.init(
       type: DATE
     },
     termRegistrations: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     studyRightCancellation: {
       type: JSONB
@@ -64,7 +64,7 @@ StudyRight.init(
       type: JSONB
     },
     studyRightExtensions: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     transferOutUniversityUrn: {
       type: STRING
@@ -73,10 +73,10 @@ StudyRight.init(
       type: JSONB
     },
     phase1MinorSelections: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     phase2MinorSelections: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     phase1EducationClassificationUrn: {
       type: STRING

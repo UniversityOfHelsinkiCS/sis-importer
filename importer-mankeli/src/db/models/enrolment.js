@@ -44,7 +44,7 @@ Enrolment.init(
       type: DATE
     },
     studySubGroups: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     confirmedStudySubGroupIds: {
       type: ARRAY(STRING)

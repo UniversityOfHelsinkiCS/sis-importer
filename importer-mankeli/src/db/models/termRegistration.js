@@ -14,7 +14,7 @@ TermRegistration.init(
       type: STRING
     },
     termRegistrations: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     createdAt: {
       type: DATE

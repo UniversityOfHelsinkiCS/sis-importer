@@ -12,9 +12,6 @@ Attainment.init(
     personId: {
       type: STRING
     },
-    personStudentNumber: {
-      type: STRING
-    },
     verifierPersonId: {
       type: STRING
     },
@@ -34,10 +31,10 @@ Attainment.init(
       type: STRING
     },
     acceptorPersons: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     organisations: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     state: {
       type: STRING
@@ -103,7 +100,7 @@ Attainment.init(
       type: STRING
     },
     nodes: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     createdAt: {
       type: DATE
@@ -132,9 +129,6 @@ Attainment.init(
       },
       {
         fields: ['module_id']
-      },
-      {
-        fields: ['person_student_number']
       }
     ]
   }

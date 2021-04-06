@@ -19,7 +19,7 @@ StudyYear.init(
       type: STRING
     },
     studyTerms: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     createdAt: {
       type: DATE

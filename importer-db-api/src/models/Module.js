@@ -187,10 +187,10 @@ Module.init(
       type: JSONB,
     },
     responsibilityInfos: {
-      type: ARRAY(JSONB),
+      type: JSONB,
     },
     organisations: {
-      type: ARRAY(JSONB),
+      type: JSONB,
     },
     name: {
       type: JSONB,

@@ -40,7 +40,7 @@ CourseUnit.init(
       type: ARRAY(STRING)
     },
     organisations: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     universityOrgIds: {
       type: ARRAY(STRING)
@@ -49,13 +49,13 @@ CourseUnit.init(
       type: ARRAY(STRING)
     },
     substitutions: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     completionMethods: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     responsibilityInfos: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     createdAt: {
       type: DATE

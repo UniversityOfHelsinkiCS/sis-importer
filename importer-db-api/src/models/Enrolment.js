@@ -42,7 +42,7 @@ Enrolment.init(
       type: STRING,
     },
     study_sub_groups: {
-      type: ARRAY(JSONB),
+      type: JSONB,
     },
   },
   {

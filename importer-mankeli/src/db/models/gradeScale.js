@@ -10,7 +10,7 @@ GradeScale.init(
       type: STRING
     },
     grades: {
-      type: ARRAY(JSONB)
+      type: JSONB
     },
     name: {
       type: JSONB
