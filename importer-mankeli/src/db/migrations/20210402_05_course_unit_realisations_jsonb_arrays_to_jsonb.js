@@ -4,7 +4,9 @@ const migrateColumnFromJSONBArrayToJSONB = (queryInterface, transaction) => asyn
   const tempColumnName = `temp_${column}`
   await queryInterface.renameColumn(table, column, tempColumnName, { transaction })
   await queryInterface.addColumn(table, column, JSONB, { transaction })
-  await queryInterface.sequelize.query(`UPDATE ${table} SET ${column}=array_to_json(${tempColumnName})::jsonb`, { transaction })
+  await queryInterface.sequelize.query(`UPDATE ${table} SET ${column}=array_to_json(${tempColumnName})::jsonb`, {
+    transaction
+  })
   await queryInterface.removeColumn(table, tempColumnName, { transaction })
 }
 
@@ -23,5 +25,5 @@ module.exports = {
       throw err
     }
   },
-  down: async queryInterface => {}
+  down: async () => {}
 }

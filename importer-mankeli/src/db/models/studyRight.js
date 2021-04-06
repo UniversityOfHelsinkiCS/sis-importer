@@ -1,4 +1,4 @@
-const { Model, ARRAY, STRING, DATE, BIGINT, JSONB, BOOLEAN } = require('sequelize')
+const { Model, STRING, DATE, BIGINT, JSONB, BOOLEAN } = require('sequelize')
 const { connection } = require('../connection')
 
 class StudyRight extends Model {}
