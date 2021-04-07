@@ -1,3 +1,5 @@
+const { Op } = require("sequelize");
+
 const express = require('express')
 const _ = require('lodash')
 
@@ -30,6 +32,20 @@ router.get('/course_unit_realisations/enrolled/:username', async (req, res) => {
   res.send(courseUnitRealisations)
 })
 
+router.get('/course_unit_realisations/:id/assessment_items', async (req, res) => {
+  const {
+    params: { id }
+  } = req
+
+  const courseUnitRealisation = await models.CourseUnitRealisation.findOne({ where: { id }})
+
+  const assessmentItems = await models.AssessmentItem.findAll({ where: { id: {
+    [Op.in]: courseUnitRealisation.assessmentItemIds,
+  } }})
+
+  res.send(assessmentItems)
+})
+
 router.get('/course_unit_realisations/responsible/:username', async (req, res) => {
   const {
     params: { username },
@@ -38,8 +54,6 @@ router.get('/course_unit_realisations/responsible/:username', async (req, res) =
   const sisuPerson = await models.Person.findOne({
     where: { eduPersonPrincipalName: getEduPersonPrincipalNameFromUsername(username) },
   })
-
-  console.log('Wat')
 
   const courseUnitRealisations = await models.CourseUnitRealisation.sequelize.query(
     `select * from course_unit_realisations where responsibility_infos @> '[{"personId": "${sisuPerson.id}"}]'`,
