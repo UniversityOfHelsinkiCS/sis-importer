@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+const { Op } = require('sequelize')
 
 const express = require('express')
 const _ = require('lodash')
@@ -34,14 +34,18 @@ router.get('/course_unit_realisations/enrolled/:username', async (req, res) => {
 
 router.get('/course_unit_realisations/:id/assessment_items', async (req, res) => {
   const {
-    params: { id }
+    params: { id },
   } = req
 
-  const courseUnitRealisation = await models.CourseUnitRealisation.findOne({ where: { id }})
+  const courseUnitRealisation = await models.CourseUnitRealisation.findOne({ where: { id } })
 
-  const assessmentItems = await models.AssessmentItem.findAll({ where: { id: {
-    [Op.in]: courseUnitRealisation.assessmentItemIds,
-  } }})
+  const assessmentItems = await models.AssessmentItem.findAll({
+    where: {
+      id: {
+        [Op.in]: courseUnitRealisation.assessmentItemIds,
+      },
+    },
+  })
 
   res.send(assessmentItems)
 })
