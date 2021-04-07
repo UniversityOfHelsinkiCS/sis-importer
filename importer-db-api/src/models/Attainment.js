@@ -12,9 +12,6 @@ Attainment.init(
     personId: {
       type: STRING,
     },
-    personStudentNumber: {
-      type: STRING,
-    },
     verifierPersonId: {
       type: STRING,
     },
@@ -126,10 +123,7 @@ Attainment.init(
       },
       {
         fields: ['module_id'],
-      },
-      {
-        fields: ['person_student_number'],
-      },
+      }
     ],
   }
 )
