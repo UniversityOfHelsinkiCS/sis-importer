@@ -39,6 +39,8 @@ router.get('/course_unit_realisations/:id/assessment_items', async (req, res) =>
 
   const courseUnitRealisation = await models.CourseUnitRealisation.findOne({ where: { id } })
 
+  if (!courseUnitRealisation) return res.sendStatus(404)
+
   const assessmentItems = await models.AssessmentItem.findAll({
     where: {
       id: {
