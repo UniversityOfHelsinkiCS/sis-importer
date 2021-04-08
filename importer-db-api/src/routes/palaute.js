@@ -1,17 +1,12 @@
 const { Op } = require('sequelize')
-
 const express = require('express')
-const _ = require('lodash')
-
 const models = require('../models')
 
 const router = express.Router()
 
-const getEduPersonPrincipalNameFromUsername = username => `${username}@helsinki.fi`
-
-router.get('/course_unit_realisations/enrolled/:username', async (req, res) => {
+router.get('/enrolled/:personId', async (req, res) => {
   const {
-    params: { username },
+    params: { personId },
     query: { startDateBefore, endDateAfter },
   } = req
 
@@ -21,52 +16,50 @@ router.get('/course_unit_realisations/enrolled/:username', async (req, res) => {
   ].filter(Boolean)
 
   const enrolments = await models.Enrolment.findAll({
-    include: [
-      { model: models.CourseUnitRealisation.scope(scopes) },
-      { model: models.Person, where: { eduPersonPrincipalName: getEduPersonPrincipalNameFromUsername(username) } },
-    ],
+    where: {
+      personId,
+    },
+    include: [{ model: models.CourseUnitRealisation.scope(scopes) }, { model: models.AssessmentItem }],
   })
 
-  const courseUnitRealisations = enrolments.map(({ course_unit_realisation }) => course_unit_realisation)
-
-  res.send(courseUnitRealisations)
+  res.send(enrolments)
 })
 
-router.get('/course_unit_realisations/:id/assessment_items', async (req, res) => {
+router.get('/responsible/:personId', async (req, res) => {
   const {
-    params: { id },
+    params: { personId },
   } = req
 
-  const courseUnitRealisation = await models.CourseUnitRealisation.findOne({ where: { id } })
-
-  if (!courseUnitRealisation) return res.sendStatus(404)
-
-  const assessmentItems = await models.AssessmentItem.findAll({
+  const courses = await models.CourseUnitRealisation.findAll({
     where: {
-      id: {
-        [Op.in]: courseUnitRealisation.assessmentItemIds,
+      responsibilityInfos: {
+        [Op.contains]: [
+          {
+            personId: personId,
+          },
+        ],
       },
     },
   })
 
-  res.send(assessmentItems)
-})
+  const assessmentItemIds = [].concat(...courses.map(c => c.assessmentItemIds))
 
-router.get('/course_unit_realisations/responsible/:username', async (req, res) => {
-  const {
-    params: { username },
-  } = req
-
-  const sisuPerson = await models.Person.findOne({
-    where: { eduPersonPrincipalName: getEduPersonPrincipalNameFromUsername(username) },
+  const assessmentItems = await models.AssessmentItem.findAll({
+    where: {
+      id: {
+        [Op.in]: assessmentItemIds,
+      },
+    },
   })
 
-  const courseUnitRealisations = await models.CourseUnitRealisation.sequelize.query(
-    `select * from course_unit_realisations where responsibility_infos @> '[{"personId": "${sisuPerson.id}"}]'`,
-    { model: models.CourseUnitRealisation, mapToModel: true }
-  )
+  const withAssessmentItems = courses.map(course => {
+    return {
+      ...course.dataValues,
+      assessmentItems: course.assessmentItemIds.map(id => assessmentItems.find(aItem => aItem.id === id)),
+    }
+  })
 
-  res.send(courseUnitRealisations)
+  res.send(withAssessmentItems)
 })
 
 module.exports = router

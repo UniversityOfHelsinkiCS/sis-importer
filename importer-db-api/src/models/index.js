@@ -17,9 +17,10 @@ Organisation.hasMany(StudyRight, { foreignKey: 'id', targetKey: 'organisationId'
 
 StudyRight.hasOne(Education, { sourceKey: 'educationId', foreignKey: 'id' })
 
-Enrolment.belongsTo(CourseUnitRealisation, { sourceKey: 'courseUnitRealisationId', targetKey: 'id' })
-Enrolment.belongsTo(CourseUnit, { sourceKey: 'courseUnitId', targetKey: 'id' })
-Enrolment.belongsTo(Person, { sourceKey: 'personId', targetKey: 'id' })
+Enrolment.belongsTo(AssessmentItem, { foreignKey: 'assessmentItemId', targetKey: 'id' })
+Enrolment.belongsTo(CourseUnitRealisation, { foreignKey: 'courseUnitRealisationId', targetKey: 'id' })
+Enrolment.belongsTo(CourseUnit, { foreignKey: 'courseUnitId', targetKey: 'id' })
+Enrolment.belongsTo(Person, { foreignKey: 'personId', targetKey: 'id' })
 
 Person.hasMany(StudyRight, { sourceKey: 'id', foreignKey: 'personId' })
 StudyRight.belongsTo(Person, { foreignKey: 'personId', targetKey: 'id' })
