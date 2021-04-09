@@ -267,11 +267,11 @@ router.get('/:studentNumber/enrolled/study_track/:studyTrackId', async (req, res
         personId: req.student.id,
         state: "ENROLLED"
       },
-      include: [CourseUnitRealisation]
+      include: [{ model: CourseUnitRealisation, as: 'courseUnitRealisation' }]
     })
 
-    for(const {course_unit_realisation} of enrolledCourses){
-      const organisationIds = course_unit_realisation.organisations.map(e => e.organisationId)
+    for(const {courseUnitRealisation} of enrolledCourses){
+      const organisationIds = courseUnitRealisation.organisations.map(e => e.organisationId)
       
       const responsibleOrganisations = await models.Organisation.findAll({
         where: {
@@ -282,7 +282,7 @@ router.get('/:studentNumber/enrolled/study_track/:studyTrackId', async (req, res
       })
 
       const organisationIsValid = responsibleOrganisations.map(({code}) => code).includes(studyTrackId)
-      const registrationIsActive = new Date(course_unit_realisation.activityPeriod.endDate).getTime() > new Date().getTime()
+      const registrationIsActive = new Date(courseUnitRealisation.activityPeriod.endDate).getTime() > new Date().getTime()
 
       if(organisationIsValid && registrationIsActive) return res.send(true)
     }
