@@ -41,7 +41,7 @@ Enrolment.init(
     documentState: {
       type: STRING,
     },
-    study_sub_groups: {
+    studySubGroups: {
       type: JSONB,
     },
   },
