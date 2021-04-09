@@ -45,6 +45,11 @@ router.get('/enrolled/:personId', async (req, res) => {
           },
         ],
       },
+      {
+        model: models.CourseUnit,
+        attributes: relevantAttributes.courseUnit,
+        as: 'courseUnit',
+      },
     ],
   })
 
