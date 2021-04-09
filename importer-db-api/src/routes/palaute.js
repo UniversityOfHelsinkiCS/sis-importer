@@ -37,13 +37,6 @@ router.get('/enrolled/:personId', async (req, res) => {
         model: models.AssessmentItem,
         attributes: relevantAttributes.assessmentItem,
         as: 'assessmentItem',
-        include: [
-          {
-            model: models.CourseUnit,
-            attributes: relevantAttributes.courseUnit,
-            as: 'courseUnit',
-          },
-        ],
       },
       {
         model: models.CourseUnit,
