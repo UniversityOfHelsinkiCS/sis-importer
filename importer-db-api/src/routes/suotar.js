@@ -247,6 +247,22 @@ router.post('/acceptors', async (req, res) => {
   }
 })
 
+router.post('/resolve_user', async (req, res) => {
+  try {
+    const {email, employeeId, uid} = req.body
+    const filters = {}
+    if (email) filters.primaryEmail = email
+    if (employeeId) filters.employeeNumber = employeeId
+    if (uid) filters.eduPersonPrincipalName = `${uid}@helsinki.fi`
+    const user = await models.Person.findOne({ where: filters })
+    if (!user) return res.status(404).send('Person not found')
+    return res.send(user)
+  } catch (e) {
+    console.log(e)
+    res.status(500).json(e.toString())
+  }
+})
+
 const findGrade = (gradeScales, gradeScaleId, gradeId) => gradeScales
   .find(({ id }) => id === gradeScaleId).grades
   .find(({ localId }) => localId === String(gradeId))
