@@ -112,6 +112,7 @@ router.get('/persons', async (req, res) => {
 
   const persons = await models.Person.findAll({
     attributes: relevantAttributes.person,
+    limit: 100,
     where
   })
 
