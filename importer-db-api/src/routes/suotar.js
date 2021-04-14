@@ -255,7 +255,7 @@ router.post('/resolve_user', async (req, res) => {
     if (employeeId) filters.employeeNumber = employeeId
     if (uid) filters.eduPersonPrincipalName = `${uid}@helsinki.fi`
     const user = await models.Person.findOne({ where: filters })
-    if (!user) return res.status(404).send('Person not found')
+    if (!user) return res.send({})
     return res.send(user)
   } catch (e) {
     console.log(e)
