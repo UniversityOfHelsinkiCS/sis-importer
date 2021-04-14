@@ -4,6 +4,7 @@ const { Op } = require('sequelize')
 const models = require('../models')
 const fs = require('fs')
 const https = require('https')
+const _ = require('lodash')
 
 const { SIS_API_URL, PROXY_TOKEN, KEY_PATH, CERT_PATH, API_KEY } = process.env
 
@@ -249,14 +250,39 @@ router.post('/acceptors', async (req, res) => {
 
 router.post('/resolve_user', async (req, res) => {
   try {
-    const {email, employeeId, uid} = req.body
+    const { email, employeeId, uid } = req.body
     const filters = {}
     if (email) filters.primaryEmail = email
     if (employeeId) filters.employeeNumber = employeeId
     if (uid) filters.eduPersonPrincipalName = `${uid}@helsinki.fi`
-    const user = await models.Person.findOne({ where: filters })
+    const user = await models.Person.findOne({ where: filters, raw: true })
     if (!user) return res.send({})
-    return res.send(user)
+    const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
+      attributes: ['assessmentItemIds'],
+      where: {
+        responsibilityInfos: {
+          [Op.contains]: [{ personId: user.id }],
+        },
+        courseUnitRealisationTypeUrn: { [Op.iLike]: 'urn:code:course-unit-realisation-type:teaching-participation-%' }
+      },
+      raw: true
+    })
+
+    const assessmentItemIds = _.uniq(courseUnitRealisations.map(cur => cur.assessmentItemIds).flat())
+
+    const assessmentItems = await models.AssessmentItem.findAll({
+      where: {
+        id: { [Op.in]: assessmentItemIds }
+      },
+      include: [{
+        model: models.CourseUnit,
+        as: 'courseUnit'
+      }],
+      raw: true
+    })
+    const codes = _.uniq(assessmentItems.map(a => a["courseUnit.code"]))
+
+    return res.send({ ...user, courses: codes })
   } catch (e) {
     console.log(e)
     res.status(500).json(e.toString())
