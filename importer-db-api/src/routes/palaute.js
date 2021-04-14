@@ -104,7 +104,11 @@ router.get('/responsible/:personId', async (req, res) => {
 router.get('/persons', async (req, res) => {
   const where = {}
 
-  Object.entries(req.query).forEach(([key, value]) => where[key] = { [Op.iLike]: `%${value}%` })
+  Object.entries(req.query).forEach(([key, value]) => {
+    if (key === 'token') return
+
+    where[key] = { [Op.iLike]: `%${value}%` }
+  })
 
   const persons = await models.Person.findAll({
     attributes: relevantAttributes.person,
