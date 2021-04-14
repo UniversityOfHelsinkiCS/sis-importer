@@ -7,6 +7,7 @@ const relevantAttributes = {
   courseUnit: ['id', 'groupId', 'code', 'organisations', 'completionMethods', 'responsibilityInfos', 'name'],
   courseUnitRealisation: ['id', 'name', 'nameSpecifier', 'assessmentItemIds', 'activityPeriod', 'courseUnitRealisationTypeUrn', 'studyGroupSets', 'organisations', 'responsibilityInfos'],
   assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],
+  person: ['id', 'studentNumber', 'eduPersonPrincipalName', 'firstNames', 'lastName']
 }
 
 const router = express.Router()
@@ -99,5 +100,21 @@ router.get('/responsible/:personId', async (req, res) => {
     assessmentItems,
   })
 })
+
+router.get('/persons', async (req, res) => {
+  const where = {}
+
+  Object.entries(req.query).forEach(([key, value]) => where[key] = { [Op.iLike]: `%${value}%` })
+
+  const persons = await models.Person.findAll({
+    attributes: relevantAttributes.person,
+    where
+  })
+
+  res.send({
+    persons
+  })
+})
+
 
 module.exports = router
