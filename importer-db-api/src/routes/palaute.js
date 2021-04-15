@@ -21,7 +21,7 @@ const relevantAttributes = {
 }
 
 
-const addRealisationsToCourseUnits = async (courseUnitRealisations) => {
+const addCourseUnitsToRealisations = async (courseUnitRealisations) => {
   const assessmentItemIds = [].concat(...courseUnitRealisations.map(c => c.assessmentItemIds))
 
   const assessmentItemsWithCrap = await models.AssessmentItem.findAll({
@@ -127,7 +127,7 @@ router.get('/responsible/:personId', async (req, res) => {
     },
   })
 
-  const realisationsWithCourseUnits = await addRealisationsToCourseUnits(courseUnitRealisations)
+  const realisationsWithCourseUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
 
   res.send({
     courseUnitRealisations: realisationsWithCourseUnits,
