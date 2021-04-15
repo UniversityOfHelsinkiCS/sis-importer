@@ -185,7 +185,8 @@ const findProgramme = async (req, res, next) => {
 programmeRouter.get('/course_unit_realisations', async (req, res) => {
   const courseUnitRealisations = await req.organisation.getCourseUnitRealisations()
 
-  res.send(courseUnitRealisations)
+  const withUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
+  res.send(withUnits)
 })
 
 programmeRouter.get('/course_units', async (req, res) => {
