@@ -1,24 +1,35 @@
-const { Model, ARRAY, STRING, DATE, BIGINT, JSONB } = require('sequelize')
+const { Model, Op, ARRAY, STRING, DATE, BIGINT, JSONB } = require('sequelize')
 const { sequelize } = require('../config/db')
+const CourseUnitRealisation = require('./CourseUnitRealisation')
 const CourseUnit = require('./CourseUnit')
 
 class Organisation extends Model {
-  async getCourses() {
-    const units = await sequelize.query(
-      `SELECT * FROM course_units WHERE organisations @> '[{"organisationId": "${this.id}"}]'::jsonb;`,
+  async getCourseUnits() {
+    const units = await CourseUnit.findAll({
+      where: {
+        organisations: {
+          [Op.contains]: [
+            {
+              organisationId: this.id,
+            },
+          ],
+        },
+      },
+    })
+
+    return units
+  }
+
+  async getCourseUnitRealisations() {
+    const realisations = await sequelize.query(
+      `select * from course_unit_realisations where assessment_item_ids && ARRAY((select id from assessment_items where primary_course_unit_group_id in (select group_id from course_units where organisations @> '[{ "organisationId": "${this.id}"}]')));`,
       {
-        model: CourseUnit,
+        model: CourseUnitRealisation,
         mapToModel: true,
       }
     )
-    return units.map(unit => ({
-      id: unit.id,
-      code: unit.code,
-      name: unit.name,
-      validityPeriod: unit.validityPeriod,
-      groupId: unit.groupId,
-      credits: unit.credits,
-    }))
+
+    return realisations
   }
 }
 

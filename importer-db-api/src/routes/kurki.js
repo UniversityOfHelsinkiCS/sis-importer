@@ -39,7 +39,14 @@ router.get('/course_unit_realisations/programme/:programmeCode', async (req, res
     throw new NotFoundError('No such organization, use different code e.g. 500-K005')
   }
 
-  const courses = await organisation.getCourses()
+  const courses = (await organisation.getCourseUnits()).map(unit => ({
+    id: unit.id,
+    code: unit.code,
+    name: unit.name,
+    validityPeriod: unit.validityPeriod,
+    groupId: unit.groupId,
+    credits: unit.credits,
+  }))
 
   const courseLookup = _.keyBy(courses, ({ groupId }) => groupId)
 

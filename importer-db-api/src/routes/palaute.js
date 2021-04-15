@@ -20,8 +20,7 @@ const relevantAttributes = {
   person: ['id', 'studentNumber', 'eduPersonPrincipalName', 'firstNames', 'lastName'],
 }
 
-
-const addCourseUnitsToRealisations = async (courseUnitRealisations) => {
+const addCourseUnitsToRealisations = async courseUnitRealisations => {
   const assessmentItemIds = [].concat(...courseUnitRealisations.map(c => c.assessmentItemIds))
 
   const assessmentItemsWithCrap = await models.AssessmentItem.findAll({
@@ -50,11 +49,17 @@ const addCourseUnitsToRealisations = async (courseUnitRealisations) => {
     const realisation = r.get({ plain: true })
     return {
       ...realisation,
-      courseUnits: [].concat(...realisation.assessmentItemIds.map(aId => assessmentItems.filter(aItem => aItem.id === aId).map(aItem => {
-        const courseUnit = aItem.get({ plain: true }).courseUnit
-        delete courseUnit.completionMethods
-        return courseUnit
-      })))
+      courseUnits: [].concat(
+        ...realisation.assessmentItemIds.map(aId =>
+          assessmentItems
+            .filter(aItem => aItem.id === aId)
+            .map(aItem => {
+              const courseUnit = aItem.get({ plain: true }).courseUnit
+              delete courseUnit.completionMethods
+              return courseUnit
+            })
+        )
+      ),
     }
   })
 
@@ -154,5 +159,41 @@ router.get('/persons', async (req, res) => {
     persons,
   })
 })
+
+const programmeRouter = express.Router()
+
+const findProgramme = async (req, res, next) => {
+  const {
+    params: { programmeCode }, // '500-K005' = CS kandi
+  } = req
+
+  if (!programmeCode) return res.status(500).send('Missing programmeCode')
+
+  const organisation = await models.Organisation.findOne({
+    where: {
+      code: programmeCode,
+    },
+  })
+
+  if (!organisation) return res.status(404).send('No such organization, use different code e.g. 500-K005')
+
+  req.organisation = organisation
+
+  next()
+}
+
+programmeRouter.get('/course_unit_realisations', async (req, res) => {
+  const courseUnitRealisations = await req.organisation.getCourseUnitRealisations()
+
+  res.send(courseUnitRealisations)
+})
+
+programmeRouter.get('/course_units', async (req, res) => {
+  const courseUnits = await req.organisation.getCourseUnits()
+
+  res.send(courseUnits)
+})
+
+router.use('/programme/:programmeCode', findProgramme, programmeRouter)
 
 module.exports = router

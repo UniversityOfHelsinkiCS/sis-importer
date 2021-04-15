@@ -42,7 +42,14 @@ router.get('/programme/:programmeCode', async (req, res) => {
 
   if (!organisation) return res.status(404).send('No such organization, use different code e.g. 500-K005')
 
-  const courses = await organisation.getCourses()
+  const courses = (await organisation.getCourseUnits()).map(unit => ({
+    id: unit.id,
+    code: unit.code,
+    name: unit.name,
+    validityPeriod: unit.validityPeriod,
+    groupId: unit.groupId,
+    credits: unit.credits,
+  }))
 
   const searchString = query.search || ''
 
