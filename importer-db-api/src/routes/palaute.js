@@ -5,9 +5,60 @@ const models = require('../models')
 const relevantAttributes = {
   enrolment: ['id', 'personId', 'assessmentItemId', 'courseUnitRealisationId', 'courseUnitId', 'studySubGroups'],
   courseUnit: ['id', 'groupId', 'code', 'organisations', 'completionMethods', 'responsibilityInfos', 'name'],
-  courseUnitRealisation: ['id', 'name', 'nameSpecifier', 'assessmentItemIds', 'activityPeriod', 'courseUnitRealisationTypeUrn', 'studyGroupSets', 'organisations', 'responsibilityInfos'],
+  courseUnitRealisation: [
+    'id',
+    'name',
+    'nameSpecifier',
+    'assessmentItemIds',
+    'activityPeriod',
+    'courseUnitRealisationTypeUrn',
+    'studyGroupSets',
+    'organisations',
+    'responsibilityInfos',
+  ],
   assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],
-  person: ['id', 'studentNumber', 'eduPersonPrincipalName', 'firstNames', 'lastName']
+  person: ['id', 'studentNumber', 'eduPersonPrincipalName', 'firstNames', 'lastName'],
+}
+
+
+const addRealisationsToCourseUnits = async (courseUnitRealisations) => {
+  const assessmentItemIds = [].concat(...courseUnitRealisations.map(c => c.assessmentItemIds))
+
+  const assessmentItemsWithCrap = await models.AssessmentItem.findAll({
+    attributes: relevantAttributes.assessmentItem,
+    where: {
+      id: {
+        [Op.in]: assessmentItemIds,
+      },
+    },
+    include: [
+      {
+        model: models.CourseUnit,
+        attributes: relevantAttributes.courseUnit,
+        as: 'courseUnit',
+      },
+    ],
+  })
+
+  const assessmentItems = assessmentItemsWithCrap.filter(aItem => {
+    if (aItem.courseUnit.completionMethods.find(method => method.assessmentItemIds.includes(aItem.id))) return true
+
+    return false
+  })
+
+  const realisationsWithCourseUnits = courseUnitRealisations.map(r => {
+    const realisation = r.get({ plain: true })
+    return {
+      ...realisation,
+      courseUnits: [].concat(...realisation.assessmentItemIds.map(aId => assessmentItems.filter(aItem => aItem.id === aId).map(aItem => {
+        const courseUnit = aItem.get({ plain: true }).courseUnit
+        delete courseUnit.completionMethods
+        return courseUnit
+      })))
+    }
+  })
+
+  return realisationsWithCourseUnits
 }
 
 const router = express.Router()
@@ -33,11 +84,6 @@ router.get('/enrolled/:personId', async (req, res) => {
         model: models.CourseUnitRealisation.scope(scopes),
         attributes: relevantAttributes.courseUnitRealisation,
         as: 'courseUnitRealisation',
-      },
-      {
-        model: models.AssessmentItem,
-        attributes: relevantAttributes.assessmentItem,
-        as: 'assessmentItem',
       },
       {
         model: models.CourseUnit,
@@ -81,23 +127,11 @@ router.get('/responsible/:personId', async (req, res) => {
     },
   })
 
-  const assessmentItemIds = [].concat(...courseUnitRealisations.map(c => c.assessmentItemIds))
-
-  const assessmentItems = await models.AssessmentItem.findAll({
-    attributes: relevantAttributes.assessmentItem,
-    where: {
-      id: {
-        [Op.in]: assessmentItemIds,
-      },
-    },
-    include: [{ model: models.CourseUnit, attributes: relevantAttributes.courseUnit, 
-      as: 'courseUnit' }],
-  })
+  const realisationsWithCourseUnits = await addRealisationsToCourseUnits(courseUnitRealisations)
 
   res.send({
-    courseUnitRealisations,
+    courseUnitRealisations: realisationsWithCourseUnits,
     courseUnits,
-    assessmentItems,
   })
 })
 
@@ -113,13 +147,12 @@ router.get('/persons', async (req, res) => {
   const persons = await models.Person.findAll({
     attributes: relevantAttributes.person,
     limit: 100,
-    where
+    where,
   })
 
   res.send({
-    persons
+    persons,
   })
 })
-
 
 module.exports = router
