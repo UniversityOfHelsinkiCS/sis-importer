@@ -5,7 +5,7 @@ const CourseUnit = require('./CourseUnit')
 class Organisation extends Model {
   async getCourses() {
     const units = await sequelize.query(
-      `SELECT * FROM course_units WHERE organisations @> '[{"organizationId": "${this.id}"}]'::jsonb;`,
+      `SELECT * FROM course_units WHERE organisations @> '[{"organisationId": "${this.id}"}]'::jsonb;`,
       {
         model: CourseUnit,
         mapToModel: true,
