@@ -196,7 +196,8 @@ programmeRouter.get('/course_units', async (req, res) => {
 })
 
 programmeRouter.get('/recursively/course_unit_realisations', async (req, res) => {
-  const courseUnitRealisations = await req.organisation.getCourseUnitRealisationsRecursively()
+  const { limit, offset } = req.query
+  const courseUnitRealisations = await req.organisation.getCourseUnitRealisationsRecursively(limit, offset)
 
   const withUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
   res.send(withUnits)

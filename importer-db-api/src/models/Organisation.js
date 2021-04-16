@@ -32,7 +32,7 @@ class Organisation extends Model {
     return realisations
   }
 
-  async getCourseUnitRealisationsRecursively() {
+  async getCourseUnitRealisationsRecursively(limit = 10, offset = 0) {
     // Does not look in parents; only realisations of this organisation and children of this organisation are returned.
     const recursivelyFindAllOrganisationIds = `WITH RECURSIVE childorgs AS (SELECT id, parent_id, code, name FROM organisations WHERE id='${this.id}' UNION SELECT o.id, o.parent_id, o.code, o.name FROM organisations o INNER JOIN childorgs co ON co.id = o.parent_id) SELECT DISTINCT id FROM childorgs`
     
@@ -43,7 +43,7 @@ class Organisation extends Model {
             ${recursivelyFindAllOrganisationIds}
           )
         )
-      );`,
+      ) OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY;;`,
       {
         model: CourseUnitRealisation,
         mapToModel: true,
