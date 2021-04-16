@@ -31,6 +31,27 @@ class Organisation extends Model {
 
     return realisations
   }
+
+  async getCourseUnitRealisationsRecursively() {
+    // Does not look in parents; only realisations of this organisation and children of this organisation are returned.
+    const recursivelyFindAllOrganisationIds = `WITH RECURSIVE childorgs AS (SELECT id, parent_id, code, name FROM organisations WHERE id='${this.id}' UNION SELECT o.id, o.parent_id, o.code, o.name FROM organisations o INNER JOIN childorgs co ON co.id = o.parent_id) SELECT DISTINCT id FROM childorgs`
+    
+    const realisations = await sequelize.query(
+      `SELECT * FROM course_unit_realisations WHERE assessment_item_ids && ARRAY(
+        SELECT id FROM assessment_items WHERE primary_course_unit_group_id IN (
+          SELECT group_id FROM course_units cu, jsonb_array_elements(cu.organisations) orgs WHERE orgs->>'organisationId' IN (
+            ${recursivelyFindAllOrganisationIds}
+          )
+        )
+      );`,
+      {
+        model: CourseUnitRealisation,
+        mapToModel: true,
+      }
+    )
+
+    return realisations
+  }
 }
 
 Organisation.init(

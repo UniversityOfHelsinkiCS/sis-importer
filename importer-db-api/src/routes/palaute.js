@@ -195,6 +195,13 @@ programmeRouter.get('/course_units', async (req, res) => {
   res.send(courseUnits)
 })
 
+programmeRouter.get('/recursively/course_unit_realisations', async (req, res) => {
+  const courseUnitRealisations = await req.organisation.getCourseUnitRealisationsRecursively()
+
+  const withUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
+  res.send(withUnits)
+})
+
 router.use('/programme/:programmeCode', findProgramme, programmeRouter)
 
 module.exports = router
