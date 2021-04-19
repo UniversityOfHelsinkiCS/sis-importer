@@ -71,11 +71,13 @@ const router = express.Router()
 router.get('/enrolled/:personId', async (req, res) => {
   const {
     params: { personId },
-    query: { startDateBefore, endDateAfter },
+    query: { startDateBefore, startDateAfter, endDateBefore, endDateAfter },
   } = req
 
   const scopes = [
     startDateBefore && { method: ['activityPeriodStartDateBefore', new Date(startDateBefore)] },
+    startDateAfter && { method: ['activityPeriodStartDateAfter', new Date(startDateAfter)] },
+    endDateBefore && { method: ['activityPeriodEndDateBefore', new Date(endDateBefore)] },
     endDateAfter && { method: ['activityPeriodEndDateAfter', new Date(endDateAfter)] },
   ].filter(Boolean)
 
