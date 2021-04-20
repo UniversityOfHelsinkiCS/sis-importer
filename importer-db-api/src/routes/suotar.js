@@ -289,6 +289,49 @@ router.post('/resolve_user', async (req, res) => {
   }
 })
 
+router.get('/responsibles/:courseCode', async (req, res) => {
+  const { courseCode: code } = req.params
+  if (!code) return res.status(400).send("Missing course code")
+
+  const courseUnits = await models.CourseUnit.findAll({ where: { code }, attributes: ['groupId'] })
+  const groupIds = _.uniq(courseUnits.map(({ groupId }) => groupId))
+  const assessmentItems = await models.AssessmentItem.findAll({
+    where: {
+      primaryCourseUnitGroupId: { [Op.in]: groupIds }
+    },
+    attributes: ['id']
+  })
+  const courseUnitRealisations = await models.CourseUnitRealisation
+    .scope([
+      { method: ['assessmentItemIdsOverlap', assessmentItems.map(({ id }) => id)] }
+    ])
+    .findAll({ raw: true, attributes: ['responsibilityInfos'] })
+
+  const persons = await models.Person.findAll({
+    where: {
+      id: { [Op.in]: _.uniq(courseUnitRealisations.map(({ responsibilityInfos }) => responsibilityInfos.map(r => r.personId)).flat()) }
+    }
+  })
+  const personsById = persons.reduce((acc, p) => {
+    acc[p.id] = p
+    return acc
+  }, {})
+
+  const personsWithRoles = courseUnitRealisations.reduce((acc, r) => {
+    for (const role of r.responsibilityInfos) {
+      if (!acc[role.personId]) {
+        acc[role.personId] = { person: personsById[role.personId], roles: [role.roleUrn] }
+        continue
+      }
+      acc[role.personId].roles.push(role.roleUrn)
+      acc[role.personId].roles = _.uniq(acc[role.personId].roles)
+    }
+    return acc
+  }, {})
+
+  return res.send(personsWithRoles)
+})
+
 const findGrade = (gradeScales, gradeScaleId, gradeId) => gradeScales
   .find(({ id }) => id === gradeScaleId).grades
   .find(({ localId }) => localId === String(gradeId))
