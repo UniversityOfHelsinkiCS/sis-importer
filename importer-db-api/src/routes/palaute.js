@@ -4,7 +4,7 @@ const models = require('../models')
 
 const relevantAttributes = {
   enrolment: ['id', 'personId', 'assessmentItemId', 'courseUnitRealisationId', 'courseUnitId', 'studySubGroups'],
-  courseUnit: ['id', 'groupId', 'code', 'organisations', 'completionMethods', 'responsibilityInfos', 'name'],
+  courseUnit: ['id', 'groupId', 'code', 'organisations', 'completionMethods', 'responsibilityInfos', 'name', 'validityPeriod'],
   courseUnitRealisation: [
     'id',
     'name',
