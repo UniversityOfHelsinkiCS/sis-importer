@@ -18,6 +18,7 @@ const relevantAttributes = {
   ],
   assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],
   person: ['id', 'studentNumber', 'eduPersonPrincipalName', 'firstNames', 'lastName'],
+  organisation: ['id', 'code', 'name', 'parentId']
 }
 
 const addCourseUnitsToRealisations = async courseUnitRealisations => {
@@ -160,6 +161,14 @@ router.get('/persons', async (req, res) => {
   res.send({
     persons,
   })
+})
+
+router.get('/organisations', async (req, res) => {
+  const organisations = await models.Organisation.findAll({
+    attributes: relevantAttributes.organisation
+  })
+
+  res.send(organisations)
 })
 
 const programmeRouter = express.Router()
