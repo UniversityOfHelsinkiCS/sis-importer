@@ -1,3 +1,4 @@
+const { ARRAY } = require('sequelize')
 const { Model, STRING, DATE, JSONB, BOOLEAN, DOUBLE, INTEGER } = require('sequelize')
 const { connection } = require('../connection')
 
@@ -101,6 +102,9 @@ Attainment.init(
     },
     nodes: {
       type: JSONB
+    },
+    assessmentItemAttainmentIds: {
+      type: ARRAY(STRING)
     },
     createdAt: {
       type: DATE

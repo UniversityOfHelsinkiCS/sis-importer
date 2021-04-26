@@ -35,7 +35,8 @@ const parseAttainment = attainment => {
     type: attainment.type,
     moduleId: attainment.moduleId,
     moduleGroupId: attainment.moduleGroupId,
-    nodes: attainment.nodes
+    nodes: attainment.nodes,
+    assessmentItemAttainmentIds: attainment.assessmentItemAttainmentIds
   }
 }
 

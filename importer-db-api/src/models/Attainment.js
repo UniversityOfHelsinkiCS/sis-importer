@@ -105,6 +105,9 @@ Attainment.init(
     courseUnitRealisationId: {
       type: STRING
     },
+    assessmentItemAttainmentIds: {
+      type: ARRAY(STRING)
+    },
     assessmentItemId: {
       type: STRING
     },

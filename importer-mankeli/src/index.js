@@ -19,7 +19,8 @@ const {
   ILMO_ENROLMENT_CHANNEL,
   GRAPHQL_GRADE_SCALES_CHANNEL,
   URN_DEGREE_TITLE_CHANNEL,
-  URN_EDUCATION_CLASSIFICATION_CHANNEL
+  URN_EDUCATION_CLASSIFICATION_CHANNEL,
+  URN_STUDY_RIGHT_EXPIRATION_RULE_CHANNEL
 } = require('./utils/stan')
 const personHandler = require('./messageHandlers/person')
 const attainmentHandler = require('./messageHandlers/attainment')
@@ -39,6 +40,7 @@ const studyRightPrimalityHandler = require('./messageHandlers/studyRightPrimalit
 const enrolmentHandler = require('./messageHandlers/enrolment')
 const degreeTitleHandler = require('./messageHandlers/degreeTitle')
 const educationClassificationHandler = require('./messageHandlers/educationClassification')
+const studyRightExpirationRuleHandler = require('./messageHandlers/studyRightExpirationRule')
 const { sleep } = require('./utils')
 const { createTransaction } = require('./utils/db')
 const { logger } = require('./utils/logger')
@@ -69,7 +71,8 @@ const channels = {
   [ILMO_ENROLMENT_CHANNEL]: enrolmentHandler,
   [GRAPHQL_GRADE_SCALES_CHANNEL]: gradeScaleHandler,
   [URN_DEGREE_TITLE_CHANNEL]: degreeTitleHandler,
-  [URN_EDUCATION_CLASSIFICATION_CHANNEL]: educationClassificationHandler
+  [URN_EDUCATION_CLASSIFICATION_CHANNEL]: educationClassificationHandler,
+  [URN_STUDY_RIGHT_EXPIRATION_RULE_CHANNEL]: studyRightExpirationRuleHandler
 }
 
 let currentExecutionHash = null
