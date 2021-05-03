@@ -50,6 +50,8 @@ router.post('/', async (req, res) => {
 router.post('/attainments', async (req, res) => {
   try {
     const data = req.body
+    const { noSubstitutions } = req.query
+
     if (!Array.isArray(data))
       return res.status(400).send({ error: 'Input should be an array' })
 
@@ -69,7 +71,7 @@ router.post('/attainments', async (req, res) => {
         output.push({ studentNumber, courseCode, attainments: [] })
         continue
       }
-      const courseUnits = await getCourseUnits(courseCode)
+      const courseUnits = await getCourseUnits(courseCode, !!noSubstitutions)
       const allAttainments = await models.Attainment.findAll({
         where: {
           courseUnitId: {
