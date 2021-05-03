@@ -100,9 +100,12 @@ router.post('/attainments', async (req, res) => {
 /**
  * Get all attainments by course code and student number, including attainments
  * from substitutions for given course.
+ *
+ * Use req param noSubstitutions=true to include attainments for the course code only.
  */
 router.get('/attainments/:courseCode/:studentNumber', async (req, res) => {
   const { courseCode: code, studentNumber } = req.params
+  const { noSubstitutions } = req.query
 
   if (!code || !studentNumber) return res.status(400).send('Missing course code or student number')
 
@@ -116,7 +119,7 @@ router.get('/attainments/:courseCode/:studentNumber', async (req, res) => {
 
   if (!personId) return res.status(400).send(`No person found with student number ${studentNumber}`)
 
-  const allCourseUnits = await getCourseUnits(code)
+  const allCourseUnits = await getCourseUnits(code, !!noSubstitutions)
 
   const allAttainments = await models.Attainment.findAll({
     where: {
@@ -340,13 +343,15 @@ const findGrade = (gradeScales, gradeScaleId, gradeId) => gradeScales
 /**
  * Get course units and substitutions by course code
  */
-const getCourseUnits = async (code) => {
+const getCourseUnits = async (code, noSubstitutions = false) => {
   const courseUnit = await models.CourseUnit.findOne({
     where: { code },
     attributes: ['groupId', 'substitutions'],
     raw: true
   })
   if (!courseUnit) return []
+
+  if (noSubstitutions) return  courseUnit
 
   const groupIds = [courseUnit.groupId].concat(courseUnit.substitutions.map(sub => sub[0].courseUnitGroupId))
   return await models.CourseUnit.findAll({
