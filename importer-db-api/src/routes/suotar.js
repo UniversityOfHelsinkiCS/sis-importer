@@ -344,16 +344,23 @@ const findGrade = (gradeScales, gradeScaleId, gradeId) => gradeScales
  * Get course units and substitutions by course code
  */
 const getCourseUnits = async (code, noSubstitutions = false) => {
-  const courseUnit = await models.CourseUnit.findOne({
+  const courseUnits = await models.CourseUnit.findAll({
     where: { code },
     attributes: ['groupId', 'substitutions'],
     raw: true
   })
-  if (!courseUnit) return []
+  if (!courseUnits.length) return []
 
-  if (noSubstitutions) return  courseUnit
+  if (noSubstitutions) return courseUnits
 
-  const groupIds = [courseUnit.groupId].concat(courseUnit.substitutions.map(sub => sub[0].courseUnitGroupId))
+  const groupIds = [... new Set(courseUnits
+    .map(c => c.groupId)
+    .concat(courseUnits
+      .map(c => c.substitutions
+        .map(sub => sub[0].courseUnitGroupId)
+      )
+    )
+    .flat())]
   return await models.CourseUnit.findAll({
     where: {
       groupId: {
