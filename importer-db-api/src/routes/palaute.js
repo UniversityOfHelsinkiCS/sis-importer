@@ -216,4 +216,63 @@ programmeRouter.get('/recursively/course_unit_realisations', async (req, res) =>
 
 router.use('/programme/:programmeCode', findProgramme, programmeRouter)
 
+const updaterRouter = express.Router()
+
+updaterRouter.get('/persons', async (req, res) => {
+  const { limit, offset } = req.query
+  if (!limit || !offset) return res.sendStatus(400)
+
+  const persons = await models.Person.findAll({
+    attributes: relevantAttributes.person,
+    limit,
+    offset
+  })
+
+  res.send(persons)
+})
+
+updaterRouter.get('/organisations', async (req, res) => {
+  const { limit, offset } = req.query
+  if (!limit || !offset) return res.sendStatus(400)
+
+  const organisations = await models.Organisation.findAll({
+    attributes: relevantAttributes.organisation,
+    limit,
+    offset
+  })
+
+  res.send(organisations)
+})
+
+
+updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res) => {
+  const { limit, offset } = req.query
+  if (!limit || !offset) return res.sendStatus(400)
+
+  const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
+    attributes: relevantAttributes.courseUnitRealisation,
+    limit,
+    offset
+  })
+
+  const courseUnitRealisationsWithCourseUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
+
+  res.send(courseUnitRealisationsWithCourseUnits)
+})
+
+updaterRouter.get('/enrolments', async (req, res) => {
+  const { limit, offset } = req.query
+  if (!limit || !offset) return res.sendStatus(400)
+
+  const enrolments = await models.Enrolment.findAll({
+    attributes: relevantAttributes.enrolment,
+    limit,
+    offset
+  })
+
+  res.send(enrolments)
+})
+
+router.use('/updater', updaterRouter)
+
 module.exports = router
