@@ -62,20 +62,19 @@ router.post('/attainments', async (req, res) => {
       raw: true
     })
     const gradeScales = await models.GradeScale.findAll({ raw: true })
-
+    const allCourseUnits = await getAllCourseUnits(data.map(({ courseCode }) => courseCode), !!noSubstitutions)
 
     const output = []
     for (const { studentNumber, courseCode } of data) {
       const person = persons.find(p => p.studentNumber === studentNumber)
-      if (!person) {
+      if (!person || !allCourseUnits[courseCode]) {
         output.push({ studentNumber, courseCode, attainments: [] })
         continue
       }
-      const courseUnits = await getCourseUnits(courseCode, !!noSubstitutions)
       const allAttainments = await models.Attainment.findAll({
         where: {
           courseUnitId: {
-            [Op.in]: courseUnits.map(({ id }) => id)
+            [Op.in]: allCourseUnits[courseCode].map(({ id }) => id)
           },
           personId: person.id
         },
@@ -371,6 +370,58 @@ const getCourseUnits = async (code, noSubstitutions = false) => {
     },
     raw: true
   }) || []
+}
+
+/**
+ * Get course units and substitutions by course codes.
+ * Output: {courseCode: [courseUnits]}
+ */
+const getAllCourseUnits = async (codes, noSubstitutions = false) => {
+  const courseUnits = await models.CourseUnit.findAll({
+    where: { code: { [Op.in]: codes } },
+    attributes: ['groupId', 'substitutions', 'code'],
+    raw: true
+  })
+  if (!courseUnits.length) return []
+  if (noSubstitutions) return courseUnits.reduce((acc, cUnit) => {
+    acc[cUnit.code] = cUnit
+    return acc
+  }, {})
+
+  // All group ids, including substitutions
+  const groupIds = [... new Set(courseUnits
+    .map(c => c.groupId)
+    .concat(courseUnits
+      .map(c => c.substitutions
+        .map(sub => sub[0].courseUnitGroupId)
+      )
+    )
+    .flat())]
+
+  // All course units
+  const withSubs = await models.CourseUnit.findAll({
+    where: {
+      groupId: {
+        [Op.in]: groupIds
+      },
+    },
+    raw: true
+  }) || []
+
+  // Group ids, including substitutions  by course code
+  const gIdsByCode = withSubs.reduce((acc, cUnit, i, array) => {
+    acc[cUnit.code] = [cUnit.groupId].concat(courseUnits
+      .map(c => c.substitutions
+        .map(sub => sub[0].courseUnitGroupId)
+      ))
+      .flat()
+    return acc
+  }, {})
+
+  return withSubs.reduce((acc, cUnit, i, arr) => {
+    acc[cUnit.code] = arr.filter(c => gIdsByCode[cUnit.code].includes(c.groupId))
+    return acc
+  }, {})
 }
 
 module.exports = router
