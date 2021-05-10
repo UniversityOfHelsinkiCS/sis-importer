@@ -1,6 +1,6 @@
 const express = require('express')
 const logger = require('morgan')
-
+const Sentry = require('@sentry/node')
 require('express-async-errors')
 
 const courseUnitsRouter = require('./routes/courseUnits')
@@ -14,8 +14,14 @@ const gradesRouter = require('./routes/grades')
 const archeologyRouter = require('./routes/archeology')
 const palauteRouter = require('./routes/palaute')
 const { ApplicationError } = require('./errors')
+const initializeSentry = require('./utils/sentry')
 
 const app = express()
+
+initializeSentry(app)
+
+app.use(Sentry.Handlers.requestHandler())
+app.use(Sentry.Handlers.tracingHandler())
 
 app.use(logger('short'))
 app.use(express.json())
@@ -45,6 +51,9 @@ app.use('/suotar', suotarRouter)
 app.use('/grades', gradesRouter)
 app.use('/archeology', archeologyRouter)
 app.use('/palaute', palauteRouter)
+app.get('/sandbox', () => { throw new Error('Importer is melting down! :fine:') })
+
+app.use(Sentry.Handlers.errorHandler())
 
 app.use((error, req, res, next) => {
   console.log(error)
