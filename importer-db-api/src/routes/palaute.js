@@ -4,7 +4,16 @@ const models = require('../models')
 
 const relevantAttributes = {
   enrolment: ['id', 'personId', 'assessmentItemId', 'courseUnitRealisationId', 'courseUnitId', 'studySubGroups'],
-  courseUnit: ['id', 'groupId', 'code', 'organisations', 'completionMethods', 'responsibilityInfos', 'name', 'validityPeriod'],
+  courseUnit: [
+    'id',
+    'groupId',
+    'code',
+    'organisations',
+    'completionMethods',
+    'responsibilityInfos',
+    'name',
+    'validityPeriod',
+  ],
   courseUnitRealisation: [
     'id',
     'name',
@@ -18,7 +27,7 @@ const relevantAttributes = {
   ],
   assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],
   person: ['id', 'studentNumber', 'employeeNumber', 'eduPersonPrincipalName', 'firstNames', 'lastName'],
-  organisation: ['id', 'code', 'name', 'parentId']
+  organisation: ['id', 'code', 'name', 'parentId'],
 }
 
 const addCourseUnitsToRealisations = async courseUnitRealisations => {
@@ -165,7 +174,7 @@ router.get('/persons', async (req, res) => {
 
 router.get('/organisations', async (req, res) => {
   const organisations = await models.Organisation.findAll({
-    attributes: relevantAttributes.organisation
+    attributes: relevantAttributes.organisation,
   })
 
   res.send(organisations)
@@ -225,7 +234,8 @@ updaterRouter.get('/persons', async (req, res) => {
   const persons = await models.Person.findAll({
     attributes: relevantAttributes.person,
     limit,
-    offset
+    offset,
+    order: [['id', 'DESC']],
   })
 
   res.send(persons)
@@ -238,12 +248,12 @@ updaterRouter.get('/organisations', async (req, res) => {
   const organisations = await models.Organisation.findAll({
     attributes: relevantAttributes.organisation,
     limit,
-    offset
+    offset,
+    order: [['id', 'DESC']],
   })
 
   res.send(organisations)
 })
-
 
 updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res) => {
   const { limit, offset } = req.query
@@ -252,7 +262,8 @@ updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     attributes: relevantAttributes.courseUnitRealisation,
     limit,
-    offset
+    offset,
+    order: [['id', 'DESC']],
   })
 
   const courseUnitRealisationsWithCourseUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
@@ -267,7 +278,8 @@ updaterRouter.get('/enrolments', async (req, res) => {
   const enrolments = await models.Enrolment.findAll({
     attributes: relevantAttributes.enrolment,
     limit,
-    offset
+    offset,
+    order: [['id', 'DESC']],
   })
 
   res.send(enrolments)
