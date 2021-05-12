@@ -28,6 +28,9 @@ const parseStudyRight = studyRight => {
     phase2EducationClassificationUrn: studyRight.phase2EducationClassificationUrn,
     phase1EducationClassificationLocked: studyRight.phase1EducationClassificationLocked,
     phase2EducationClassificationLocked: studyRight.phase2EducationClassificationLocked,
+    studyRightExpirationRulesUrn: Array.isArray(studyRight.studyRightExpirationRulesUrn)
+      ? studyRight.studyRightExpirationRulesUrn
+      : [studyRight.studyRightExpirationRulesUrn],
     modificationOrdinal: studyRight.metadata.modificationOrdinal
   }
 }
