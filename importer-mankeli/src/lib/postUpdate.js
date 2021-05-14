@@ -13,7 +13,14 @@ const sendToStan = (channel, message) =>
 
 const removeOpenUniversityStudyRights = async () => {
   return connection.sequelize.query(
-    `DELETE FROM studyrights WHERE studyrights.education_id IN (SELECT id FROM educations WHERE educations.education_type = 'urn:code:education-type:non-degree-education:open-university-studies');`
+    `
+    DELETE FROM studyrights
+    WHERE studyrights.education_id IN (
+      SELECT educations.id FROM educations
+      LEFT JOIN education_types ON education_types.id = educations.education_type
+      WHERE education_types.parent_id = 'urn:code:education-type:non-degree-education'
+    );
+    `
   )
 }
 
