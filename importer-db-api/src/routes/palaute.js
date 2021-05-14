@@ -50,6 +50,7 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
   })
 
   const assessmentItems = assessmentItemsWithCrap.filter(aItem => {
+    if (!aItem.courseUnit) return false
     if (aItem.courseUnit.completionMethods.find(method => method.assessmentItemIds.includes(aItem.id))) return true
 
     return false
