@@ -248,6 +248,12 @@ updaterRouter.get('/organisations', async (req, res) => {
 
   const organisations = await models.Organisation.findAll({
     attributes: relevantAttributes.organisation,
+    where: {
+      [Op.and]: [
+          // Only latest snapshot
+          models.Organisation.sequelize.literal('(id, snapshot_date_time) in (select id, max(snapshot_date_time) from organisations group by id)')
+      ]
+    },
     limit,
     offset,
     order: [['id', 'DESC']],
