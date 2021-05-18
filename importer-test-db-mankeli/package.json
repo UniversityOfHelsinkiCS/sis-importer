@@ -1,0 +1,21 @@
+{
+  "name": "importer-test-db-mankeli",
+  "version": "1.0.0",
+  "description": "Package to mangel better test-db from impoter-db-test-db",
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "test": "npm run lint",
+    "lint": "eslint .",
+    "lintfix": "prettier --write **/*.{js,json} && eslint --fix ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^7.26.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "prettier": "^2.3.0",
+    "prettier-eslint": "^12.0.0"
+  }
+}
