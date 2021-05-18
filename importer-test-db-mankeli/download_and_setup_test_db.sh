@@ -24,6 +24,12 @@ get_username() {
   username=$(head -n 1 < $USER_DATA_FILE_PATH)
 }
 
+retry () {
+    for i in {1..60}; do
+        "$@" && break || echo "Retry attempt $i failed, waiting..." && sleep 10;
+    done
+}
+
 drop_psql () {
     echo "Dropping psql in container $1 with db name $2"
     retry docker exec -u postgres "$1" pg_isready --dbname="$2"
@@ -51,14 +57,18 @@ run_importer_test_db_setup() {
     echo "Using your Uni Helsinki username: $username"
 
     # Copy db to current folder
-    # remotepath="/home/importer_user/staging/backup/importer-db-staging.sqz"
-    # scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
-    # "$username@importer:$remotepath" .
+    server_dump_filename="importer-test-db.sqz"
+    remotepath="/home/importer_user/staging/backup/importer-db-staging.sqz"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
+    "$username@importer:$remotepath" "$server_dump_filename"
 
     # Setup db inside docker
-    docker-compose up -d sis-importer-test-db
-    ping_psql "sis-importer-test-db" "importer-db"
-    restore_psql_from_backup "importer-db-staging.sqz" sis-importer-test-db importer-db
+    container_name="importer-test-db"
+    database_name="importer-db"
+
+    docker-compose up -d "$container_name"
+    ping_psql "$container_name" "$database_name"
+    restore_psql_from_backup "$server_dump_filename" "$container_name" "$database_name"
     docker-compose down
 }
 
