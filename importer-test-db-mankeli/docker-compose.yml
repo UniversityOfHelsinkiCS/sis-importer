@@ -1,0 +1,13 @@
+version: "3.2"
+
+services:
+  importer-test-db:
+    image: postgres:13
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - sis-importer-test-pgdata:/var/lib/postgresql/data
+    container_name: sis-importer-test-db
+
+volumes:
+  sis-importer-test-pgdata:
