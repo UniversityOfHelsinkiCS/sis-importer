@@ -6,7 +6,7 @@ services:
       args:
         NODE_ENV: "development"
       context: .
-    command: "npm run start"
+    command: "npm run start:dev"
     depends_on:
       - importer-test-db
     environment:
@@ -14,6 +14,9 @@ services:
       DB_PORT: 5432
       DB_HOST: importer-test-db
       DB_DATABASE: importer-db
+    volumes:
+      - mankeli_modules:/usr/src/app/node_modules
+      - .:/usr/src/app
 
   importer-test-db:
     image: postgres:13
@@ -25,3 +28,4 @@ services:
 
 volumes:
   importer-test-pgdata:
+  mankeli_modules:
