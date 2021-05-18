@@ -1,6 +1,20 @@
 version: "3.2"
 
 services:
+  importer-test-db-mankeli:
+    build:
+      args:
+        NODE_ENV: "development"
+      context: .
+    command: "npm run start"
+    depends_on:
+      - importer-test-db
+    environment:
+      DB_USERNAME: postgres
+      DB_PORT: 5432
+      DB_HOST: importer-test-db
+      DB_DATABASE: importer-db
+
   importer-test-db:
     image: postgres:13
     environment:
