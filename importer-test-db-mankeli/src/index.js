@@ -9,7 +9,7 @@ knexConnection.on('connect', async () => {
   console.log('Knex database connection established successfully')
 })
 
-const getStudentsWithRecentStudyrights = async () => {
+const getPersonIdsOfStudentsWithRecentStudyRights = async () => {
   const { knex } = knexConnection
   const getNewerThanDate = '2017-01-01'
   const nonDegreeEducations = knex
@@ -18,36 +18,48 @@ const getStudentsWithRecentStudyrights = async () => {
     .leftJoin('education_types', 'education_types.id', 'educations.education_type')
     .where('parent_id', 'urn:code:education-type:non-degree-education')
 
-  return knex
-    .select('*')
+  return (await knex
+    .select('persons.id')
     .from('persons')
     .leftJoin('studyrights', 'studyrights.person_id', 'persons.id')
     .where('grant_date', '>', getNewerThanDate)
     .whereNotIn('education_id', nonDegreeEducations)
-    .distinctOn('student_number')
+    .distinctOn('student_number')).map(person => person.id)
+}
+
+const removeStudentsFromPersonsTable = async (students) => {
+  const { knex } = knexConnection
+  // replace select with del later
+  const deleted = await knex('persons').whereNotIn('id', students)
+  console.log(deleted.length)
+
 }
 
 const getRandomSampleOfSizeN = (students, n) => {
   return [...students].sort(() => 0.5 - Math.random()).slice(0, n)
 }
 
-const getStudyRightsAndRelatedTables = async students => {
+const removeStudyRightsAndOthersFromTables = async students => {
   const { knex } = knexConnection
-  const personIds = students.map(s => s.person_id)
-  const studyRights = await knex.select('*').from('studyrights').whereIn('person_id', personIds)
-  const studyRightIds = studyRights.map(sr => sr.id)
-
-  // should return studyrights, primalities, term_registrations
-  return [0, 0, 0]
+  // replace these selects with del later
+  const deletedStudyrights = await knex.select('*').from('studyrights').whereIn('person_id', students)
+  console.log(deletedStudyrights.length)
+  const deletedStudyRightPrimalities = await knex.select('*').from('study_right_primalities').whereIn('student_id', students)
+  console.log(deletedStudyRightPrimalities.length)
+  const deletedTermRegistrations = await knex.select('*').from('term_registrations').whereIn('student_id', students)
+  console.log(deletedStudyRightPrimalities.length)
 }
 
 const run = async () => {
   await knexConnection.connect()
+  const { knex } = knexConnection
 
-  const students = getRandomSampleOfSizeN(await getStudentsWithRecentStudyrights(), 1000)
+  const selected = getRandomSampleOfSizeN(await getPersonIdsOfStudentsWithRecentStudyRights(), 1000)
 
-  // Studyrights
-  const [studyrights, study_right_primalities, term_registrations] = await getStudyRightsAndRelatedTables(students)
+  await removeStudentsFromPersonsTable(selected)
+  await removeStudyRightsAndOthersFromTables(selected)
+
+  // TODO: remove attainments & everything related
 }
 
 run()
