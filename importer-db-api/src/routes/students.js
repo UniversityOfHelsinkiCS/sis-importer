@@ -304,6 +304,7 @@ router.get('/:studentNumber/course-unit/:courseCode/enrolments', async (req, res
   const enrollments = await models.Enrolment.findAll({
     where: {
       personId: req.student.id,
+      state: 'ENROLLED',
       courseUnitId: {
         [Op.in]: courseUnits.map(({ id }) => id)
       }
