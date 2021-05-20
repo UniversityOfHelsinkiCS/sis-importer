@@ -26,7 +26,7 @@ const isExchangeEducationType = (educationTypeUrn) => {
 }
 
 const filterOutExchangeStudentStudyRights = (studyrights) => {
-  return studyrights.filter(({education}) =>
+  return studyrights.filter(({ education }) =>
     !education || !isExchangeEducationType(education.educationType)
   )
 }
@@ -49,18 +49,18 @@ router.use('/:studentNumber', async (req, res, next) => {
  */
 router.post('/', async (req, res) => {
   try {
-      const studentNumbers = req.body
-      if (!Array.isArray(studentNumbers))
-          return res.status(400).send({error: 'Input should be an array'})
-      const persons = await models.Person.findAll({
-          where: {
-              studentNumber: { [Op.in]: studentNumbers }
-          }
-      })
-      return res.send(persons)
+    const studentNumbers = req.body
+    if (!Array.isArray(studentNumbers))
+      return res.status(400).send({ error: 'Input should be an array' })
+    const persons = await models.Person.findAll({
+      where: {
+        studentNumber: { [Op.in]: studentNumbers }
+      }
+    })
+    return res.send(persons)
   } catch (e) {
-      console.log(e)
-      res.status(500).json(e.toString())
+    console.log(e)
+    res.status(500).json(e.toString())
   }
 })
 
@@ -74,16 +74,16 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
       attributes: [
         sequelize.literal('DISTINCT ON (studyright.id) *'),
       ].concat(Object.keys(models.StudyRight.rawAttributes)),
-      order: [["id", "DESC"],['modificationOrdinal','DESC']],
+      order: [["id", "DESC"], ['modificationOrdinal', 'DESC']],
       include: [Organisation, Education],
     })
 
     if (!studyRights.length) return res.json([])
-    
-    
+
+
     const filteredStudyRights = filterOutExchangeStudentStudyRights(studyRights)
     let result = []
-    for(const {valid,education,organisation} of filteredStudyRights){
+    for (const { valid, education, organisation } of filteredStudyRights) {
 
       // Most old studyrights dont have educations
       const module = education ? await models.Module.findOne({
@@ -91,7 +91,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
           groupId: education.groupId.replace('EDU', 'DP'), // nice nice
         },
       }) : {
-        code : undefined
+        code: undefined
       }
 
       const elements = [{
@@ -104,11 +104,11 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
         "faculty_code": organisation.code,
         elements
       })
-  
+
     }
 
     // might be possible to sort earlier by studyright
-    const sortedResults = result.sort((a,b) => new Date(a.elements[0].start_date)- new Date(b.elements[0].start_date))
+    const sortedResults = result.sort((a, b) => new Date(a.elements[0].start_date) - new Date(b.elements[0].start_date))
     res.json(Object.values(sortedResults))
 
   } catch (e) {
@@ -154,7 +154,7 @@ router.get('/:studentNumber/semester_enrollments', async (req, res) => {
       where: {
         studentId: req.student.id,
       },
-    })).map(termReg => termReg.termRegistrations).reduce((pre,cur) => pre.concat(cur),[])
+    })).map(termReg => termReg.termRegistrations).reduce((pre, cur) => pre.concat(cur), [])
 
     const mankeled = termRegistrations.map(({ studyTerm, statutoryAbsence, termRegistrationType }) => {
       const semester_code =
@@ -163,7 +163,7 @@ router.get('/:studentNumber/semester_enrollments', async (req, res) => {
           : getSpringSemesterCode(studyTerm.studyYearStartYear)
 
       let semester_enrollment_type_code = 1 // present
-      if (statutoryAbsence || termRegistrationType === "MISSING" || termRegistrationType === "NONATTENDING"){
+      if (statutoryAbsence || termRegistrationType === "MISSING" || termRegistrationType === "NONATTENDING") {
         semester_enrollment_type_code = 2 // absent
       }
 
@@ -226,7 +226,7 @@ router.get('/:studentNumber/fuksi_year_credits/:startYear', async (req, res) => 
     // })
 
     const semesterStart = new Date(`${startYear}-08-01`)
-    const semesterEnd = new Date(`${parseInt(startYear)+1}-08-01`)
+    const semesterEnd = new Date(`${parseInt(startYear) + 1}-08-01`)
 
     const fuksiYearAttainments = await models.Attainment.findAll({
       where: {
@@ -270,21 +270,21 @@ router.get('/:studentNumber/enrolled/study_track/:studyTrackId', async (req, res
       include: [{ model: CourseUnitRealisation, as: 'courseUnitRealisation' }]
     })
 
-    for(const {courseUnitRealisation} of enrolledCourses){
+    for (const { courseUnitRealisation } of enrolledCourses) {
       const organisationIds = courseUnitRealisation.organisations.map(e => e.organisationId)
-      
+
       const responsibleOrganisations = await models.Organisation.findAll({
         where: {
-          id :{
-            [Op.in] : organisationIds
+          id: {
+            [Op.in]: organisationIds
           }
         }
       })
 
-      const organisationIsValid = responsibleOrganisations.map(({code}) => code).includes(studyTrackId)
+      const organisationIsValid = responsibleOrganisations.map(({ code }) => code).includes(studyTrackId)
       const registrationIsActive = new Date(courseUnitRealisation.activityPeriod.endDate).getTime() > new Date().getTime()
 
-      if(organisationIsValid && registrationIsActive) return res.send(true)
+      if (organisationIsValid && registrationIsActive) return res.send(true)
     }
 
     return res.send(false)
@@ -292,6 +292,25 @@ router.get('/:studentNumber/enrolled/study_track/:studyTrackId', async (req, res
     console.log(e)
     res.status(500).send(e)
   }
+})
+
+router.get('/:studentNumber/course-unit/:courseCode/enrolments', async (req, res) => {
+  const { courseCode: code } = req.params
+  const courseUnits = await models.CourseUnit.findAll({
+    where: { code },
+    attributes: ['id'],
+    raw: true
+  })
+  const enrollments = await models.Enrolment.findAll({
+    where: {
+      personId: req.student.id,
+      courseUnitId: {
+        [Op.in]: courseUnits.map(({ id }) => id)
+      }
+    },
+    raw: true
+  })
+  return res.send(!!enrollments.length)
 })
 
 module.exports = router
