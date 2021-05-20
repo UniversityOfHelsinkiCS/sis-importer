@@ -32,7 +32,22 @@ const removeStudentsFromPersonsTable = async (students) => {
   // replace select with del later
   const deleted = await knex('persons').whereNotIn('id', students)
   console.log(deleted.length)
+}
 
+const removeAttainments = async (students) => {
+  const { knex } = knexConnection
+  //const deleted = await knex.select('attainments.id').from('attainments').whereNotIn('person_id', students)
+  const relevantAttainmentsAndCourseUnits = await knex.select('id', 'course_unit_id').from('attainments').whereIn('person_id', students).whereNotNull('course_unit_id')
+  const courseUnitGroupIds = await knex.select('group_id').from('course_units').whereIn('id', relevantAttainmentsAndCourseUnits.map(({course_unit_id}) => course_unit_id))
+  const relevantAssessmentItems = await knex.select('id').from('assessment_items').whereIn('primary_course_unit_group_id', courseUnitGroupIds.map(({group_id}) => group_id))
+  const relevantCourseUnitRealisations = await knex.select('id').from('course_unit_realisations').where('assessment_item_ids', '&&', relevantAssessmentItems.map(({id}) => id))
+  console.log(relevantAttainmentsAndCourseUnits.length, relevantAssessmentItems.length, relevantCourseUnitRealisations.length)
+}
+
+const removeEnrollments = async (students) => {
+  const { knex } = knexConnection
+  const relevantEnrollments = await knex.select('id').from('enrollments').whereIn('person_id', students)
+  console.log(relevantEnrollments.length)
 }
 
 const getRandomSampleOfSizeN = (students, n) => {
@@ -47,7 +62,8 @@ const removeStudyRightsAndOthersFromTables = async students => {
   const deletedStudyRightPrimalities = await knex.select('*').from('study_right_primalities').whereIn('student_id', students)
   console.log(deletedStudyRightPrimalities.length)
   const deletedTermRegistrations = await knex.select('*').from('term_registrations').whereIn('student_id', students)
-  console.log(deletedStudyRightPrimalities.length)
+  console.log(deletedTermRegistrations.length)
+
 }
 
 const run = async () => {
@@ -56,10 +72,12 @@ const run = async () => {
 
   const selected = getRandomSampleOfSizeN(await getPersonIdsOfStudentsWithRecentStudyRights(), 1000)
 
-  await removeStudentsFromPersonsTable(selected)
-  await removeStudyRightsAndOthersFromTables(selected)
+  await removeAttainments(selected)
+  // await removeStudentsFromPersonsTable(selected)
+  // await removeStudyRightsAndOthersFromTables(selected)
 
-  // TODO: remove attainments & everything related
+  // TODO: remove modules
+  // TODO: remove other non related tables
 }
 
 run()
