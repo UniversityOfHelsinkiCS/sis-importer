@@ -26,7 +26,12 @@ router.get('/', async (req, res) => {
   const assessmentItems = await models.AssessmentItem.findAll({
     where: {
       primary_course_unit_group_id: groupId,
-      assessment_item_type: 'urn:code:assessment-item-type:teaching-participation'
+      assessment_item_type: {
+        [Op.in] : [
+          'urn:code:assessment-item-type:exam',
+          'urn:code:assessment-item-type:teaching-participation'
+        ]
+      }
     },
     attributes: ['id'],
     raw: true

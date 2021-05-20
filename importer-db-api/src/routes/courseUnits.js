@@ -10,13 +10,13 @@ router.get('/', async (req, res) => {
 
   // We don't want to return every single course unit if codes query parameter is not defined
   if (!codesString) {
-    return []
+    return res.send([])
   }
 
   const codes = codesString.split(',').filter(Boolean)
 
   if (codes.length === 0) {
-    return []
+    return res.send([])
   }
 
   const courseUnits = await models.CourseUnit.findAll({
