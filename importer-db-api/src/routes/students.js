@@ -310,7 +310,7 @@ router.get('/:studentNumber/course-unit/:courseCode/enrolments', async (req, res
     },
     raw: true
   })
-  return res.send(!!enrollments.length)
+  return res.send(enrollments)
 })
 
 module.exports = router
