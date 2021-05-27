@@ -77,6 +77,24 @@ const channels = {
 
 let currentExecutionHash = null
 
+const splitEntitiesToActiveAndDeleted = (entities, channel) => {
+  const active = []
+  const deleted = []
+
+  entities.forEach(entity => {
+    if (entity.documentState === 'ACTIVE') return active.push(entity)
+    if (entity.documentState === 'DELETED') return deleted.push(entity)
+    // documentState must be DRAFT
+
+    if (channel === KORI_EDUCATION_CHANNEL) return active.push(entity)
+    return deleted.push(entity)
+  })
+  return {
+    active,
+    deleted
+  }
+}
+
 const handleMessage = (channel, msgHandler) => async msg => {
   let response = null
   const transaction = await createTransaction()
@@ -89,11 +107,9 @@ const handleMessage = (channel, msgHandler) => async msg => {
       return
     }
 
-    data.active = []
-    data.deleted = []
-    data.entities.forEach(e => {
-      data[e.documentState === 'ACTIVE' ? 'active' : 'deleted'].push(e)
-    })
+    const { active, deleted } = splitEntitiesToActiveAndDeleted(data.entities, channel)
+    data.active = active
+    data.deleted = deleted
 
     response = {
       ...(await msgHandler(data, transaction)),
