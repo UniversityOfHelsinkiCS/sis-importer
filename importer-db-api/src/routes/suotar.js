@@ -384,7 +384,7 @@ const getAllCourseUnits = async (codes, noSubstitutions = false) => {
   })
   if (!courseUnits.length) return []
   if (noSubstitutions) return courseUnits.reduce((acc, cUnit) => {
-    acc[cUnit.code] = cUnit
+    acc[cUnit.code] = courseUnits.filter(c => c.code === cUnit.code)
     return acc
   }, {})
 
