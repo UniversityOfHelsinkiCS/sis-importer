@@ -336,6 +336,22 @@ router.get('/responsibles/:courseCode', async (req, res) => {
   return res.send(personsWithRoles)
 })
 
+router.post('/substitutions', async (req, res) => {
+  try {
+    const codes = req.body
+    if (!Array.isArray(codes))
+      return res.status(400).send({ error: 'Input should be an array' })
+    const courseUnits = await getAllCourseUnits(codes)
+    return res.send(codes.reduce((acc, code) => {
+      acc[code] = [...new Set(courseUnits[code].map(c => c.code))]
+      return acc
+    }, {}))
+  } catch (e) {
+    console.log(e)
+    res.status(500).json(e.toString())
+  }
+})
+
 const findGrade = (gradeScales, gradeScaleId, gradeId) => gradeScales
   .find(({ id }) => id === gradeScaleId).grades
   .find(({ localId }) => localId === String(gradeId))
