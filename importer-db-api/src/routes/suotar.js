@@ -76,7 +76,8 @@ router.post('/attainments', async (req, res) => {
           courseUnitId: {
             [Op.in]: allCourseUnits[courseCode].map(({ id }) => id)
           },
-          personId: person.id
+          personId: person.id,
+          misregistration: false
         },
         raw: true
       })
@@ -127,6 +128,7 @@ router.get('/attainments/:courseCode/:studentNumber', async (req, res) => {
       courseUnitId: {
         [Op.in]: allCourseUnits.map(({ id }) => id)
       },
+      misregistration: false,
       personId
     },
     raw: true
@@ -156,7 +158,8 @@ router.post('/verify', async (req, res) => {
 
     const attainments = await models.Attainment.findAll({
       where: {
-        personId: { [Op.in]: data.map(({ personId }) => personId) }
+        personId: { [Op.in]: data.map(({ personId }) => personId) },
+        misregistration: false
       }
     })
 
@@ -199,6 +202,7 @@ router.post('/enrolments', async (req, res) => {
       const enrolments = await models.Enrolment.findAll({
         where: {
           courseUnitId: { [Op.in]: courseUnits.map(({ id }) => id) },
+          state: 'ENROLLED',
           personId
         },
         raw: true
