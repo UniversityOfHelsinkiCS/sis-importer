@@ -1,7 +1,12 @@
 const { knexConnection } = require('./db/connection')
+const { bscStudents, mscStudents, otherStudents } = require('./studentNumbersForTestDump')
 
 // Danger zone
 const DESTROY = false
+// How many students to fetch to dump
+// 1/3 of student will be taken from new msc, 1/3 from new bsc and rest from the doctor
+// + old programmes
+const DUMP_SIZE = 1200
 
 knexConnection.on('error', e => {
   console.log('Knex database connection failed', e)
@@ -14,7 +19,7 @@ knexConnection.on('connect', async () => {
 
 const getPersonIdsOfStudentsWithRecentStudyRights = async () => {
   const { knex } = knexConnection
-  const getNewerThanDate = '2017-01-01'
+  const getNewerThanDate = '2014-01-01'
   const nonDegreeEducations = knex
     .select('educations.id')
     .from('educations')
@@ -44,13 +49,10 @@ const removeAttainments = async (students) => {
   ])
 }
 
-const getRandomSampleOfSizeN = (students, n) => {
-  return [...students].sort(() => 0.5 - Math.random()).slice(0, n)
-}
-
 const removeStudyRightsAndOthersFromTables = async students => {
   const { knex } = knexConnection
   const relevantStudyRights = await knex.select('*').from('studyrights').whereIn('person_id', students)
+  console.log("rel sr len", relevantStudyRights.length)
   const relevantModules = await knex.select('id').from('modules')
     .whereIn(
       'id',
@@ -80,14 +82,27 @@ const run = async () => {
   await knexConnection.connect()
   const { knex } = knexConnection
 
-  const selected = getRandomSampleOfSizeN(await getPersonIdsOfStudentsWithRecentStudyRights(), 100)
+  // if (personIdsOfStudentsWithRecentStudyRights.length <= DUMP_SIZE) {
+  //   console.log(`Found ${DUMP_SIZE} or less students from original db. Deletion was probably already performed?`)
+  //   return
+  // }
+  //
+  // Take first two hundred students from each category
+  const selected = [
+    ...bscStudents.slice(0, DUMP_SIZE / 3),
+    ...mscStudents.slice(0, DUMP_SIZE / 3),
+    ...otherStudents.slice(0, DUMP_SIZE / 3)
+  ]
+  console.log("selected", selected)
 
   removeStuff('persons', 'id', selected, knex)
   removeStudyRightsAndOthersFromTables(selected)
   removeStuff('enrolments', 'person_id', selected, knex)
   removeAttainments(selected)
 
-  console.log("Data deleted successfully")
+  if (DESTROY) 
+    console.log("Data deleted successfully")
+
 }
 
 run()
