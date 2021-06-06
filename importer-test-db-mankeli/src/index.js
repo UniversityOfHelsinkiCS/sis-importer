@@ -87,8 +87,6 @@ const run = async () => {
   removeStuff('enrolments', 'person_id', selected, knex)
   removeAttainments(selected)
 
-  // TODO: remove other non related tables
-
   console.log("Data deleted successfully")
 }
 
