@@ -6,7 +6,7 @@ const DESTROY = false
 // How many students to fetch to dump
 // 1/3 of student will be taken from new msc, 1/3 from new bsc and rest from the doctor
 // + old programmes
-const DUMP_SIZE = 1200
+const DUMP_SIZE = 900
 
 knexConnection.on('error', e => {
   console.log('Knex database connection failed', e)
@@ -17,22 +17,13 @@ knexConnection.on('connect', async () => {
   console.log('Knex database connection established successfully')
 })
 
-const getPersonIdsOfStudentsWithRecentStudyRights = async () => {
+const getPersonIdsForStudentNumbers = async studentNumbers => {
   const { knex } = knexConnection
-  const getNewerThanDate = '2014-01-01'
-  const nonDegreeEducations = knex
-    .select('educations.id')
-    .from('educations')
-    .leftJoin('education_types', 'education_types.id', 'educations.education_type')
-    .where('parent_id', 'urn:code:education-type:non-degree-education')
 
   return (await knex
-    .select('persons.id')
+    .select('id')
     .from('persons')
-    .leftJoin('studyrights', 'studyrights.person_id', 'persons.id')
-    .where('grant_date', '>', getNewerThanDate)
-    .whereNotIn('education_id', nonDegreeEducations)
-    .distinctOn('student_number')).map(person => person.id)
+    .whereIn('student_number', studentNumbers)).map(person => person.id)
 }
 
 const removeAttainments = async (students) => {
@@ -52,7 +43,6 @@ const removeAttainments = async (students) => {
 const removeStudyRightsAndOthersFromTables = async students => {
   const { knex } = knexConnection
   const relevantStudyRights = await knex.select('*').from('studyrights').whereIn('person_id', students)
-  console.log("rel sr len", relevantStudyRights.length)
   const relevantModules = await knex.select('id').from('modules')
     .whereIn(
       'id',
@@ -82,18 +72,20 @@ const run = async () => {
   await knexConnection.connect()
   const { knex } = knexConnection
 
-  // if (personIdsOfStudentsWithRecentStudyRights.length <= DUMP_SIZE) {
-  //   console.log(`Found ${DUMP_SIZE} or less students from original db. Deletion was probably already performed?`)
-  //   return
-  // }
-  //
+  const persons = await knex.table('persons')
+  if (persons.length <= DUMP_SIZE) {
+    console.log(`Found ${DUMP_SIZE} or less students from original db. Deletion was probably already performed?`)
+    return
+  }
+
   // Take first two hundred students from each category
-  const selected = [
+  const studentNumbersFromSamples = [
     ...bscStudents.slice(0, DUMP_SIZE / 3),
     ...mscStudents.slice(0, DUMP_SIZE / 3),
     ...otherStudents.slice(0, DUMP_SIZE / 3)
   ]
-  console.log("selected", selected)
+
+  const selected = await getPersonIdsForStudentNumbers(studentNumbersFromSamples)
 
   removeStuff('persons', 'id', selected, knex)
   removeStudyRightsAndOthersFromTables(selected)
