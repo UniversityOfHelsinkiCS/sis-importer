@@ -168,14 +168,14 @@ router.post('/verify', async (req, res) => {
         attainment.personId === entry.personId &&
         attainment.type === 'CourseUnitAttainment',
         attainment.courseUnitId === entry.courseUnitId &&
-        attainment.assessmentItemAttainmentIds.includes(entry.id)
+        Array.isArray(attainment.assessmentItemAttainmentIds) && attainment.assessmentItemAttainmentIds.includes(entry.id)
       ))
 
       if (courseUnitAttainment)
         return { ...entry, registered: courseUnitAttainment.type }
 
       const assessmentItemAttainment = attainments.find(attainment => attainment.id === entry.id)
-        return { ...entry, registered: assessmentItemAttainment ? assessmentItemAttainment.type : false }
+      return { ...entry, registered: assessmentItemAttainment ? assessmentItemAttainment.type : false }
 
     })
     return res.send(output)
