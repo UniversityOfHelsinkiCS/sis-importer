@@ -145,8 +145,8 @@ router.get('/attainments/:courseCode/:studentNumber', async (req, res) => {
 })
 
 /**
- * Post array of {personId, courseUnitId, courseUnitRealisationId, assessmentItemId, gradeId} attainments. This endpoint
- * will return the data with additional field called registered with true/false is the attainment found from Sisu.
+ * Post array of {personId, assessmentItemAttainmentId (hy-kur-*), courseUnitId, gradeId} attainments. This endpoint
+ * will return the data with additional field called registered with attainment type or false.
  *
  * Performance of this is still WIP...
  */
@@ -164,14 +164,19 @@ router.post('/verify', async (req, res) => {
     })
 
     const output = data.map(entry => {
-      const filtered = attainments.find(attainment => (
+      const courseUnitAttainment = attainments.find(attainment => (
         attainment.personId === entry.personId &&
+        attainment.type === 'CourseUnitAttainment',
         attainment.courseUnitId === entry.courseUnitId &&
-        attainment.courseUnitRealisationId === entry.courseUnitRealisationId &&
-        attainment.gradeId === parseInt(entry.gradeId) &&
-        attainment.assessmentItemId === entry.assessmentItemId
+        attainment.assessmentItemAttainmentIds.includes(entry.id)
       ))
-      return { ...entry, registered: filtered ?  filtered.type : false}
+
+      if (courseUnitAttainment)
+        return { ...entry, registered: courseUnitAttainment.type }
+
+      const assessmentItemAttainment = attainments.find(attainment => attainment.id === entry.id)
+        return { ...entry, registered: assessmentItemAttainment ? assessmentItemAttainment.type : false }
+
     })
     return res.send(output)
   } catch (e) {
