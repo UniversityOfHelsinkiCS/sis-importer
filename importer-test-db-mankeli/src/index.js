@@ -2,11 +2,11 @@ const { knexConnection } = require('./db/connection')
 const { bscStudents, mscStudents, otherStudents } = require('./studentNumbersForTestDump')
 
 // Danger zone
-const DESTROY = false
+const DESTROY = true
 // How many students to fetch to dump
 // 1/3 of student will be taken from new msc, 1/3 from new bsc and rest from the doctor
 // + old programmes
-const DUMP_SIZE = 900
+const DUMP_SIZE = 1200
 
 knexConnection.on('error', e => {
   console.log('Knex database connection failed', e)
@@ -28,16 +28,17 @@ const getPersonIdsForStudentNumbers = async studentNumbers => {
 
 const removeAttainments = async (students) => {
   const { knex } = knexConnection
-  const relevantAttainmentsAndCourseUnits = await knex.select('id', 'course_unit_id').from('attainments').whereIn('person_id', students).whereNotNull('course_unit_id')
-  const courseUnitGroupIds = await knex.select('group_id').from('course_units').whereIn('id', relevantAttainmentsAndCourseUnits.map(({course_unit_id}) => course_unit_id))
-  const relevantAssessmentItems = await knex.select('id').from('assessment_items').whereIn('primary_course_unit_group_id', courseUnitGroupIds.map(({group_id}) => group_id))
-  const relevantCourseUnitRealisations = await knex.select('id').from('course_unit_realisations').where('assessment_item_ids', '&&', relevantAssessmentItems.map(({id}) => id))
+  const relevantAttainmentsAndCourseUnits = await knex.select('id', 'course_unit_id', 'acceptor_persons').from('attainments').whereIn('person_id', students).whereNotNull('course_unit_id')
+  // const courseUnitGroupIds = await knex.select('group_id').from('course_units').whereIn('id', relevantAttainmentsAndCourseUnits.map(({course_unit_id}) => course_unit_id))
+  // const relevantAssessmentItems = await knex.select('id').from('assessment_items').whereIn('primary_course_unit_group_id', courseUnitGroupIds.map(({group_id}) => group_id))
+  // const relevantCourseUnitRealisations = await knex.select('id').from('course_unit_realisations').where('assessment_item_ids', '&&', relevantAssessmentItems.map(({id}) => id))
   await Promise.all([
     removeStuff('attainments', 'id', relevantAttainmentsAndCourseUnits.map(({id}) => id), knex),
-    removeStuff('course_units', 'group_id', courseUnitGroupIds.map(({group_id}) => group_id), knex),
-    removeStuff('assessment_items', 'id', relevantAssessmentItems.map(({id}) => id), knex),
-    removeStuff('course_unit_realisations', 'id', relevantCourseUnitRealisations.map(({id}) => id), knex)
+    //removeStuff('course_units', 'group_id', courseUnitGroupIds.map(({group_id}) => group_id), knex),
+    //removeStuff('assessment_items', 'id', relevantAssessmentItems.map(({id}) => id), knex),
+    //removeStuff('course_unit_realisations', 'id', relevantCourseUnitRealisations.map(({id}) => id), knex)
   ])
+  return relevantAttainmentsAndCourseUnits
 }
 
 const removeStudyRightsAndOthersFromTables = async students => {
@@ -58,25 +59,20 @@ const removeStudyRightsAndOthersFromTables = async students => {
 
 /**
   * Nuke stuff from db in table by preserving rows with given values in given column.
-  * @returns promise?
 */
 const removeStuff = async (table, column, idsNotToDelete, knex) => {
-  if (DESTROY)
-    return knex(table).whereNotIn(column, idsNotToDelete).del()
-  const res = await knex(table).whereNotIn(column, idsNotToDelete).count(column)
-  console.log(`Would delete ${res[0].count} rows from ${table}`)
-  return Promise.resolve(res[0].count)
+  if (DESTROY) {
+    const res = await knex(table).whereNotIn(column, idsNotToDelete).del()
+    console.log(`Deleted ${res} rows from ${table}`)
+  } else {
+    const res = await knex(table).whereNotIn(column, idsNotToDelete).count(column)
+    console.log(`Would delete ${res[0].count} rows from ${table}`)
+  }
 }
 
 const run = async () => {
   await knexConnection.connect()
   const { knex } = knexConnection
-
-  const persons = await knex.table('persons')
-  if (persons.length <= DUMP_SIZE) {
-    console.log(`Found ${DUMP_SIZE} or less students from original db. Deletion was probably already performed?`)
-    return
-  }
 
   // Take first two hundred students from each category
   const studentNumbersFromSamples = [
@@ -86,11 +82,14 @@ const run = async () => {
   ]
 
   const selected = await getPersonIdsForStudentNumbers(studentNumbersFromSamples)
-
-  removeStuff('persons', 'id', selected, knex)
-  removeStudyRightsAndOthersFromTables(selected)
-  removeStuff('enrolments', 'person_id', selected, knex)
-  removeAttainments(selected)
+  const attainments = await removeAttainments(selected)
+  const teachers = attainments.reduce((acc, curr) => 
+    [...acc, ...curr.acceptor_persons.map(p => p.personId)], []
+  )
+  console.log("teach len", teachers.length)
+  await removeStudyRightsAndOthersFromTables(selected)
+  await removeStuff('enrolments', 'person_id', selected, knex)
+  await removeStuff('persons', 'id', [...selected, ...teachers], knex)
 
   if (DESTROY) 
     console.log("Data deleted successfully")
