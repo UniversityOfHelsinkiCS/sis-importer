@@ -164,14 +164,14 @@ router.post('/verify', async (req, res) => {
     })
 
     const output = data.map(entry => {
-      const isRegistered = attainments.find(attainment => (
+      const filtered = attainments.find(attainment => (
         attainment.personId === entry.personId &&
         attainment.courseUnitId === entry.courseUnitId &&
         attainment.courseUnitRealisationId === entry.courseUnitRealisationId &&
         attainment.gradeId === parseInt(entry.gradeId) &&
         attainment.assessmentItemId === entry.assessmentItemId
       ))
-      return { ...entry, registered: !!isRegistered }
+      return { ...entry, registered: filtered ?  filtered.type : false}
     })
     return res.send(output)
   } catch (e) {
