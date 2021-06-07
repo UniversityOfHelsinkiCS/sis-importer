@@ -76,7 +76,8 @@ router.post('/attainments', async (req, res) => {
           courseUnitId: {
             [Op.in]: allCourseUnits[courseCode].map(({ id }) => id)
           },
-          personId: person.id
+          personId: person.id,
+          misregistration: false
         },
         raw: true
       })
@@ -127,6 +128,7 @@ router.get('/attainments/:courseCode/:studentNumber', async (req, res) => {
       courseUnitId: {
         [Op.in]: allCourseUnits.map(({ id }) => id)
       },
+      misregistration: false,
       personId
     },
     raw: true
@@ -156,7 +158,8 @@ router.post('/verify', async (req, res) => {
 
     const attainments = await models.Attainment.findAll({
       where: {
-        personId: { [Op.in]: data.map(({ personId }) => personId) }
+        personId: { [Op.in]: data.map(({ personId }) => personId) },
+        misregistration: false
       }
     })
 
@@ -199,6 +202,7 @@ router.post('/enrolments', async (req, res) => {
       const enrolments = await models.Enrolment.findAll({
         where: {
           courseUnitId: { [Op.in]: courseUnits.map(({ id }) => id) },
+          state: 'ENROLLED',
           personId
         },
         raw: true
@@ -334,6 +338,22 @@ router.get('/responsibles/:courseCode', async (req, res) => {
   }, {})
 
   return res.send(personsWithRoles)
+})
+
+router.post('/substitutions', async (req, res) => {
+  try {
+    const codes = req.body
+    if (!Array.isArray(codes))
+      return res.status(400).send({ error: 'Input should be an array' })
+    const courseUnits = await getAllCourseUnits(codes)
+    return res.send(codes.reduce((acc, code) => {
+      acc[code] = [...new Set(courseUnits[code].map(c => c.code))]
+      return acc
+    }, {}))
+  } catch (e) {
+    console.log(e)
+    res.status(500).json(e.toString())
+  }
 })
 
 const findGrade = (gradeScales, gradeScaleId, gradeId) => gradeScales
