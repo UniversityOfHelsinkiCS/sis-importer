@@ -2,9 +2,9 @@ services:
   importer-test-db-mankeli:
     build:
       args:
-        NODE_ENV: "development"
+        NODE_ENV: 'development'
       context: .
-    command: "npm run start:dev"
+    command: 'npm run start:dev'
     depends_on:
       - importer-test-db
     environment:

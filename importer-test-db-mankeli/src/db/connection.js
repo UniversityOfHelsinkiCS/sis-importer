@@ -16,12 +16,12 @@ class Connection {
           host: DB_HOST,
           port: DB_PORT,
           user: DB_USERNAME,
-          database: this.db
+          database: this.db,
         },
         pool: {
           min: 0,
-          max: 50
-        }
+          max: 50,
+        },
       })
       await this.knex.raw('select 1+1 as result')
       console.log(`Connected to ${this.db}`)
@@ -31,7 +31,7 @@ class Connection {
         return
       }
       console.log(`Database connection to ${this.db} failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`)
-      console.log("Error: ", e)
+      console.log('Error: ', e)
       setTimeout(() => this.connectKnex(attempt + 1), 1000 * attempt)
     }
   }
@@ -45,5 +45,5 @@ connections.forEach(conn => conn.connect())
 
 module.exports = {
   sourceConnection,
-  targetConnection
+  targetConnection,
 }
