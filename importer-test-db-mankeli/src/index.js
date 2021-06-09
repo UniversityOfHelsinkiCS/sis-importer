@@ -1,6 +1,6 @@
 const { sourceConnection, targetConnection } = require('./db/connection')
 
-const DESTROY = true
+const DESTROY = false // DANGER ZONE
 
 const getIdsOfSuitableStudentsFromTestDb = async () => {
   const { knex } = sourceConnection
@@ -14,7 +14,6 @@ const getIdsOfSuitableStudentsFromTestDb = async () => {
   return (
     (
       await knex
-        //return await knex
         .select('persons.id')
         .from('persons')
         .join('studyrights', 'persons.id', 'studyrights.person_id')
@@ -28,10 +27,8 @@ const getIdsOfSuitableStudentsFromTestDb = async () => {
         .distinctOn('persons.student_number')
         .limit(sampleSize)
     )
-      //.toSQL().toNative())
       .map(({ id }) => id)
   )
-  return []
 }
 
 /**
