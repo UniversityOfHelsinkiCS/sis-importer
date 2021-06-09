@@ -1,4 +1,5 @@
 hyuserdata
 importer-test-db.sqz
+importer-test-db-sample-dump.sqz
 node_modules/
 src/studentNumbersForTestDump/*.txt

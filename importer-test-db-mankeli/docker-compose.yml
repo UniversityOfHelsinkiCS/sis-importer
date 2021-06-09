@@ -1,5 +1,3 @@
-version: "3.2"
-
 services:
   importer-test-db-mankeli:
     build:
@@ -13,7 +11,8 @@ services:
       DB_USERNAME: postgres
       DB_PORT: 5432
       DB_HOST: importer-test-db
-      DB_DATABASE: importer-db
+      SOURCE_DATABASE: importer-db
+      TARGET_DATABASE: importer-test-db-sample
     volumes:
       - mankeli_modules:/usr/src/app/node_modules
       - .:/usr/src/app
@@ -26,14 +25,6 @@ services:
       - importer-test-pgdata:/var/lib/postgresql/data
     container_name: importer-test-db
 
-  importer-test-db-sample:
-    image: postgres:13
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
-    volumes:
-      - importer-test-pgdata:/var/lib/postgresql/data
-    container_name: importer-test-db-sample
-
   importer-adminer-test:
     container_name: importer-adminer-test
     environment:
@@ -43,8 +34,6 @@ services:
     ports:
       - 5051:8080 # http://localhost:5051/?pgsql=importer-test-db&username=postgres&db=importer-db&ns=public
 
-
 volumes:
   importer-test-pgdata:
-  importer-test-sample-pgdata:
   mankeli_modules:

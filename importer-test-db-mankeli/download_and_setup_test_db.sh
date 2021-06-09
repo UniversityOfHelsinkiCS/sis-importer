@@ -69,8 +69,8 @@ run_importer_test_db_setup() {
     docker-compose up -d "$container_name"
     ping_psql "$container_name" "$database_name"
     restore_psql_from_backup "$server_dump_filename" "$container_name" "$database_name"
-    docker-compose down
 }
 
 # Run the script
 run_importer_test_db_setup
+docker-compose down
