@@ -30,6 +30,16 @@ const relevantAttributes = {
   organisation: ['id', 'code', 'name', 'parentId'],
 }
 
+const validRealisationTypes = [
+  'urn:code:course-unit-realisation-type:teaching-participation-lab',
+  'urn:code:course-unit-realisation-type:teaching-participation-online',
+  'urn:code:course-unit-realisation-type:teaching-participation-field-course',
+  'urn:code:course-unit-realisation-type:teaching-participation-project',
+  'urn:code:course-unit-realisation-type:teaching-participation-lectures',
+  'urn:code:course-unit-realisation-type:teaching-participation-small-group',
+  'urn:code:course-unit-realisation-type:teaching-participation-seminar',
+]
+
 const addCourseUnitsToRealisations = async courseUnitRealisations => {
   const assessmentItemIds = [].concat(...courseUnitRealisations.map(c => c.assessmentItemIds))
 
@@ -267,6 +277,11 @@ updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res
   if (!limit || !offset) return res.sendStatus(400)
 
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
+    where: {
+      courseUnitRealisationTypeUrn: {
+        [Op.in]: validRealisationTypes
+      }
+    },
     attributes: relevantAttributes.courseUnitRealisation,
     limit,
     offset,

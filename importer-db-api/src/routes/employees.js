@@ -25,6 +25,20 @@ router.get('/:id', async (req, res) => {
         res.status(500).json(e.toString())
     }
 })
-  
+
+/**
+ * Is the person even an employee?
+ * id is the sisuId.
+ */
+router.get('/:id/is_employee', async (req, res) => {
+    const { id } = req.params
+
+    const employee = await models.Person.findByPk(id, {
+        attributes: ['employeeNumber']
+    })
+
+    res.send(!!employee.employeeNumber)
+})
+
 module.exports = router
   
