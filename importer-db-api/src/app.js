@@ -58,8 +58,9 @@ app.use(Sentry.Handlers.errorHandler())
 app.use((error, req, res, next) => {
   console.log(error)
 
-  const normalizedError = error instanceof ApplicationError ? error : new ApplicationError('Something went wrong')
+  const { originalUrl, method, query } = req
 
+  const normalizedError = error instanceof ApplicationError ? error : new ApplicationError(error.toString(), 500 , {stack: error.stack, originalUrl, method, query })
   res.status(normalizedError.status).json(normalizedError)
 
   next(error)

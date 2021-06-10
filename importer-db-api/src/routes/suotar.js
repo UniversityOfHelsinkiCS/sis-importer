@@ -33,70 +33,59 @@ const sisApi = axios.create({
  * Send assessments to Sisu
  */
 router.post('/', async (req, res) => {
-  try {
-    const { body } = req
-    const resp = await sisApi.post('/hy-custom/assessments/send/kurki', body)
-    return res.status(200).json(resp.data)
-  } catch (e) {
-    console.log(e)
-    console.log(JSON.stringify(e.response.data))
-    res.status(500).json(e.response.data)
-  }
+  const { body } = req
+  const resp = await sisApi.post('/hy-custom/assessments/send/kurki', body)
+  return res.status(200).json(resp.data)
 })
 
 /**
  * Post list of {courseCode, studentNumber} pairs here to get their attainments
  */
 router.post('/attainments', async (req, res) => {
-  try {
-    const data = req.body
-    const { noSubstitutions } = req.query
+  const data = req.body
+  const { noSubstitutions } = req.query
 
-    if (!Array.isArray(data))
-      return res.status(400).send({ error: 'Input should be an array' })
+  if (!Array.isArray(data))
+    return res.status(400).send({ error: 'Input should be an array' })
 
-    const persons = await models.Person.findAll({
+  const persons = await models.Person.findAll({
+    where: {
+      studentNumber: { [Op.in]: data.map(({ studentNumber }) => studentNumber) }
+    },
+    raw: true
+  })
+  const gradeScales = await models.GradeScale.findAll({ raw: true })
+  const allCourseUnits = await getAllCourseUnits(data.map(({ courseCode }) => courseCode), !!noSubstitutions)
+
+  const output = []
+  for (const { studentNumber, courseCode } of data) {
+    const person = persons.find(p => p.studentNumber === studentNumber)
+    if (!person || !allCourseUnits[courseCode]) {
+      output.push({ studentNumber, courseCode, attainments: [] })
+      continue
+    }
+    const allAttainments = await models.Attainment.findAll({
       where: {
-        studentNumber: { [Op.in]: data.map(({ studentNumber }) => studentNumber) }
+        courseUnitId: {
+          [Op.in]: allCourseUnits[courseCode].map(({ id }) => id)
+        },
+        personId: person.id,
+        misregistration: false
       },
       raw: true
     })
-    const gradeScales = await models.GradeScale.findAll({ raw: true })
-    const allCourseUnits = await getAllCourseUnits(data.map(({ courseCode }) => courseCode), !!noSubstitutions)
+    const attainmentsWithGrade = allAttainments.map(attainment => ({
+      ...attainment,
+      grade: findGrade(gradeScales, attainment.gradeScaleId, attainment.gradeId)
+    }))
 
-    const output = []
-    for (const { studentNumber, courseCode } of data) {
-      const person = persons.find(p => p.studentNumber === studentNumber)
-      if (!person || !allCourseUnits[courseCode]) {
-        output.push({ studentNumber, courseCode, attainments: [] })
-        continue
-      }
-      const allAttainments = await models.Attainment.findAll({
-        where: {
-          courseUnitId: {
-            [Op.in]: allCourseUnits[courseCode].map(({ id }) => id)
-          },
-          personId: person.id,
-          misregistration: false
-        },
-        raw: true
-      })
-      const attainmentsWithGrade = allAttainments.map(attainment => ({
-        ...attainment,
-        grade: findGrade(gradeScales, attainment.gradeScaleId, attainment.gradeId)
-      }))
-
-      output.push({
-        studentNumber,
-        courseCode,
-        attainments: attainmentsWithGrade
-      })
-    }
-    return res.send(output)
-  } catch (e) {
-    console.log(e)
-    res.status(500).json(e.toString())
+    output.push({
+      studentNumber,
+      courseCode,
+      attainments: attainmentsWithGrade
+    })
   }
+  return res.send(output)
 })
 
 /**
@@ -145,44 +134,39 @@ router.get('/attainments/:courseCode/:studentNumber', async (req, res) => {
 })
 
 /**
- * Post array of {personId, assessmentItemAttainmentId (hy-kur-*), courseUnitId, gradeId} attainments. This endpoint
+ * Post array of {personId, id (hy-kur-*), courseUnitId, gradeId} attainments. This endpoint
  * will return the data with additional field called registered with attainment type or false.
  *
  * Performance of this is still WIP...
  */
 router.post('/verify', async (req, res) => {
-  try {
-    const data = req.body
-    if (!Array.isArray(data))
-      return res.status(400).send({ error: 'Input should be an array' })
+  const data = req.body
+  if (!Array.isArray(data))
+    return res.status(400).send({ error: 'Input should be an array' })
 
-    const attainments = await models.Attainment.findAll({
-      where: {
-        personId: { [Op.in]: data.map(({ personId }) => personId) },
-        misregistration: false
-      }
-    })
+  const attainments = await models.Attainment.findAll({
+    where: {
+      personId: { [Op.in]: data.map(({ personId }) => personId) },
+      misregistration: false
+    }
+  })
 
-    const output = data.map(entry => {
-      const courseUnitAttainment = attainments.find(attainment => (
-        attainment.personId === entry.personId &&
-        attainment.type === 'CourseUnitAttainment',
-        attainment.courseUnitId === entry.courseUnitId &&
-        Array.isArray(attainment.assessmentItemAttainmentIds) && attainment.assessmentItemAttainmentIds.includes(entry.id)
-      ))
+  const output = data.map(entry => {
+    const courseUnitAttainment = attainments.find(attainment => (
+      attainment.personId === entry.personId &&
+      attainment.type === 'CourseUnitAttainment',
+      attainment.courseUnitId === entry.courseUnitId &&
+      Array.isArray(attainment.assessmentItemAttainmentIds) && attainment.assessmentItemAttainmentIds.includes(entry.id)
+    ))
 
-      if (courseUnitAttainment)
-        return { ...entry, registered: courseUnitAttainment.type }
+    if (courseUnitAttainment)
+      return { ...entry, registered: courseUnitAttainment.type }
 
-      const assessmentItemAttainment = attainments.find(attainment => attainment.id === entry.id)
-      return { ...entry, registered: assessmentItemAttainment ? assessmentItemAttainment.type : false }
+    const assessmentItemAttainment = attainments.find(attainment => attainment.id === entry.id)
+    return { ...entry, registered: assessmentItemAttainment ? assessmentItemAttainment.type : false }
 
-    })
-    return res.send(output)
-  } catch (e) {
-    console.log(e)
-    res.status(500).json(e.toString())
-  }
+  })
+  return res.send(output)
 })
 
 /**
@@ -191,115 +175,100 @@ router.post('/verify', async (req, res) => {
  * Post list of {personId, code} objects.
  */
 router.post('/enrolments', async (req, res) => {
-  try {
-    const data = req.body
-    if (!Array.isArray(data))
-      return res.status(400).send({ error: 'Input should be an array' })
+  const data = req.body
+  if (!Array.isArray(data))
+    return res.status(400).send({ error: 'Input should be an array' })
 
 
-    const output = await Promise.all(data.map(async ({ code, personId }) => {
-      if (!code || !personId)
-        return null
-      const courseUnits = await models.CourseUnit.findAll({
-        where: { code },
+  const output = await Promise.all(data.map(async ({ code, personId }) => {
+    if (!code || !personId)
+      return null
+    const courseUnits = await models.CourseUnit.findAll({
+      where: { code },
+      raw: true
+    })
+    const enrolments = await models.Enrolment.findAll({
+      where: {
+        courseUnitId: { [Op.in]: courseUnits.map(({ id }) => id) },
+        state: 'ENROLLED',
+        personId
+      },
+      raw: true
+    })
+    const enrolmentsWithRealisations = await Promise.all(enrolments.map(async (enrolment) => ({
+      ...enrolment,
+      courseUnitRealisation: await models.CourseUnitRealisation.findOne({
+        where: { id: enrolment.courseUnitRealisationId },
         raw: true
-      })
-      const enrolments = await models.Enrolment.findAll({
-        where: {
-          courseUnitId: { [Op.in]: courseUnits.map(({ id }) => id) },
-          state: 'ENROLLED',
-          personId
-        },
-        raw: true
-      })
-      const enrolmentsWithRealisations = await Promise.all(enrolments.map(async (enrolment) => ({
-        ...enrolment,
-        courseUnitRealisation: await models.CourseUnitRealisation.findOne({
-          where: { id: enrolment.courseUnitRealisationId },
-          raw: true
-        }),
-        courseUnit: courseUnits.find(({ id }) => id === enrolment.courseUnitId)
-      })))
-      return { code, personId, enrolments: enrolmentsWithRealisations }
-    }))
-    // Filter out possible nulls
-    res.send(output.filter(e => !!e))
-  } catch (e) {
-    console.log(e)
-    res.status(500).json(e.toString())
-  }
+      }),
+      courseUnit: courseUnits.find(({ id }) => id === enrolment.courseUnitId)
+    })))
+    return { code, personId, enrolments: enrolmentsWithRealisations }
+  }))
+  // Filter out possible nulls
+  res.send(output.filter(e => !!e))
 })
 
 router.post('/acceptors', async (req, res) => {
-  try {
-    const data = req.body
-    if (!Array.isArray(data))
-      return res.status(400).send({ error: 'Input should be an array' })
-    const realisations = await models.CourseUnitRealisation.findAll({
-      where: { id: { [Op.in]: data } },
-      raw: true
-    })
-    if (!realisations.length)
-      return res.status(404).send('Realisation not found')
+  const data = req.body
+  if (!Array.isArray(data))
+    return res.status(400).send({ error: 'Input should be an array' })
+  const realisations = await models.CourseUnitRealisation.findAll({
+    where: { id: { [Op.in]: data } },
+    raw: true
+  })
+  if (!realisations.length)
+    return res.status(404).send('Realisation not found')
 
-    const acceptors = realisations.reduce((acc, { id, responsibilityInfos }) => {
-      acc[id] = responsibilityInfos
-        .filter(({ roleUrn }) => (
-          roleUrn === 'urn:code:course-unit-realisation-responsibility-info-type:teacher' ||
-          roleUrn === 'urn:code:course-unit-realisation-responsibility-info-type:responsible-teacher')
-        )
-        .map(({ personId }) => ({
-          roleUrn: 'urn:code:attainment-acceptor-type:approved-by',
-          personId
-        }))
-      return acc
-    }, {})
-    return res.send(acceptors)
-  } catch (e) {
-    console.log(e)
-    res.status(500).json(e.toString())
-  }
+  const acceptors = realisations.reduce((acc, { id, responsibilityInfos }) => {
+    acc[id] = responsibilityInfos
+      .filter(({ roleUrn }) => (
+        roleUrn === 'urn:code:course-unit-realisation-responsibility-info-type:teacher' ||
+        roleUrn === 'urn:code:course-unit-realisation-responsibility-info-type:responsible-teacher')
+      )
+      .map(({ personId }) => ({
+        roleUrn: 'urn:code:attainment-acceptor-type:approved-by',
+        personId
+      }))
+    return acc
+  }, {})
+  return res.send(acceptors)
 })
 
 router.post('/resolve_user', async (req, res) => {
-  try {
-    const { email, employeeId, uid } = req.body
-    const filters = {}
-    if (email) filters.primaryEmail = email
-    if (employeeId) filters.employeeNumber = employeeId
-    if (uid) filters.eduPersonPrincipalName = `${uid}@helsinki.fi`
-    const user = await models.Person.findOne({ where: filters, raw: true })
-    if (!user) return res.send({})
-    const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
-      attributes: ['assessmentItemIds'],
-      where: {
-        responsibilityInfos: {
-          [Op.contains]: [{ personId: user.id }],
-        },
-        courseUnitRealisationTypeUrn: { [Op.iLike]: 'urn:code:course-unit-realisation-type:teaching-participation-%' }
+  const { email, employeeId, uid } = req.body
+  const filters = {}
+  if (email) filters.primaryEmail = email
+  if (employeeId) filters.employeeNumber = employeeId
+  if (uid) filters.eduPersonPrincipalName = `${uid}@helsinki.fi`
+  const user = await models.Person.findOne({ where: filters, raw: true })
+  if (!user) return res.send({})
+  const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
+    attributes: ['assessmentItemIds'],
+    where: {
+      responsibilityInfos: {
+        [Op.contains]: [{ personId: user.id }],
       },
-      raw: true
-    })
+      courseUnitRealisationTypeUrn: { [Op.iLike]: 'urn:code:course-unit-realisation-type:teaching-participation-%' }
+    },
+    raw: true
+  })
 
-    const assessmentItemIds = _.uniq(courseUnitRealisations.map(cur => cur.assessmentItemIds).flat())
+  const assessmentItemIds = _.uniq(courseUnitRealisations.map(cur => cur.assessmentItemIds).flat())
 
-    const assessmentItems = await models.AssessmentItem.findAll({
-      where: {
-        id: { [Op.in]: assessmentItemIds }
-      },
-      include: [{
-        model: models.CourseUnit,
-        as: 'courseUnit'
-      }],
-      raw: true
-    })
-    const codes = _.uniq(assessmentItems.map(a => a["courseUnit.code"]))
+  const assessmentItems = await models.AssessmentItem.findAll({
+    where: {
+      id: { [Op.in]: assessmentItemIds }
+    },
+    include: [{
+      model: models.CourseUnit,
+      as: 'courseUnit'
+    }],
+    raw: true
+  })
+  const codes = _.uniq(assessmentItems.map(a => a["courseUnit.code"]))
 
-    return res.send({ ...user, courses: codes })
-  } catch (e) {
-    console.log(e)
-    res.status(500).json(e.toString())
-  }
+  return res.send({ ...user, courses: codes })
 })
 
 router.get('/responsibles/:courseCode', async (req, res) => {
@@ -346,19 +315,14 @@ router.get('/responsibles/:courseCode', async (req, res) => {
 })
 
 router.post('/substitutions', async (req, res) => {
-  try {
-    const codes = req.body
-    if (!Array.isArray(codes))
-      return res.status(400).send({ error: 'Input should be an array' })
-    const courseUnits = await getAllCourseUnits(codes)
-    return res.send(codes.reduce((acc, code) => {
-      acc[code] = [...new Set(courseUnits[code].map(c => c.code))]
-      return acc
-    }, {}))
-  } catch (e) {
-    console.log(e)
-    res.status(500).json(e.toString())
-  }
+  const codes = req.body
+  if (!Array.isArray(codes))
+    return res.status(400).send({ error: 'Input should be an array' })
+  const courseUnits = await getAllCourseUnits(codes)
+  return res.send(codes.reduce((acc, code) => {
+    acc[code] = [...new Set(courseUnits[code].map(c => c.code))]
+    return acc
+  }, {}))
 })
 
 const findGrade = (gradeScales, gradeScaleId, gradeId) => gradeScales

@@ -8,6 +8,7 @@ const sequelize = new Sequelize({
     acquire: 10000,
     idle: 300000000
   },
+  logging: process.env.NODE_ENV === 'production' ? false : true,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
