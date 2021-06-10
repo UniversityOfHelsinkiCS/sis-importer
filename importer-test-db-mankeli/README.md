@@ -8,9 +8,3 @@ Scripts:
 - To setup db, run `./download_and_setup_test_db.sh`.
 - To start and open psql inside container, run `./psql-db.sh`
 - To run mankeli, run `docker-compose up`
-
-TODO:
-- write mankeliparser
-- add db container for output
-- add script to get sqz compressed file from output container
-- add script to push sqz compressed test fb to somewhere (server, github?)

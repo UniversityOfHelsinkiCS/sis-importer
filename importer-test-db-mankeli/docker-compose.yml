@@ -1,19 +1,18 @@
-version: "3.2"
-
 services:
   importer-test-db-mankeli:
     build:
       args:
-        NODE_ENV: "development"
+        NODE_ENV: 'development'
       context: .
-    command: "npm run start:dev"
+    command: 'npm run start:dev'
     depends_on:
       - importer-test-db
     environment:
       DB_USERNAME: postgres
       DB_PORT: 5432
       DB_HOST: importer-test-db
-      DB_DATABASE: importer-db
+      SOURCE_DATABASE: importer-db
+      TARGET_DATABASE: importer-test-db-sample
     volumes:
       - mankeli_modules:/usr/src/app/node_modules
       - .:/usr/src/app
@@ -34,7 +33,6 @@ services:
     image: adminer:4.7.5
     ports:
       - 5051:8080 # http://localhost:5051/?pgsql=importer-test-db&username=postgres&db=importer-db&ns=public
-
 
 volumes:
   importer-test-pgdata:
