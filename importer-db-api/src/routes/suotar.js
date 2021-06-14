@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
   const { body } = req
   logger.info(`Sending to Sisu: ${JSON.stringify(body)}`)
   try {
-    const { data } = await axios.post(SIS_API_URL, '/hy-custom/assessments/send/kurki', body)
+    const { data } = await sisApi.post('/hy-custom/assessments/send/kurki', body)
     return res.status(200).json(data)
   } catch (e) {
     if (e.response) {
