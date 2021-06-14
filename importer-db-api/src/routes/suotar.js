@@ -5,6 +5,7 @@ const models = require('../models')
 const fs = require('fs')
 const https = require('https')
 const _ = require('lodash')
+var sub = require('date-fns/sub')
 
 const { SIS_API_URL, PROXY_TOKEN, KEY_PATH, CERT_PATH, API_KEY } = process.env
 
@@ -70,7 +71,8 @@ router.post('/attainments', async (req, res) => {
           [Op.in]: allCourseUnits[courseCode].map(({ id }) => id)
         },
         personId: person.id,
-        misregistration: false
+        misregistration: false,
+        attainmentDate: { [Op.gt]: sub(new Date(), { years: 10 }) }
       },
       raw: true
     })
@@ -118,6 +120,7 @@ router.get('/attainments/:courseCode/:studentNumber', async (req, res) => {
         [Op.in]: allCourseUnits.map(({ id }) => id)
       },
       misregistration: false,
+      attainmentDate: { [Op.gt]: sub(new Date(), { years: 10 }) },
       personId
     },
     raw: true
@@ -147,6 +150,7 @@ router.post('/verify', async (req, res) => {
   const attainments = await models.Attainment.findAll({
     where: {
       personId: { [Op.in]: data.map(({ personId }) => personId) },
+      attainmentDate: { [Op.gt]: sub(new Date(), { years: 10 }) },
       misregistration: false
     }
   })
