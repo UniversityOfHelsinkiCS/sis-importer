@@ -7,6 +7,8 @@ const https = require('https')
 const _ = require('lodash')
 var sub = require('date-fns/sub')
 
+const logger = require('../utils/logger')
+
 const { SIS_API_URL, PROXY_TOKEN, KEY_PATH, CERT_PATH, API_KEY } = process.env
 
 const hasCerts = KEY_PATH && CERT_PATH
@@ -35,8 +37,18 @@ const sisApi = axios.create({
  */
 router.post('/', async (req, res) => {
   const { body } = req
-  const resp = await sisApi.post('/hy-custom/assessments/send/kurki', body)
-  return res.status(200).json(resp.data)
+  logger.info(`Sending to Sisu: ${JSON.stringify(body)}`)
+  try {
+    const { data } = await axios.post(SIS_API_URL, '/hy-custom/assessments/send/kurki', body)
+    return res.status(200).json(data)
+  } catch (e) {
+    if (e.response) {
+      const { response } = e
+      logger.info(`Sending entries to Sisu failed: ${JSON.stringify(response.data)}`)
+      return res.status(response.status).json(response.data)
+    }
+    throw new Error(`Sending entries to Sisu failed: ${e.toString()}`)
+  }
 })
 
 /**
