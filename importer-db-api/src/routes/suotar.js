@@ -384,7 +384,7 @@ const getCourseUnits = async (code, noSubstitutions = false) => {
 const getAllCourseUnits = async (codes, noSubstitutions = false) => {
   const courseUnits = await models.CourseUnit.findAll({
     where: { code: { [Op.in]: codes } },
-    attributes: ['groupId', 'substitutions', 'code'],
+    attributes: ['groupId', 'substitutions', 'code', 'id'],
     raw: true
   })
   if (!courseUnits.length) return []
