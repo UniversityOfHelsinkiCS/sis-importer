@@ -43,13 +43,13 @@ restore_psql_from_backup () {
     docker exec "$2" pg_restore -U postgres --no-owner -F c --dbname="$3" -j4 /asd.sqz
 }
 
-docker-compose up -d importer-db-staging
-ping_psql importer-db-staging importer-db-staging
-restore_psql_from_backup importer-db-staging.sqz importer-db-staging importer-db-staging
+docker-compose up -d importer-db-staging-copy
+ping_psql importer-db-staging-copy importer-db-staging-copy
+restore_psql_from_backup importer-db-staging.sqz importer-db-staging-copy importer-db-staging-copy
 
 # Create copy of original table with correct name for oodikone
-docker exec importer-db-staging psql -U postgres -c 'DROP DATABASE IF EXISTS "sis-importer-db";'
-docker exec importer-db-staging psql -U postgres -c 'CREATE DATABASE "sis-importer-db" WITH TEMPLATE "importer-db";'
+docker exec importer-db-staging-copy psql -U postgres -c 'DROP DATABASE IF EXISTS "sis-importer-db";'
+docker exec importer-db-staging-copy psql -U postgres -c 'CREATE DATABASE "sis-importer-db" WITH TEMPLATE "importer-db-staging-copy";'
 
 # Run sampletaker: first dry-run, then confirm
 docker-compose up importer-db-staging-sampletaker dry-run
@@ -62,10 +62,10 @@ fi
 docker-compose up importer-db-staging-sampletaker destroy
 
 # Vacuum the sample database
-docker exec importer-db-staging psql -U postgres sis-importer-db -c 'VACUUM FULL;'
+docker exec importer-db-staging-copy psql -U postgres sis-importer-db -c 'VACUUM FULL;'
 
 # Finally create dump that contains only the new sample
-docker exec -i importer-db-staging pg_dump -Fc -U postgres sis-importer-db > sis-importer-db.sqz
+docker exec -i importer-db-staging-copy pg_dump -Fc -U postgres sis-importer-db > sis-importer-db.sqz
 
 # Remove original dump
 rm importer-db-staging.sqz

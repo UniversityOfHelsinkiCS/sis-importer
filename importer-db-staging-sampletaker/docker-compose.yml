@@ -6,11 +6,11 @@ services:
       context: .
     command: 'npm run start:dev'
     depends_on:
-      - importer-db-staging
+      - importer-db-staging-copy
     environment:
       DB_USERNAME: postgres
       DB_PORT: 5432
-      DB_HOST: importer-db-staging
+      DB_HOST: importer-db-staging-copy
       SOURCE_DATABASE: importer-db
       TARGET_DATABASE: sis-importer-db
     volumes:
@@ -24,21 +24,21 @@ services:
       context: .
     command: 'npm start'
     depends_on:
-      - importer-db-staging
+      - importer-db-staging-copy
     environment:
       DB_USERNAME: postgres
       DB_PORT: 5432
-      DB_HOST: importer-db-staging
+      DB_HOST: importer-db-staging-copy
       SOURCE_DATABASE: importer-db
       TARGET_DATABASE: sis-importer-db
 
-  importer-db-staging:
+  importer-db-staging-copy:
     image: postgres:13
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
-      - importer-db-staging-data:/var/lib/postgresql/data
-    container_name: importer-db-staging
+      - importer-db-staging-copy-data:/var/lib/postgresql/data
+    container_name: importer-db-staging-copy
 
   importer-db-staging-sampletaker-adminer:
     container_name: importer-db-staging-sampletaker-adminer
@@ -50,5 +50,5 @@ services:
       - 5051:8080 # http://localhost:5051/?pgsql=importer-test-db&username=postgres&db=importer-db&ns=public
 
 volumes:
-  importer-db-staging-data:
+  importer-db-staging-copy-data:
   sampletaker_modules:
