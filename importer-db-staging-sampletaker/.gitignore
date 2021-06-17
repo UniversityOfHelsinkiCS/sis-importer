@@ -1,5 +1,2 @@
-hyuserdata
-importer-test-db.sqz
-importer-test-db-sample-dump.sqz
+*.sqz
 node_modules/
-src/studentNumbersForTestDump/*.txt
