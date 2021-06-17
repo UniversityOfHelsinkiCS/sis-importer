@@ -1,13 +1,18 @@
 #!/bin/bash
 
-echo "Enter your Uni Helsinki username:"
-read -r username
-echo "Using your Uni Helsinki username: $username"
+read -rp "Are you running this locally or in pannu(l/p)?" RUNENV
+pannupath="/home/importer_user/staging/backup/importer-db-staging.sqz"
+if [ "$RUNENV" = "l" ]; then
+  # Get db from pannu to current folder
+  echo "Enter your Uni Helsinki username:"
+  read -r username
+  echo "Using your Uni Helsinki username: $username"
 
-# Copy db to current folder
-remotepath="/home/importer_user/staging/backup/importer-db-staging.sqz"
-scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
-"$username@importer:$remotepath"
+  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
+  "$username@importer:$pannupath" importer-db-staging.sqz
+elif [ "$RUNENV" = "p" ]; then
+  cp pannupath .
+fi
 
 # Setup db inside docker
 retry () {
@@ -47,7 +52,7 @@ docker exec importer-db-staging psql -U postgres -c 'CREATE DATABASE "sis-import
 docker-compose up importer-db-staging-sampletaker dry-run
 
 read -rp "Create sample by nuking extra stuff from db(y/n)?" CONT
-if [ "$CONT" = "n" ]; then
+if [ "$CONT" != "y" ]; then
   exit 0
 fi
 
@@ -58,3 +63,9 @@ docker exec importer-db-staging psql -U postgres sis-importer-db -c 'VACUUM FULL
 
 # Finally create dump that contains only the new sample
 docker exec -i importer-db-staging pg_dump -Fc -U postgres sis-importer-db > sis-importer-db.sqz
+
+# Remove original dump
+rm importer-db-staging.sqz
+
+# Run down services
+docker-compose down --rmi all --volumes --remove-orphans
