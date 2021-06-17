@@ -11,7 +11,7 @@ if [ "$RUNENV" = "l" ]; then
   scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
   "$username@importer:$pannupath" importer-db-staging.sqz
 elif [ "$RUNENV" = "p" ]; then
-  cp pannupath .
+  cp $pannupath .
 else
   echo "Wrong option $RUNENV!"
   exit 1
