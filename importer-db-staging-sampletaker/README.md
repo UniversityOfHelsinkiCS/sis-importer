@@ -1,12 +1,12 @@
 # Take sample from importer-db-staging
 
-write clear message
+Folder contains script that allows you to create sample from anonymized SIS db. You can run script either locally or at importerpannu.
 
-This takes sis-test-db from importer staging server and takes out sample of
-1000 students. Taken sample can be then used to test importer and oodikone.
-
-Scripts:
-
-- To setup db, run `./download_and_setup_test_db.sh`.
-- To start and open psql inside container, run `./psql-db.sh`
-- To run mankeli, run `docker-compose up`
+## How-to:
+- Ensure there's backup available at `staging/backup` -folder in importerpannu. You can make backup with script in importerpannus `staging` -folder.
+- Tune parameters (sample size, educations to include etc.) in `src/index.js`.
+- When happy, run `./run.sh`.
+  - Script will do dry-run first and reports what would be left to sample database. You can return back to tuning if results look weird.
+  - If you're tuning parameters after dry-run, remember to comment out database downloading, moving and restoring steps from the script!
+- After running the script, dump will be in this folder with name `sis-importer-db.sqz`.
+  - In case you're creating new anon databases for oodikone, copy dump to [anonyymioodi -repo](https://github.com/UniversityOfHelsinkiCS/anonyymioodi/) and continue to creating sis-db with oodikone's updater.
