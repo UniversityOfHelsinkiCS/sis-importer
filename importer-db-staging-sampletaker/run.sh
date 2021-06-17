@@ -12,6 +12,9 @@ if [ "$RUNENV" = "l" ]; then
   "$username@importer:$pannupath" importer-db-staging.sqz
 elif [ "$RUNENV" = "p" ]; then
   cp pannupath .
+else
+  echo "Wrong option $RUNENV!"
+  exit 1
 fi
 
 # Setup db inside docker
