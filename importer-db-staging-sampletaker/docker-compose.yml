@@ -1,32 +1,47 @@
 services:
-  importer-test-db-mankeli:
+  importer-db-staging-sampletaker-dev:
     build:
       args:
         NODE_ENV: 'development'
       context: .
     command: 'npm run start:dev'
     depends_on:
-      - importer-test-db
+      - importer-db-staging
     environment:
       DB_USERNAME: postgres
       DB_PORT: 5432
-      DB_HOST: importer-test-db
+      DB_HOST: importer-db-staging
       SOURCE_DATABASE: importer-db
-      TARGET_DATABASE: importer-test-db-sample
+      TARGET_DATABASE: sis-importer-db
     volumes:
-      - mankeli_modules:/usr/src/app/node_modules
+      - sampletaker_modules:/usr/src/app/node_modules
       - .:/usr/src/app
 
-  importer-test-db:
+  importer-db-staging-sampletaker:
+    build:
+      args:
+        NODE_ENV: 'production'
+      context: .
+    command: 'npm start'
+    depends_on:
+      - importer-db-staging
+    environment:
+      DB_USERNAME: postgres
+      DB_PORT: 5432
+      DB_HOST: importer-db-staging
+      SOURCE_DATABASE: importer-db
+      TARGET_DATABASE: sis-importer-db
+
+  importer-db-staging:
     image: postgres:13
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
-      - importer-test-pgdata:/var/lib/postgresql/data
-    container_name: importer-test-db
+      - importer-db-staging-data:/var/lib/postgresql/data
+    container_name: importer-db-staging
 
-  importer-adminer-test:
-    container_name: importer-adminer-test
+  importer-db-staging-sampletaker-adminer:
+    container_name: importer-db-staging-sampletaker-adminer
     environment:
       - ADMINER_DESIGN=pepa-linha
       - ADMINER_DEFAULT_SERVER=importer-db
@@ -35,5 +50,5 @@ services:
       - 5051:8080 # http://localhost:5051/?pgsql=importer-test-db&username=postgres&db=importer-db&ns=public
 
 volumes:
-  importer-test-pgdata:
-  mankeli_modules:
+  importer-db-staging-data:
+  sampletaker_modules:

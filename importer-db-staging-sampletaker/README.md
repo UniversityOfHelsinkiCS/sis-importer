@@ -1,4 +1,6 @@
-# Scripts and stuff to mangel test database for importer and oodikone
+# Take sample from importer-db-staging
+
+write clear message
 
 This takes sis-test-db from importer staging server and takes out sample of
 1000 students. Taken sample can be then used to test importer and oodikone.

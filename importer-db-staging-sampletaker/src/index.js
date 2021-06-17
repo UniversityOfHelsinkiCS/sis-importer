@@ -140,6 +140,15 @@ const removePersons = async (students, teachers) => {
 }
 
 const run = async () => {
+  if (process.argv.length !== 3 || process.argv[2] !== "dry-run" || process.argv[2] !== "destroy") {
+    console.log(`Usage: ${process.argv[1]} dry-run/destroy`)
+    return
+  }
+  if (process.argv[2] === "destroy") DESTROY = true
+
+  console.log("DESTROY", DESTROY)
+  return
+
   const students = await getIdsOfSuitableStudentsFromTestDb()
   const teachers = await removeAttainmentRelatedData(students)
   removeStudyrightRelatedData(students)
