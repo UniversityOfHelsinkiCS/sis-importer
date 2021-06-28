@@ -11,7 +11,7 @@
     "lint:fix": "prettier --write **/*.{js,json} && eslint --fix .",
     "ci": "../run.sh ci build importer-db-api && ../run.sh ci run importer-db-api npm run ci:test",
     "jest": "jest",
-    "ci:test": "npm-run-all -c lint run:test",
+    "ci:test": "npm-run-all lint run:test",
     "test": "../run.sh ci up --build --abort-on-container-exit --exit-code-from importer-db-api"
   },
   "author": "",
