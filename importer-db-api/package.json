@@ -6,13 +6,13 @@
   "scripts": {
     "start": "node ./src/index.js",
     "start:dev": "nodemon ./src/index.js",
-    "run:test": "npm-run-all -r -p start:dev jest",
+    "run:test": "npm-run-all -r -p start jest",
     "lint": "eslint .",
     "lint:fix": "prettier --write **/*.{js,json} && eslint --fix .",
-    "lint:ci": "docker-compose -f ../docker-compose.ci.yml build importer-db-api &&  docker-compose -f ../docker-compose.ci.yml run importer-db-api npm run lint",
-    "ci": "npm-run-all -c lint:ci test",
+    "ci": "../run.sh ci build importer-db-api && ../run.sh ci run importer-db-api npm run ci:test",
     "jest": "jest",
-    "test": "docker-compose -f ../docker-compose.ci.yml up --build --abort-on-container-exit --exit-code-from importer-db-api"
+    "ci:test": "npm-run-all -c lint run:test",
+    "test": "../run.sh ci up --build --abort-on-container-exit --exit-code-from importer-db-api"
   },
   "author": "",
   "license": "ISC",

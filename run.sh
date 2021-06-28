@@ -15,6 +15,9 @@ then
 elif [[ $option == db ]];
 then
   docker-compose "${@:2}" importer-db importer-adminer importer-db-api
+elif [[ $option == ci ]];
+then
+  docker-compose -f ~/sis-importer/docker-compose.ci.yml "${@:2}"
 else
   docker-compose "${@:1}"
 fi
