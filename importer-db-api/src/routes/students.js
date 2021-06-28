@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const sequelize = require("sequelize")
+const sequelize = require('sequelize')
 const { Op } = require('sequelize')
 const models = require('../models')
 const { Organisation, Education, CourseUnitRealisation } = require('../models')
@@ -7,28 +7,26 @@ const { Organisation, Education, CourseUnitRealisation } = require('../models')
 const MATLU = 'H50'
 
 const EXCHANGE_STUDENT_EDUCATIONTYPE_URNS = [
-  "urn:code:education-type:non-degree-education:exchange-studies",
-  "urn:code:education-type:non-degree-education:exchange-studies-postgraduate"
+  'urn:code:education-type:non-degree-education:exchange-studies',
+  'urn:code:education-type:non-degree-education:exchange-studies-postgraduate',
 ]
 
 const getFallSemesterCode = year => (year - 1950) * 2 + 1
 const getSpringSemesterCode = year => (year - 1950) * 2 + 2
 
-const isBachelorsStudyRight = urn => {
-  const splitted = urn.split(':')
-  const educationType = splitted[3]
-  const degree = splitted[4]
-  return educationType === 'degree-education' && ['bachelors-and-masters-degree', 'bachelors-degree'].includes(degree)
-}
+// const isBachelorsStudyRight = urn => {
+//   const splitted = urn.split(':')
+//   const educationType = splitted[3]
+//   const degree = splitted[4]
+//   return educationType === 'degree-education' && ['bachelors-and-masters-degree', 'bachelors-degree'].includes(degree)
+// }
 
-const isExchangeEducationType = (educationTypeUrn) => {
+const isExchangeEducationType = educationTypeUrn => {
   return EXCHANGE_STUDENT_EDUCATIONTYPE_URNS.includes(educationTypeUrn)
 }
 
-const filterOutExchangeStudentStudyRights = (studyrights) => {
-  return studyrights.filter(({ education }) =>
-    !education || !isExchangeEducationType(education.educationType)
-  )
+const filterOutExchangeStudentStudyRights = studyrights => {
+  return studyrights.filter(({ education }) => !education || !isExchangeEducationType(education.educationType))
 }
 
 router.use('/:studentNumber', async (req, res, next) => {
@@ -50,12 +48,11 @@ router.use('/:studentNumber', async (req, res, next) => {
 router.post('/', async (req, res) => {
   try {
     const studentNumbers = req.body
-    if (!Array.isArray(studentNumbers))
-      return res.status(400).send({ error: 'Input should be an array' })
+    if (!Array.isArray(studentNumbers)) return res.status(400).send({ error: 'Input should be an array' })
     const persons = await models.Person.findAll({
       where: {
-        studentNumber: { [Op.in]: studentNumbers }
-      }
+        studentNumber: { [Op.in]: studentNumbers },
+      },
     })
     return res.send(persons)
   } catch (e) {
@@ -71,46 +68,49 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
         personId: req.student.id,
         '$organisation.code$': MATLU,
       },
-      attributes: [
-        sequelize.literal('DISTINCT ON (studyright.id) *'),
-      ].concat(Object.keys(models.StudyRight.rawAttributes)),
-      order: [["id", "DESC"], ['modificationOrdinal', 'DESC']],
+      attributes: [sequelize.literal('DISTINCT ON (studyright.id) *')].concat(
+        Object.keys(models.StudyRight.rawAttributes)
+      ),
+      order: [
+        ['id', 'DESC'],
+        ['modificationOrdinal', 'DESC'],
+      ],
       include: [Organisation, Education],
     })
 
     if (!studyRights.length) return res.json([])
 
-
     const filteredStudyRights = filterOutExchangeStudentStudyRights(studyRights)
     let result = []
     for (const { valid, education, organisation } of filteredStudyRights) {
-
       // Most old studyrights dont have educations
-      const module = education ? await models.Module.findOne({
-        where: {
-          groupId: education.groupId.replace('EDU', 'DP'), // nice nice
-        },
-      }) : {
-        code: undefined
-      }
+      const module = education
+        ? await models.Module.findOne({
+            where: {
+              groupId: education.groupId.replace('EDU', 'DP'), // nice nice
+            },
+          })
+        : {
+            code: undefined,
+          }
 
-      const elements = [{
-        code: module.code,
-        start_date: valid.startDate,
-        end_date: valid.endDate,
-      }]
+      const elements = [
+        {
+          code: module.code,
+          start_date: valid.startDate,
+          end_date: valid.endDate,
+        },
+      ]
 
       result.push({
-        "faculty_code": organisation.code,
-        elements
+        faculty_code: organisation.code,
+        elements,
       })
-
     }
 
     // might be possible to sort earlier by studyright
     const sortedResults = result.sort((a, b) => new Date(a.elements[0].start_date) - new Date(b.elements[0].start_date))
     res.json(Object.values(sortedResults))
-
   } catch (e) {
     console.log(e)
     res.status(500).json(e.toString())
@@ -150,11 +150,15 @@ router.get('/:studentNumber/enrollment_statuses/:year', async (req, res) => {
 
 router.get('/:studentNumber/semester_enrollments', async (req, res) => {
   try {
-    const termRegistrations = (await models.TermRegistrations.findAll({
-      where: {
-        studentId: req.student.id,
-      },
-    })).map(termReg => termReg.termRegistrations).reduce((pre, cur) => pre.concat(cur), [])
+    const termRegistrations = (
+      await models.TermRegistrations.findAll({
+        where: {
+          studentId: req.student.id,
+        },
+      })
+    )
+      .map(termReg => termReg.termRegistrations)
+      .reduce((pre, cur) => pre.concat(cur), [])
 
     const mankeled = termRegistrations.map(({ studyTerm, statutoryAbsence, termRegistrationType }) => {
       const semester_code =
@@ -163,7 +167,7 @@ router.get('/:studentNumber/semester_enrollments', async (req, res) => {
           : getSpringSemesterCode(studyTerm.studyYearStartYear)
 
       let semester_enrollment_type_code = 1 // present
-      if (statutoryAbsence || termRegistrationType === "MISSING" || termRegistrationType === "NONATTENDING") {
+      if (statutoryAbsence || termRegistrationType === 'MISSING' || termRegistrationType === 'NONATTENDING') {
         semester_enrollment_type_code = 2 // absent
       }
 
@@ -265,9 +269,9 @@ router.get('/:studentNumber/enrolled/study_track/:studyTrackId', async (req, res
     const enrolledCourses = await models.Enrolment.findAll({
       where: {
         personId: req.student.id,
-        state: "ENROLLED"
+        state: 'ENROLLED',
       },
-      include: [{ model: CourseUnitRealisation, as: 'courseUnitRealisation' }]
+      include: [{ model: CourseUnitRealisation, as: 'courseUnitRealisation' }],
     })
 
     for (const { courseUnitRealisation } of enrolledCourses) {
@@ -276,13 +280,14 @@ router.get('/:studentNumber/enrolled/study_track/:studyTrackId', async (req, res
       const responsibleOrganisations = await models.Organisation.findAll({
         where: {
           id: {
-            [Op.in]: organisationIds
-          }
-        }
+            [Op.in]: organisationIds,
+          },
+        },
       })
 
       const organisationIsValid = responsibleOrganisations.map(({ code }) => code).includes(studyTrackId)
-      const registrationIsActive = new Date(courseUnitRealisation.activityPeriod.endDate).getTime() > new Date().getTime()
+      const registrationIsActive =
+        new Date(courseUnitRealisation.activityPeriod.endDate).getTime() > new Date().getTime()
 
       if (organisationIsValid && registrationIsActive) return res.send(true)
     }
@@ -299,17 +304,17 @@ router.get('/:studentNumber/course-unit/:courseCode/enrolments', async (req, res
   const courseUnits = await models.CourseUnit.findAll({
     where: { code },
     attributes: ['id'],
-    raw: true
+    raw: true,
   })
   const enrollments = await models.Enrolment.findAll({
     where: {
       personId: req.student.id,
       state: 'ENROLLED',
       courseUnitId: {
-        [Op.in]: courseUnits.map(({ id }) => id)
-      }
+        [Op.in]: courseUnits.map(({ id }) => id),
+      },
     },
-    raw: true
+    raw: true,
   })
   return res.send(enrollments)
 })

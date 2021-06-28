@@ -6,8 +6,8 @@
     "dco": "./run.sh",
     "start": "./run.sh up --scale importer-mankeli=3 && ./run.sh logs -f",
     "build": "npm i && npm i --prefix ./importer-api && npm i --prefix ./importer-mankeli && npm i --prefix ./importer-db-api && ./run.sh build",
-    "test": "npm test --prefix ./importer-api && npm test --prefix ./importer-mankeli",
-    "lintfix": "npm run lintfix --prefix ./importer-api && npm run lintfix --prefix ./importer-mankeli",
+    "test": "npm test --prefix ./importer-api && npm test --prefix ./importer-mankeli && npm test --prefix ./importer-db-api",
+    "lintfix": "npm run lintfix --prefix ./importer-api && npm run lintfix --prefix ./importer-mankeli && npm run lint:fix --prefix ./importer-db-api",
     "reset": "./run.sh morning",
     "restart": "./run.sh morning && npm start"
   },

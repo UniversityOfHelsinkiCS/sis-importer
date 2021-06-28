@@ -6,7 +6,7 @@ router.get('/min_max_semesters', async (req, res) => {
   const min = '2008-08-01' // fuksilaiterekisteri specific
 
   // Incicates when the *current* semester started
-  const max = now < new Date(`${currentYear}-08-01`) ? `${currentYear-1}-08-01` : `${currentYear}-08-01`
+  const max = now < new Date(`${currentYear}-08-01`) ? `${currentYear - 1}-08-01` : `${currentYear}-08-01`
 
   res.json({
     min,

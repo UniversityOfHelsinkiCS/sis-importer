@@ -1,0 +1,36 @@
+version: "3.2"
+
+services:
+  importer-db:
+    container_name: sis-importer-db
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: importer-db
+    image: registry.toska.cs.helsinki.fi/sis-importer-db:latest
+
+  importer-db-api:
+    build:
+      args:
+        NODE_ENV: "test"
+      context: importer-db-api
+    command: "npm run run:test"
+    container_name: sis-importer-db-api
+    tty: true
+    depends_on:
+      - importer-db
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+      DB_HOST: importer-db
+      DB_DATABASE: sis-importer-db
+      NODE_ENV: test
+      PORT: 3001
+      TOKEN: sup3rSecre7TestT0ken
+    ports:
+      - 3001:3001
+
+networks:
+  default:
+    name: importer_network

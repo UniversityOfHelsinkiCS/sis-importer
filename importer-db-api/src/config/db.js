@@ -6,9 +6,9 @@ const sequelize = new Sequelize({
     max: 10,
     min: 0,
     acquire: 10000,
-    idle: 300000000
+    idle: 300000000,
   },
-  logging: process.env.NODE_ENV === 'production' ? false : true,
+  logging: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test' ? false : true,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
@@ -17,5 +17,5 @@ const sequelize = new Sequelize({
 })
 
 module.exports = {
-  sequelize
+  sequelize,
 }
