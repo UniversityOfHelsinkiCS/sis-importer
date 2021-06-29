@@ -30,6 +30,8 @@ services:
       TOKEN: sup3rSecre7TestT0ken
     ports:
       - 3001:3001
+    volumes:
+      - ./importer-db-api/coverage:/usr/src/app/coverage/
 
 networks:
   default:
