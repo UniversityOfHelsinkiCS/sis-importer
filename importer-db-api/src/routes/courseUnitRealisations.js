@@ -27,14 +27,11 @@ router.get('/', async (req, res) => {
     where: {
       primary_course_unit_group_id: groupId,
       assessment_item_type: {
-        [Op.in] : [
-          'urn:code:assessment-item-type:exam',
-          'urn:code:assessment-item-type:teaching-participation'
-        ]
-      }
+        [Op.in]: ['urn:code:assessment-item-type:exam', 'urn:code:assessment-item-type:teaching-participation'],
+      },
     },
     attributes: ['id'],
-    raw: true
+    raw: true,
   })
 
   if (!assessmentItems) {
@@ -44,7 +41,7 @@ router.get('/', async (req, res) => {
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     where: {
       assessmentItemIds: {
-        [Op.overlap]: assessmentItems.map(({id}) => id),
+        [Op.overlap]: assessmentItems.map(({ id }) => id),
       },
       ...(activityPeriodEndDateAfter && {
         [Op.and]: [

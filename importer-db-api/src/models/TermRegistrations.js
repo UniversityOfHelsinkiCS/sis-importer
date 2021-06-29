@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, ARRAY, JSONB } = require('sequelize')
+const { Model, STRING, DATE, JSONB } = require('sequelize')
 const { sequelize } = require('../config/db')
 
 class TermRegistration extends Model {}

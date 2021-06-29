@@ -20,7 +20,11 @@ StudyRight.hasOne(Education, { sourceKey: 'educationId', foreignKey: 'id' })
 AssessmentItem.belongsTo(CourseUnit, { foreignKey: 'primaryCourseUnitGroupId', targetKey: 'groupId', as: 'courseUnit' })
 
 Enrolment.belongsTo(AssessmentItem, { foreignKey: 'assessmentItemId', targetKey: 'id', as: 'assessmentItem' })
-Enrolment.belongsTo(CourseUnitRealisation, { foreignKey: 'courseUnitRealisationId', targetKey: 'id', as: 'courseUnitRealisation' })
+Enrolment.belongsTo(CourseUnitRealisation, {
+  foreignKey: 'courseUnitRealisationId',
+  targetKey: 'id',
+  as: 'courseUnitRealisation',
+})
 Enrolment.belongsTo(CourseUnit, { foreignKey: 'courseUnitId', targetKey: 'id', as: 'courseUnit' })
 Enrolment.belongsTo(Person, { foreignKey: 'personId', targetKey: 'id' })
 
@@ -40,7 +44,7 @@ const models = {
   TermRegistrations,
   Education,
   Enrolment,
-  GradeScale
+  GradeScale,
 }
 
 module.exports = models

@@ -11,7 +11,7 @@ const { SIS_GRAPHQL_API_URL, SIS_GRAPHQL_API_TOKEN, KEY_PATH, CERT_PATH } = proc
 const createGraphqlHttpClient = () => {
   const hasCerts = CERT_PATH && KEY_PATH
 
-  logger.info(`Using SIS GraphQL API in URL ${SIS_GRAPHQL_API_URL}`);
+  logger.info(`Using SIS GraphQL API in URL ${SIS_GRAPHQL_API_URL}`)
 
   logger.info(
     hasCerts

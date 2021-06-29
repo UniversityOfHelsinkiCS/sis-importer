@@ -12,7 +12,7 @@ if (IS_DEV) {
   transports.push(
     new winston.transports.Console({
       level: 'debug',
-      format: combine(splat(), timestamp(), devFormat)
+      format: combine(splat(), timestamp(), devFormat),
     })
   )
 }
@@ -25,16 +25,19 @@ if (!IS_DEV) {
     http: 3,
     verbose: 4,
     debug: 5,
-    silly: 6
+    silly: 6,
   }
 
-  const prodFormat = winston.format.printf(({ level, ...rest }) => JSON.stringify({
-    level: levels[level], ...rest
-  }))
+  const prodFormat = winston.format.printf(({ level, ...rest }) =>
+    JSON.stringify({
+      level: levels[level],
+      ...rest,
+    })
+  )
 
   transports.push(new winston.transports.Console({ format: prodFormat }))
 }
 
 const logger = winston.createLogger({ transports })
 
-module.exports = logger;
+module.exports = logger

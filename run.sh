@@ -1,4 +1,5 @@
 #!/bin/bash
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # Passes all additional arguments to docker-compose as is. See ./run db up --help
 
@@ -15,6 +16,9 @@ then
 elif [[ $option == db ]];
 then
   docker-compose "${@:2}" importer-db importer-adminer importer-db-api
+elif [[ $option == ci ]];
+then
+  docker-compose -f "$SCRIPT_DIR"/docker-compose.ci.yml "${@:2}"
 else
   docker-compose "${@:1}"
 fi

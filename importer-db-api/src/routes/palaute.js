@@ -260,9 +260,11 @@ updaterRouter.get('/organisations', async (req, res) => {
     attributes: relevantAttributes.organisation,
     where: {
       [Op.and]: [
-          // Only latest snapshot
-          models.Organisation.sequelize.literal('(id, snapshot_date_time) in (select id, max(snapshot_date_time) from organisations group by id)')
-      ]
+        // Only latest snapshot
+        models.Organisation.sequelize.literal(
+          '(id, snapshot_date_time) in (select id, max(snapshot_date_time) from organisations group by id)'
+        ),
+      ],
     },
     limit,
     offset,
@@ -279,8 +281,8 @@ updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     where: {
       courseUnitRealisationTypeUrn: {
-        [Op.in]: validRealisationTypes
-      }
+        [Op.in]: validRealisationTypes,
+      },
     },
     attributes: relevantAttributes.courseUnitRealisation,
     limit,

@@ -103,13 +103,13 @@ Attainment.init(
       type: DATE,
     },
     courseUnitRealisationId: {
-      type: STRING
+      type: STRING,
     },
     assessmentItemAttainmentIds: {
-      type: ARRAY(STRING)
+      type: ARRAY(STRING),
     },
     assessmentItemId: {
-      type: STRING
+      type: STRING,
     },
   },
   {
@@ -126,7 +126,7 @@ Attainment.init(
       },
       {
         fields: ['module_id'],
-      }
+      },
     ],
   }
 )

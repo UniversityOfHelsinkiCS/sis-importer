@@ -93,6 +93,9 @@ StudyRight.init(
     studyRightExpirationRulesUrn: {
       type: ARRAY(STRING)
     },
+    admissionTypeUrn: {
+      type: STRING
+    },
     createdAt: {
       type: DATE
     },

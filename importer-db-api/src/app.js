@@ -24,7 +24,7 @@ app.use(Sentry.Handlers.requestHandler())
 app.use(Sentry.Handlers.tracingHandler())
 
 app.use(logger('short'))
-app.use(express.json({limit: '50mb'}))
+app.use(express.json({ limit: '50mb' }))
 
 app.get('/ping', (req, res) => {
   res.send('pong')
@@ -51,7 +51,9 @@ app.use('/suotar', suotarRouter)
 app.use('/grades', gradesRouter)
 app.use('/archeology', archeologyRouter)
 app.use('/palaute', palauteRouter)
-app.get('/sandbox', () => { throw new Error('Importer is melting down! :fine:') })
+app.get('/sandbox', () => {
+  throw new Error('Importer is melting down! :fine:')
+})
 
 app.use(Sentry.Handlers.errorHandler())
 
@@ -60,7 +62,10 @@ app.use((error, req, res, next) => {
 
   const { originalUrl, method, query } = req
 
-  const normalizedError = error instanceof ApplicationError ? error : new ApplicationError(error.toString(), 500 , {stack: error.stack, originalUrl, method, query })
+  const normalizedError =
+    error instanceof ApplicationError
+      ? error
+      : new ApplicationError(error.toString(), 500, { stack: error.stack, originalUrl, method, query })
   res.status(normalizedError.status).json(normalizedError)
 
   next(error)

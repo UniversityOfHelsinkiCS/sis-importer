@@ -392,31 +392,36 @@ router.get('/assessmentItemsFromCoursesWithPartAttainments', async (req, res) =>
 
 router.post('/courseUnitsAndRealisations', async (req, res) => {
   const out = {}
-  await Promise.all(req.body.map(async (code) => {
-    console.log("WHAT", code)
-    const courseUnits = await models.CourseUnit.findAll({
-      where: { code },
-      attributes: ['groupId', 'id'],
-      raw: true
+  await Promise.all(
+    req.body.map(async code => {
+      console.log('WHAT', code)
+      const courseUnits = await models.CourseUnit.findAll({
+        where: { code },
+        attributes: ['groupId', 'id'],
+        raw: true,
+      })
+      const aItems = await models.AssessmentItem.findAll({
+        where: { primaryCourseUnitGroupId: { [Op.in]: courseUnits.map(c => c.groupId) } },
+        attributes: ['id'],
+        raw: true,
+      })
+      const reals = await models.CourseUnitRealisation.findAll({
+        where: { assessmentItemIds: { [Op.overlap]: aItems.map(a => a.id) } },
+        attributes: ['id', 'name', 'activityPeriod', 'courseUnitRealisationTypeUrn'],
+      })
+      out[code] = {
+        courseUnits: courseUnits.map(c => c.id),
+        realsisations: reals.map(
+          r =>
+            `${r.id} - ${r.courseUnitRealisationTypeUrn.split(':')[3]} - ${r.name.fi || r.name.en} - ${
+              r.activityPeriod.startDate
+            } - ${r.activityPeriod.endDate}`
+        ),
+      }
+      return Promise.resolve()
     })
-    const aItems = await models.AssessmentItem.findAll({
-      where: { primaryCourseUnitGroupId: { [Op.in]: courseUnits.map(c => c.groupId) } },
-      attributes: ['id'],
-      raw: true
-    })
-    const reals = await models.CourseUnitRealisation.findAll({
-      where: { assessmentItemIds: { [Op.overlap]: aItems.map(a => a.id) } },
-      attributes: ['id', 'name', 'activityPeriod', 'courseUnitRealisationTypeUrn']
-    })
-    out[code] = {
-      courseUnits: courseUnits.map(c => c.id),
-      realsisations: reals.map(r => `${r.id} - ${r.courseUnitRealisationTypeUrn.split(":")[3]} - ${r.name.fi || r.name.en} - ${r.activityPeriod.startDate} - ${r.activityPeriod.endDate}`)
-    }
-    return Promise.resolve()
-  }))
-  res.send(
-    out
   )
+  res.send(out)
 })
 
 module.exports = router
