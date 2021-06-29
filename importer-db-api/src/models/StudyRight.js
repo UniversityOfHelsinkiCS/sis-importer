@@ -78,6 +78,9 @@ StudyRight.init(
     phase2MinorSelections: {
       type: JSONB,
     },
+    admissionTypeUrn: {
+      type: STRING,
+    },
     createdAt: {
       type: DATE,
     },

@@ -49,7 +49,10 @@
   "jest": {
     "rootDir": "./",
     "collectCoverage": true,
-    "coverageReporters": ["json", "html"],
+    "coverageReporters": [
+      "json",
+      "html"
+    ],
     "collectCoverageFrom": [
       "src/**/*.js*"
     ]

@@ -20,6 +20,7 @@ const {
   STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID,
   info: studyRightExpirationRuleInfo
 } = require('./studyRightExpirationRule')
+const { ADMISSION_TYPE_SCHEDULE_ID, info: admissionTypeInfo } = require('./admissionType')
 
 const services = {
   [ATTAINMENT_SCHEDULE_ID]: attainmentInfo,
@@ -40,7 +41,8 @@ const services = {
   [GRAPHQL_GRADE_SCALES_SCHEDULE_ID]: gradeScalesInfo,
   [DEGREE_TITLE_SCHEDULE_ID]: degreeTitleInfo,
   [EDUCATION_CLASSIFICATION_SCHEDULE_ID]: educationClassificationInfo,
-  [STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID]: studyRightExpirationRuleInfo
+  [STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID]: studyRightExpirationRuleInfo,
+  [ADMISSION_TYPE_SCHEDULE_ID]: admissionTypeInfo
 }
 
 // Imported in this order
@@ -63,7 +65,8 @@ const serviceIds = [
   GRAPHQL_GRADE_SCALES_SCHEDULE_ID,
   DEGREE_TITLE_SCHEDULE_ID,
   EDUCATION_CLASSIFICATION_SCHEDULE_ID,
-  STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID
+  STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID,
+  ADMISSION_TYPE_SCHEDULE_ID
 ]
 
 module.exports = {
