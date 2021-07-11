@@ -1,46 +1,60 @@
 const { sourceConnection, targetConnection } = require('./db/connection')
 
-const DESTROY = false // DANGER ZONE
+let DESTROY = false // DANGER ZONE
 
 /**
- * Anon data has some inconsistensies, e.g. students have attainments totally from 
+ * Anon data has some inconsistensies, e.g. students have attainments totally from
  * another program, which makes data not usable. Following query tries to find data
  * where students:
  * - have recently started (+2017) studyright for given programme
  * - have attainments that are from given programme
  * - don't have values nulled in fields that are needed for toska software
  */
-const getIdsOfStudentsOfProgramme = async ({educationId, organisationId}) => {
+const getIdsOfStudentsOfProgramme = async ({ educationId, organisationId }) => {
   const { knex } = sourceConnection
   const startDateForNewProgrammes = '2017-01-08'
-    return (
-      await knex
-        .select('persons.id')
-        .from('persons')
-        .join('studyrights', 'persons.id', 'studyrights.person_id')
-        .join('term_registrations', 'studyrights.id', 'term_registrations.study_right_id')
-        .join('attainments', builder =>
-          builder.on('attainments.person_id', 'persons.id').andOn('attainments.study_right_id', 'studyrights.id')
-        )
-        .where('studyrights.education_id', educationId)
-        .andWhere(builder => builder.whereNotNull('persons.student_number', 'persons.first_names', 'persons.last_name'))
-        .andWhereRaw("cast(studyrights.valid->>'startDate' as date) >= ?", new Date(startDateForNewProgrammes))
-        .andWhereRaw(`attainments.organisations @> '[{\"organisationId\": \"${organisationId}\"}]'`)
-        .distinctOn('persons.student_number')
-    )
-      .map(({ id }) => id)
+  return (
+    await knex
+      .select('persons.id')
+      .from('persons')
+      .join('studyrights', 'persons.id', 'studyrights.person_id')
+      .join('term_registrations', 'studyrights.id', 'term_registrations.study_right_id')
+      .join('attainments', builder =>
+        builder.on('attainments.person_id', 'persons.id').andOn('attainments.study_right_id', 'studyrights.id')
+      )
+      .where('studyrights.education_id', educationId)
+      .andWhere(builder => builder.whereNotNull('persons.student_number', 'persons.first_names', 'persons.last_name'))
+      .andWhereRaw("cast(studyrights.valid->>'startDate' as date) >= ?", new Date(startDateForNewProgrammes))
+      .andWhereRaw(`attainments.organisations @> '[{\"organisationId\": \"${organisationId}\"}]'`)
+      .distinctOn('persons.student_number')
+  ).map(({ id }) => id)
 }
 
 const getIdsOfSuitableStudentsFromTestDb = async () => {
-
-  // Comp science bach
+  // Bachelor's Programme in Computer Science
   const KH50_005 = {
     educationId: 'hy-EDU-114256325-2017',
-    organisationId: 'hy-org-116716376'
+    organisationId: 'hy-org-116716376',
+  }
+
+  // Degree Programme in Medicine
+  const MH30_001 = {
+    educationId: 'hy-EDU-114256791-2017',
+    organisationId: 'hy-org-116719396',
+  }
+
+  // Bachelor's Programme in Education
+  const KH60_001 = {
+    educationId: 'hy-EDU-114257576-2017',
+    organisationId: 'hy-org-116715340',
   }
 
   return [
-  ...await getIdsOfStudentsOfProgramme(KH50_005)
+    ...new Set([
+      ...(await getIdsOfStudentsOfProgramme(KH50_005)),
+      ...(await getIdsOfStudentsOfProgramme(MH30_001)),
+      ...(await getIdsOfStudentsOfProgramme(KH60_001)),
+    ]),
   ]
 }
 
@@ -153,16 +167,11 @@ const removePersons = async (students, teachers) => {
 }
 
 const run = async () => {
-  const destroy = process.env.DESTROY
-  if (destroy?.toLowerCase() === "true") DESTROY = true
+  if (process.env.DESTROY?.toLowerCase() === 'true') DESTROY = true
   const students = await getIdsOfSuitableStudentsFromTestDb()
-  console.log(students.length)
-  console.log(students[0])
-  console.log(students[20])
-  console.log(students[50])
-  // const teachers = await removeAttainmentRelatedData(students)
-  // removeStudyrightRelatedData(students)
-  // removePersons(students, teachers)
+  const teachers = await removeAttainmentRelatedData(students)
+  removeStudyrightRelatedData(students)
+  removePersons(students, teachers)
 }
 
 run()
