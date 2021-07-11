@@ -11,7 +11,7 @@ services:
       DB_USERNAME: postgres
       DB_PORT: 5432
       DB_HOST: importer-db-staging-copy
-      SOURCE_DATABASE: importer-db
+      SOURCE_DATABASE: importer-db-staging-copy
       TARGET_DATABASE: sis-importer-db
     volumes:
       - sampletaker_modules:/usr/src/app/node_modules
@@ -29,7 +29,7 @@ services:
       DB_USERNAME: postgres
       DB_PORT: 5432
       DB_HOST: importer-db-staging-copy
-      SOURCE_DATABASE: importer-db
+      SOURCE_DATABASE: importer-db-staging-copy
       TARGET_DATABASE: sis-importer-db
 
   importer-db-staging-copy:
@@ -44,7 +44,7 @@ services:
     container_name: importer-db-staging-sampletaker-adminer
     environment:
       - ADMINER_DESIGN=pepa-linha
-      - ADMINER_DEFAULT_SERVER=importer-db
+      - ADMINER_DEFAULT_SERVER=importer-db-staging-copy
     image: adminer:4.7.5
     ports:
       - 5051:8080 # http://localhost:5051/?pgsql=importer-test-db&username=postgres&db=importer-db&ns=public

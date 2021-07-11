@@ -2,17 +2,18 @@ const { sourceConnection, targetConnection } = require('./db/connection')
 
 const DESTROY = false // DANGER ZONE
 
-const getIdsOfSuitableStudentsFromTestDb = async () => {
+/**
+ * Anon data has some inconsistensies, e.g. students have attainments totally from 
+ * another program, which makes data not usable. Following query tries to find data
+ * where students:
+ * - have recently started (+2017) studyright for given programme
+ * - have attainments that are from given programme
+ * - don't have values nulled in fields that are needed for toska software
+ */
+const getIdsOfStudentsOfProgramme = async ({educationId, organisationId}) => {
   const { knex } = sourceConnection
-
-  // Settings for sample to be fetched
-  // TODO: get these from config and don't hardcode
-  const sampleSize = 100
-  const compScienceBachMastProgrammeEducation = 'hy-EDU-114256325-2017'
   const startDateForNewProgrammes = '2017-01-08'
-
-  return (
-    (
+    return (
       await knex
         .select('persons.id')
         .from('persons')
@@ -21,14 +22,26 @@ const getIdsOfSuitableStudentsFromTestDb = async () => {
         .join('attainments', builder =>
           builder.on('attainments.person_id', 'persons.id').andOn('attainments.study_right_id', 'studyrights.id')
         )
-        .where('studyrights.education_id', compScienceBachMastProgrammeEducation)
+        .where('studyrights.education_id', educationId)
         .andWhere(builder => builder.whereNotNull('persons.student_number', 'persons.first_names', 'persons.last_name'))
         .andWhereRaw("cast(studyrights.valid->>'startDate' as date) >= ?", new Date(startDateForNewProgrammes))
+        .andWhereRaw(`attainments.organisations @> '[{\"organisationId\": \"${organisationId}\"}]'`)
         .distinctOn('persons.student_number')
-        .limit(sampleSize)
     )
       .map(({ id }) => id)
-  )
+}
+
+const getIdsOfSuitableStudentsFromTestDb = async () => {
+
+  // Comp science bach
+  const KH50_005 = {
+    educationId: 'hy-EDU-114256325-2017',
+    organisationId: 'hy-org-116716376'
+  }
+
+  return [
+  ...await getIdsOfStudentsOfProgramme(KH50_005)
+  ]
 }
 
 /**
@@ -143,9 +156,13 @@ const run = async () => {
   const destroy = process.env.DESTROY
   if (destroy?.toLowerCase() === "true") DESTROY = true
   const students = await getIdsOfSuitableStudentsFromTestDb()
-  const teachers = await removeAttainmentRelatedData(students)
-  removeStudyrightRelatedData(students)
-  removePersons(students, teachers)
+  console.log(students.length)
+  console.log(students[0])
+  console.log(students[20])
+  console.log(students[50])
+  // const teachers = await removeAttainmentRelatedData(students)
+  // removeStudyrightRelatedData(students)
+  // removePersons(students, teachers)
 }
 
 run()
