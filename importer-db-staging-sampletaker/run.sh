@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit on error
+set -e
+
 read -rp "Are you running this locally or in pannu(l/p)?" RUNENV
 pannupath="/home/importer_user/staging/backup/importer-db-staging.sqz"
 if [ "$RUNENV" = "l" ]; then
@@ -52,14 +55,14 @@ docker exec importer-db-staging-copy psql -U postgres -c 'DROP DATABASE IF EXIST
 docker exec importer-db-staging-copy psql -U postgres -c 'CREATE DATABASE "sis-importer-db" WITH TEMPLATE "importer-db-staging-copy";'
 
 # Run sampletaker: first dry-run, then confirm
-docker-compose up importer-db-staging-sampletaker dry-run
+docker-compose run importer-db-staging-sampletaker
 
 read -rp "Create sample by nuking extra stuff from db(y/n)?" CONT
 if [ "$CONT" != "y" ]; then
   exit 0
 fi
 
-docker-compose up importer-db-staging-sampletaker destroy
+docker-compose run -e DESTROY=TRUE importer-db-staging-sampletaker
 
 # Vacuum the sample database
 docker exec importer-db-staging-copy psql -U postgres sis-importer-db -c 'VACUUM FULL;'
