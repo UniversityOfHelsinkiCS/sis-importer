@@ -1,4 +1,4 @@
-const { sourceConnection, targetConnection } = require('./db/connection')
+const { connection } = require('./db/connection')
 
 let DESTROY = false // DANGER ZONE
 
@@ -11,7 +11,7 @@ let DESTROY = false // DANGER ZONE
  * - don't have values nulled in fields that are needed for toska software
  */
 const getIdsOfStudentsOfProgramme = async ({ educationId, organisationId }) => {
-  const { knex } = sourceConnection
+  const { knex } = connection
   const startDateForNewProgrammes = '2017-01-08'
   return (
     await knex
@@ -63,7 +63,7 @@ const getIdsOfSuitableStudentsFromTestDb = async () => {
  * @returns promise?
  */
 const removeStuff = async (table, column, idsNotToDelete) => {
-  const { knex } = targetConnection
+  const { knex } = connection
   if (DESTROY) {
     const deleted = await knex(table).whereNotIn(column, idsNotToDelete).del()
     const sizeNow = await knex(table).count()
@@ -77,7 +77,7 @@ const removeStuff = async (table, column, idsNotToDelete) => {
 }
 
 const removeAttainmentRelatedData = async students => {
-  const { knex } = sourceConnection
+  const { knex } = connection
   const relevantAttainmentsAndCourseUnits = await knex
     .select('id', 'course_unit_id', 'acceptor_persons')
     .from('attainments')
@@ -148,7 +148,7 @@ const removeAttainmentRelatedData = async students => {
 }
 
 const removeStudyrightRelatedData = async students => {
-  const { knex } = sourceConnection
+  const { knex } = connection
   const relevantEducations = await knex.select('education_id').from('studyrights').whereIn('person_id', students)
   await Promise.all([
     removeStuff(

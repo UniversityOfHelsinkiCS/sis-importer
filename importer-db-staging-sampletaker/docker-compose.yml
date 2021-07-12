@@ -11,8 +11,7 @@ services:
       DB_USERNAME: postgres
       DB_PORT: 5432
       DB_HOST: importer-db-staging-copy
-      SOURCE_DATABASE: importer-db-staging-copy
-      TARGET_DATABASE: sis-importer-db
+      DB_NAME: sis-importer-db
     volumes:
       - sampletaker_modules:/usr/src/app/node_modules
       - .:/usr/src/app
@@ -29,8 +28,7 @@ services:
       DB_USERNAME: postgres
       DB_PORT: 5432
       DB_HOST: importer-db-staging-copy
-      SOURCE_DATABASE: importer-db-staging-copy
-      TARGET_DATABASE: sis-importer-db
+      DB_NAME: sis-importer-db
 
   importer-db-staging-copy:
     image: postgres:13
