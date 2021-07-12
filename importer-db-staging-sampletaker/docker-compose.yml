@@ -39,6 +39,7 @@ services:
     volumes:
       - importer-db-staging-copy-data:/var/lib/postgresql/data
     container_name: importer-db-staging-copy
+    command: ["-c", "max_wal_size=4GB", "-c", "maintenance_work_mem=1GB"]
 
   importer-db-staging-sampletaker-adminer:
     container_name: importer-db-staging-sampletaker-adminer
