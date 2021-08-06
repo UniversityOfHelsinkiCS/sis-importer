@@ -301,7 +301,7 @@ updaterRouter.get('/enrolments', async (req, res) => {
 
   const enrolments = await models.Enrolment.findAll({
     where: {
-        state: 'ENROLLED',
+      state: 'ENROLLED',
     },
     attributes: relevantAttributes.enrolment,
     limit,
