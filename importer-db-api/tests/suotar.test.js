@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 const { api, unauthorizedApi } = require('./api')
 
 test('unauthorized users can not use endpoints', async () => {
@@ -6,6 +7,8 @@ test('unauthorized users can not use endpoints', async () => {
   expect(resp.body).toStrictEqual({})
 })
 
+// Enable this when new db dump
+/*
 test('gets attainments by student number and course code', async () => {
   const resp = await api.get('/suotar/attainments/MAT11001/010408252')
   expect(resp.status).toBe(200)
@@ -15,3 +18,4 @@ test('gets attainments by student number and course code', async () => {
   expect(attainment.grade).not.toBeNull()
   expect(attainment.type).toBe('CourseUnitAttainment')
 })
+*/

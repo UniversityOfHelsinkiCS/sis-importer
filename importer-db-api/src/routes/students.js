@@ -96,7 +96,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
 
       const elements = [
         {
-          code: module.code,
+          code: module ? module.code : undefined,
           start_date: valid.startDate,
           end_date: valid.endDate,
         },
