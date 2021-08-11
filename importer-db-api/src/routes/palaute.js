@@ -300,9 +300,9 @@ updaterRouter.get('/enrolments', async (req, res) => {
   if (!limit || !offset) return res.sendStatus(400)
 
   const enrolments = await models.Enrolment.findAll({
-    /* where: {
+    where: {
       state: 'ENROLLED',
-    }, */
+    },
     attributes: relevantAttributes.enrolment,
     limit,
     offset,
