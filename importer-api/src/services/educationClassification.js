@@ -6,7 +6,7 @@ const info = {
   API: APIS.urn,
   CHANNEL: URN_EDUCATION_CLASSIFICATION_CHANNEL,
   REDIS_KEY: EDUCATION_CLASSIFICATION_SCHEDULE_ID,
-  API_URL: 'https://sis-helsinki-test.funidata.fi/kori/api/cached/codebooks/urn:code:education-classification',
+  API_URL: 'https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:education-classification',
   ONETIME: true
 }
 

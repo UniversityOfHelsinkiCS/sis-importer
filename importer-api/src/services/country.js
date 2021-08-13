@@ -6,7 +6,7 @@ const info = {
   API: APIS.urn,
   CHANNEL: URN_COUNTRY_CHANNEL,
   REDIS_KEY: COUNTRY_SCHEDULE_ID,
-  API_URL: 'https://sis-helsinki-test.funidata.fi/kori/api/cached/codebooks/urn:code:country',
+  API_URL: 'https://sis-helsinki.funidata.fi/kori/api/cached/codebooks/urn:code:country',
   ONETIME: true
 }
 
