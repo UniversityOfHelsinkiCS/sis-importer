@@ -52,7 +52,9 @@ router.post('/', async (req, res) => {
 })
 
 /**
- * Post list of {courseCode, studentNumber} pairs here to get their attainments
+ * Post list of {courseCode, studentNumber} pairs here to get their attainments.
+ *
+ * Use req param noSubstitutions=true to include attainments for the course code only.
  */
 router.post('/attainments', async (req, res) => {
   const data = req.body
@@ -335,6 +337,7 @@ router.get('/responsibles/:courseCode', async (req, res) => {
   return res.send(personsWithRoles)
 })
 
+// Currently not used
 router.post('/substitutions', async (req, res) => {
   const codes = req.body
   if (!Array.isArray(codes)) return res.status(400).send({ error: 'Input should be an array' })
