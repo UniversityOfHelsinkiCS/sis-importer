@@ -1,14 +1,20 @@
 // eslint-disable-next-line no-unused-vars
-const { api, unauthorizedApi } = require('./api')
+const { auth, invalidAuth } = require('./api')
+const supertest = require('supertest')
+const app = require('../src/app')
 
 test('unauthorized users can not use endpoints', async () => {
-  const resp = await unauthorizedApi.get('/suotar/attainments/MAT11001/010408252')
+  let resp = await supertest(app).get('/suotar/attainments/MAT11001/010408252')
+  expect(resp.status).toBe(401)
+  expect(resp.body).toStrictEqual({})
+
+  resp = await supertest(app).get('/suotar/attainments/MAT11001/010408252').query(invalidAuth)
   expect(resp.status).toBe(401)
   expect(resp.body).toStrictEqual({})
 })
 
 test('gets attainments by student number and course code', async () => {
-  const resp = await api.get('/suotar/attainments/TKT10001/010231474')
+  const resp = await supertest(app).get('/suotar/attainments/TKT10001/010231474').query(auth)
   expect(resp.status).toBe(200)
   expect(resp.body.length).toBe(1)
 
@@ -18,11 +24,14 @@ test('gets attainments by student number and course code', async () => {
 })
 
 test('gets batch attainments by student number and course code', async () => {
-  const resp = await api.post('/suotar/attainments').send([
-    { courseCode: 'TKT10001', studentNumber: '010231474' },
-    { courseCode: 'TKT10001', studentNumber: '010239573' },
-    { courseCode: 'TKT10001', studentNumber: 'not-a-student' },
-  ])
+  const resp = await supertest(app)
+    .post('/suotar/attainments')
+    .query(auth)
+    .send([
+      { courseCode: 'TKT10001', studentNumber: '010231474' },
+      { courseCode: 'TKT10001', studentNumber: '010239573' },
+      { courseCode: 'TKT10001', studentNumber: 'not-a-student' },
+    ])
   expect(resp.status).toBe(200)
   expect(resp.body.length).toBe(3)
 
@@ -43,7 +52,10 @@ test('gets batch attainments by student number and course code', async () => {
 })
 
 test('gets batch attainments by student number and course code with substituting course code', async () => {
-  const resp = await api.post('/suotar/attainments').send([{ courseCode: '582102', studentNumber: '010231474' }])
+  const resp = await supertest(app)
+    .post('/suotar/attainments')
+    .query(auth)
+    .send([{ courseCode: '582102', studentNumber: '010231474' }])
   expect(resp.status).toBe(200)
   expect(resp.body.length).toBe(1)
 
@@ -55,9 +67,10 @@ test('gets batch attainments by student number and course code with substituting
 })
 
 test('gets batch attainments by student number and course code without substitutions', async () => {
-  const resp = await api
+  const resp = await supertest(app)
     .post('/suotar/attainments')
     .query({ noSubstitutions: true })
+    .query(auth)
     .send([{ courseCode: '582102', studentNumber: '010231474' }])
 
   expect(resp.status).toBe(200)
@@ -67,11 +80,14 @@ test('gets batch attainments by student number and course code without substitut
 })
 
 test('gets batch enrollments by student number and course code', async () => {
-  const resp = await api.post('/suotar/enrolments').send([
-    { code: 'TKT20005', personId: 'hy-hlo-130906952' },
-    { code: 'TKT20005', personId: 'hy-hlo-128785149' },
-    { code: 'TKT20005', personId: 'not-a-student' },
-  ])
+  const resp = await supertest(app)
+    .post('/suotar/enrolments')
+    .query(auth)
+    .send([
+      { code: 'TKT20005', personId: 'hy-hlo-130906952' },
+      { code: 'TKT20005', personId: 'hy-hlo-128785149' },
+      { code: 'TKT20005', personId: 'not-a-student' },
+    ])
   expect(resp.status).toBe(200)
   expect(resp.body.length).toBe(3)
 
@@ -91,7 +107,7 @@ test('gets batch enrollments by student number and course code', async () => {
 })
 
 test('gets acceptor persons for course unit realisation', async () => {
-  const resp = await api.post('/suotar/acceptors').send(['hy-CUR-138156846', 'not-a-course'])
+  const resp = await supertest(app).post('/suotar/acceptors').query(auth).send(['hy-CUR-138156846', 'not-a-course'])
   expect(resp.status).toBe(200)
 
   expect(resp.body['hy-CUR-138156846'].length).toBe(1)

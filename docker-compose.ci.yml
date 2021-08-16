@@ -14,7 +14,7 @@ services:
       args:
         NODE_ENV: "test"
       context: importer-db-api
-    command: "npm run run:test"
+    command: "npm run jest"
     container_name: sis-importer-db-api
     tty: true
     depends_on:

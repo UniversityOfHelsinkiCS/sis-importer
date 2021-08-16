@@ -6,12 +6,11 @@
   "scripts": {
     "start": "node ./src/index.js",
     "start:dev": "nodemon ./src/index.js",
-    "run:test": "npm-run-all -r -p start jest",
     "lint": "eslint .",
     "lint:fix": "prettier --write **/*.{js,json} && eslint --fix .",
     "ci": "../run.sh ci build importer-db-api && ../run.sh ci run importer-db-api npm run ci:test",
-    "jest": "jest",
-    "ci:test": "npm-run-all lint run:test",
+    "jest": "jest --no-cache --forceExit",
+    "ci:test": "npm-run-all lint jest",
     "test": "../run.sh ci up --build --abort-on-container-exit --exit-code-from importer-db-api"
   },
   "author": "",
@@ -47,14 +46,15 @@
     "supertest": "^6.1.3"
   },
   "jest": {
-    "rootDir": "./",
     "collectCoverage": true,
     "coverageReporters": [
       "json",
-      "html"
+      "html",
+      "text"
     ],
     "collectCoverageFrom": [
-      "src/**/*.js*"
+      "**/*.{js,jsx}",
+      "!**/node_modules/**"
     ]
   }
 }
