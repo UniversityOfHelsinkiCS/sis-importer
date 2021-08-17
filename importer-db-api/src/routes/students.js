@@ -244,6 +244,7 @@ router.get('/:studentNumber/enrolled/study_track/:studyTrackId', async (req, res
   })
 
   for (const { courseUnitRealisation } of enrolledCourses) {
+    if (!courseUnitRealisation.organisations) continue
     const organisationIds = courseUnitRealisation.organisations.map(e => e.organisationId)
 
     const responsibleOrganisations = await models.Organisation.findAll({
