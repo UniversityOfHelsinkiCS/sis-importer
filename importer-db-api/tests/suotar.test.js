@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 const { auth, invalidAuth } = require('./api')
 const supertest = require('supertest')
 const app = require('../src/app')
@@ -49,6 +48,12 @@ test('gets batch attainments by student number and course code', async () => {
   expect(student2.attainments[0].personId).toBe('hy-hlo-128785149')
   expect(student2.attainments[0].credits).toBe(5)
   expect(student2.attainments[0].gradeId).toBe(5)
+})
+
+test('gets batch attainments with invalid data', async () => {
+  const resp = await supertest(app).post('/suotar/attainments').query(auth).send('wat')
+  expect(resp.status).toBe(400)
+  expect(resp.body.error).not.toBeNull()
 })
 
 test('gets batch attainments by student number and course code with substituting course code', async () => {
@@ -106,6 +111,22 @@ test('gets batch enrollments by student number and course code', async () => {
   expect(invalidStudent.enrolments.length).toBe(0)
 })
 
+test('gets batch enrollments with invalid data', async () => {
+  let resp = await supertest(app).post('/suotar/enrolments').query(auth).send('wat')
+  expect(resp.status).toBe(400)
+  expect(resp.body.error).not.toBeNull()
+
+  resp = await supertest(app)
+    .post('/suotar/enrolments')
+    .query(auth)
+    .send([
+      { code: null, personId: 'hy-hlo-130906952' },
+      { code: 'TKT20005', personId: null },
+    ])
+  expect(resp.status).toBe(200)
+  expect(resp.body).toEqual([])
+})
+
 test('gets acceptor persons for course unit realisation', async () => {
   const resp = await supertest(app).post('/suotar/acceptors').query(auth).send(['hy-CUR-138156846', 'not-a-course'])
   expect(resp.status).toBe(200)
@@ -118,4 +139,14 @@ test('gets acceptor persons for course unit realisation', async () => {
     },
   ])
   expect(resp.body['not-a-course']).toBe(undefined)
+})
+
+test('gets responsible teachers correctly by course code', async () => {
+  const resp = await supertest(app).get('/suotar/responsibles/TKT20005').query(auth)
+
+  const persons = Object.keys(resp.body)
+
+  expect(persons.length).toBe(4)
+  expect(resp.body[persons[0]].person).not.toBe(undefined)
+  expect(resp.body[persons[0]].roles.length).not.toBe(0)
 })

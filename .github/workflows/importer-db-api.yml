@@ -47,16 +47,15 @@ jobs:
     if: always()
     steps:
       - name: Notify failed
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         if: (needs.test-lint.result != 'success' || needs.build-push.result != 'success')
-        env:
-          SLACKBOT_URL: ${{ secrets.SLACKBOT_URL }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-        run: |
-          curl --silent -X POST -H 'Content-type: application/json' --data "{\"blocks\":[{\"type\":\"header\",\"text\":{\"type\":\"plain_text\",\"text\":\"Test run failed on ${GITHUB_REF##*/} :kurkkumopo:\",\"emoji\":true}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"Uh oh, importer-db-api <https://github.com/UniversityOfHelsinkiCS/sis-importer/actions/runs/${GITHUB_RUN_ID}|workflow> run by *$GITHUB_ACTOR* has failed on branch ${GITHUB_REF##*/}. \nCommit: <https://github.com/UniversityOfHelsinkiCS/sis-importer/commit/${GITHUB_SHA}|${GITHUB_SHA:6}>\"}},{\"type\":\"section\",\"text\":{\"type\":\"plain_text\",\"text\":\"Commit message: \n $COMMIT_MESSAGE\",\"emoji\":true},\"accessory\":{\"type\":\"image\",\"image_url\":\"https://cataas.com/cat/fail?$GITHUB_RUN_ID\",\"alt_text\":\"cat failing\"}}]}" "$SLACKBOT_URL" && exit 1
+        with:
+          webhook-url: ${{ secrets.SLACKBOT_URL }}
+          message-type: test-failure
       - name: Notify success
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         if: (needs.test-lint.result == 'success' || needs.build-push.result == 'success')
-        env:
-          SLACKBOT_URL: ${{ secrets.SLACKBOT_URL }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-        run: |
-          curl --silent -X POST -H 'Content-type: application/json' --data "{\"blocks\":[{\"type\":\"header\",\"text\":{\"type\":\"plain_text\",\"text\":\"Importer-db-api ${GITHUB_REF##*/} deploying :rocket:\",\"emoji\":true}},{\"type\":\"section\",\"text\":{\"type\":\"plain_text\",\"text\":\"importer-db-api ${GITHUB_REF##*/} started deployment by $GITHUB_ACTOR.\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"Commit <https://github.com/UniversityOfHelsinkiCS/sis-importer/commit/${GITHUB_SHA}|${GITHUB_SHA:6}>: \n$COMMIT_MESSAGE\"},\"accessory\":{\"type\":\"image\",\"image_url\":\"https://cataas.com/cat/gif?$GITHUB_RUN_ID\",\"alt_text\":\"cat\"}}]}" "$SLACKBOT_URL"
+        with:
+          webhook-url: ${{ secrets.SLACKBOT_URL }}
+          message-type: deployment
+          deployment-target: production
