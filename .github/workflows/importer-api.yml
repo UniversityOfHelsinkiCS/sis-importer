@@ -30,3 +30,23 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         tag_with_ref: true       
+
+  notify:
+    runs-on: ubuntu-20.04
+    needs: [build-test-push]
+    if: always()
+    steps:
+      - name: Notify failed
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
+        if: (needs.build-test-push.result != 'success')
+        with:
+          webhook-url: ${{ secrets.SLACKBOT_URL }}
+          message-type: test-failure
+      - name: Notify success
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
+        if: (needs.build-test-push.result != 'success')
+        with:
+          webhook-url: ${{ secrets.SLACKBOT_URL }}
+          message-type: deployment
+          deployment-target: production
+          softa-url: https://youtu.be/C_S5cXbXe-4

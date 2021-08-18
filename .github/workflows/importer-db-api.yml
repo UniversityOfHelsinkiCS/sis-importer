@@ -59,3 +59,4 @@ jobs:
           webhook-url: ${{ secrets.SLACKBOT_URL }}
           message-type: deployment
           deployment-target: production
+          softa-url: https://youtu.be/NUYvbT6vTPs
