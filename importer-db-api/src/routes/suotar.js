@@ -153,7 +153,7 @@ router.get('/attainments/:courseCode/:studentNumber', async (req, res) => {
 })
 
 /**
- * Post array of {personId, id (hy-kur-*), courseUnitId, gradeId} attainments. This endpoint
+ * Post array of {personId, id (hy-kur-*), gradeId} attainments. This endpoint
  * will return the data with additional field called registered with attainment type or false.
  *
  * Performance of this is still WIP...
@@ -174,8 +174,7 @@ router.post('/verify', async (req, res) => {
     const courseUnitAttainment = attainments.find(
       attainment => (
         attainment.personId === entry.personId && attainment.type === 'CourseUnitAttainment',
-        attainment.courseUnitId === entry.courseUnitId &&
-          Array.isArray(attainment.assessmentItemAttainmentIds) &&
+        Array.isArray(attainment.assessmentItemAttainmentIds) &&
           attainment.assessmentItemAttainmentIds.includes(entry.id)
       )
     )
