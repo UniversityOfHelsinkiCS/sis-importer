@@ -424,4 +424,21 @@ router.post('/courseUnitsAndRealisations', async (req, res) => {
   res.send(out)
 })
 
+router.get('/:studentNumber/plans', async (req, res) => {
+  const student = await models.Person.findOne({
+    where: {
+      studentNumber: req.params.studentNumber,
+    },
+  })
+
+  if (!student) return res.status(404).send('Student not found')
+
+  const plans = await models.Plan.findAll({
+    where: { userId: student.id },
+    raw: true,
+  })
+
+  res.send(plans)
+})
+
 module.exports = router

@@ -11,6 +11,7 @@ const TermRegistrations = require('./TermRegistrations')
 const Education = require('./Education')
 const Enrolment = require('./Enrolment')
 const GradeScale = require('./GradeScale')
+const Plan = require('./Plan')
 
 StudyRight.belongsTo(Organisation, { foreignKey: 'organisationId', targetKey: 'id' })
 Organisation.hasMany(StudyRight, { foreignKey: 'id', targetKey: 'organisationId' })
@@ -45,6 +46,7 @@ const models = {
   Education,
   Enrolment,
   GradeScale,
+  Plan,
 }
 
 module.exports = models
