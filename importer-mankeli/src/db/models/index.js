@@ -19,6 +19,7 @@ const DegreeTitle = require('./degreeTitle')
 const EducationClassification = require('./educationClassification')
 const StudyRightExpirationRule = require('./studyRightExpirationRule')
 const AdmissionType = require('./admissionType')
+const Plan = require('./plan')
 
 Person.hasMany(StudyRight)
 Education.hasMany(StudyRight)
@@ -47,5 +48,6 @@ module.exports = {
   DegreeTitle,
   EducationClassification,
   StudyRightExpirationRule,
-  AdmissionType
+  AdmissionType,
+  Plan
 }

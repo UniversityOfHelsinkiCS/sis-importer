@@ -9,6 +9,7 @@ const APIS = {
   ori: 'ORI',
   kori: 'KORI',
   ilmo: 'ILMO',
+  osuva: 'OSUVA',
   urn: 'URN',
   custom: 'CUSTOM',
   graphql: 'GRAPHQL'

@@ -4,6 +4,7 @@ const { oriRequest } = require('./utils/oriApi')
 const { koriRequest } = require('./utils/koriApi')
 const { urnRequest } = require('./utils/urnApi')
 const { ilmoRequest } = require('./utils/ilmoApi')
+const { osuvaRequest } = require('./utils/osuvaApi')
 const { graphqlRequest } = require('./utils/graphqlApi')
 const { get: redisGet, set: redisSet, incrby: redisIncrementBy, del: redisDel } = require('./utils/redis')
 const { services, serviceIds } = require('./services')
@@ -16,6 +17,7 @@ const API_MAPPING = {
   [APIS.ori]: oriRequest,
   [APIS.kori]: koriRequest,
   [APIS.ilmo]: ilmoRequest,
+  [APIS.osuva]: osuvaRequest,
   [APIS.urn]: urnRequest
 }
 
