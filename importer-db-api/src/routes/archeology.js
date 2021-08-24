@@ -441,4 +441,14 @@ router.get('/:studentNumber/plans', async (req, res) => {
   res.send(plans)
 })
 
+router.get('/:personId/person-groups', async (req, res) => {
+  const { personId } = req.params
+
+  if (!personId) return res.status(404).send('plz gibe person id')
+
+  const plans = await models.PersonGroup.findAll()
+
+  res.send(plans.filter(p => p.responsibilityInfos.some(r => r.personId === personId)))
+})
+
 module.exports = router

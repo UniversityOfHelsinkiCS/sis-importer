@@ -22,7 +22,8 @@ const {
   URN_EDUCATION_CLASSIFICATION_CHANNEL,
   URN_STUDY_RIGHT_EXPIRATION_RULE_CHANNEL,
   URN_ADMISSION_TYPE_CHANNEL,
-  OSUVA_PLAN_CHANNEL
+  OSUVA_PLAN_CHANNEL,
+  ORI_PERSON_GROUP_CHANNEL
 } = require('./utils/stan')
 const personHandler = require('./messageHandlers/person')
 const attainmentHandler = require('./messageHandlers/attainment')
@@ -45,6 +46,7 @@ const educationClassificationHandler = require('./messageHandlers/educationClass
 const studyRightExpirationRuleHandler = require('./messageHandlers/studyRightExpirationRule')
 const admissionTypeHandler = require('./messageHandlers/admissionType')
 const planHandler = require('./messageHandlers/plan')
+const personGroupHandler = require('./messageHandlers/personGroup')
 
 const { sleep } = require('./utils')
 const { createTransaction } = require('./utils/db')
@@ -79,7 +81,8 @@ const channels = {
   [URN_EDUCATION_CLASSIFICATION_CHANNEL]: educationClassificationHandler,
   [URN_STUDY_RIGHT_EXPIRATION_RULE_CHANNEL]: studyRightExpirationRuleHandler,
   [URN_ADMISSION_TYPE_CHANNEL]: admissionTypeHandler,
-  [OSUVA_PLAN_CHANNEL]: planHandler
+  [OSUVA_PLAN_CHANNEL]: planHandler,
+  [ORI_PERSON_GROUP_CHANNEL]: personGroupHandler
 }
 
 let currentExecutionHash = null

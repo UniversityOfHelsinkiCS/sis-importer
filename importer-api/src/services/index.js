@@ -17,6 +17,7 @@ const { GRAPHQL_GRADE_SCALES_SCHEDULE_ID, info: gradeScalesInfo } = require('./g
 const { DEGREE_TITLE_SCHEDULE_ID, info: degreeTitleInfo } = require('./degreeTitle')
 const { EDUCATION_CLASSIFICATION_SCHEDULE_ID, info: educationClassificationInfo } = require('./educationClassification')
 const { PLAN_SCHEDULE_ID, info: planInfo } = require('./plan')
+const { PERSON_GROUP_SCHEDULE_ID, info: personGroupInfo } = require('./personGroups')
 
 const {
   STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID,
@@ -45,7 +46,8 @@ const services = {
   [EDUCATION_CLASSIFICATION_SCHEDULE_ID]: educationClassificationInfo,
   [STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID]: studyRightExpirationRuleInfo,
   [ADMISSION_TYPE_SCHEDULE_ID]: admissionTypeInfo,
-  [PLAN_SCHEDULE_ID]: planInfo
+  [PLAN_SCHEDULE_ID]: planInfo,
+  [PERSON_GROUP_SCHEDULE_ID]: personGroupInfo
 }
 
 // Imported in this order
@@ -70,7 +72,8 @@ const serviceIds = [
   EDUCATION_CLASSIFICATION_SCHEDULE_ID,
   STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID,
   ADMISSION_TYPE_SCHEDULE_ID,
-  PLAN_SCHEDULE_ID
+  PLAN_SCHEDULE_ID,
+  PERSON_GROUP_SCHEDULE_ID
 ]
 
 module.exports = {
