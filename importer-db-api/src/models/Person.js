@@ -45,6 +45,12 @@ Person.init(
     dead: {
       type: BOOLEAN,
     },
+    preferredLanguageUrn: {
+      type: STRING,
+    },
+    secondaryEmail: {
+      type: STRING,
+    },
     createdAt: {
       type: DATE,
     },

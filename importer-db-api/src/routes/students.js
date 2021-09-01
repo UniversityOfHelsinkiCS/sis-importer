@@ -285,8 +285,9 @@ router.get('/:studentNumber/course-unit/:courseCode/enrolments', async (req, res
 })
 
 router.get('/:studentNumber/details', (req, res) => {
-  const { firstNames, lastName, eduPersonPrincipalName, primaryEmail, dead } = req.student
-  res.send({ firstNames, lastName, eduPersonPrincipalName, primaryEmail, dead })
+  const { firstNames, lastName, eduPersonPrincipalName, primaryEmail, dead, secondaryEmail, preferredLanguageUrn } =
+    req.student
+  res.send({ firstNames, lastName, eduPersonPrincipalName, primaryEmail, dead, secondaryEmail, preferredLanguageUrn })
 })
 
 module.exports = router

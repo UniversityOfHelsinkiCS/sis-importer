@@ -15,7 +15,9 @@ const parsePerson = person => {
     citizenships: person.citizenshipUrns,
     dead: person.dead,
     genderUrn: person.genderUrn,
-    countryUrn: person.primaryAddress ? person.primaryAddress.countryUrn : null
+    countryUrn: person.primaryAddress ? person.primaryAddress.countryUrn : null,
+    preferredLanguageUrn: person.preferredLanguageUrn,
+    secondaryEmail: person.secondaryEmail
   }
 }
 

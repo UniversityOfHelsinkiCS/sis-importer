@@ -30,6 +30,9 @@ Person.init(
     primaryEmail: {
       type: STRING
     },
+    secondaryEmail: {
+      type: STRING
+    },
     oppijaId: {
       type: STRING
     },
@@ -44,6 +47,9 @@ Person.init(
     },
     dead: {
       type: BOOLEAN
+    },
+    preferredLanguageUrn: {
+      type: STRING
     },
     createdAt: {
       type: DATE
