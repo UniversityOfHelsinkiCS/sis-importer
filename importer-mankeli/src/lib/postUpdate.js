@@ -28,7 +28,7 @@ const postUpdate = async () => {
   if (IS_DEV) return console.log('Skipping post update in dev env')
   console.log('Post Update Start')
 
-  await removeOpenUniversityStudyRights()
+  // await removeOpenUniversityStudyRights()
 
   sendToStan('POST_UPDATE_FINISH', { success: true })
 }
