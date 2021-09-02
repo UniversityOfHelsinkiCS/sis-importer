@@ -182,6 +182,7 @@ router.get('/:studentNumber/enrollments', async (req, res) => {
     const enrolments = await models.Enrolment.findAll({
       where: {
         personId: student.id,
+        state: 'ENROLLED'
       },
       order: [['enrolmentDateTime', 'DESC']],
       limit: req.query.limit || null,

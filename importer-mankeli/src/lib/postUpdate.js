@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const { stan, opts } = require('../utils/stan')
 const { NATS_GROUP, IS_DEV } = require('../config')
 
