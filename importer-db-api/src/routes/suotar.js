@@ -196,36 +196,32 @@ router.post('/enrolments', async (req, res) => {
   const data = req.body
   if (!Array.isArray(data)) return res.status(400).send({ error: 'Input should be an array' })
 
-  const output = await Promise.all(
-    data.map(async ({ code, personId }) => {
-      if (!code || !personId) return null
-      const courseUnits = await models.CourseUnit.findAll({
-        where: { code },
-        raw: true,
-      })
-      const enrolments = await models.Enrolment.findAll({
-        where: {
-          courseUnitId: { [Op.in]: courseUnits.map(({ id }) => id) },
-          state: 'ENROLLED',
-          personId,
-        },
-        raw: true,
-      })
-      const enrolmentsWithRealisations = await Promise.all(
-        enrolments.map(async enrolment => ({
-          ...enrolment,
-          courseUnitRealisation: await models.CourseUnitRealisation.findOne({
-            where: { id: enrolment.courseUnitRealisationId },
-            raw: true,
-          }),
-          courseUnit: courseUnits.find(({ id }) => id === enrolment.courseUnitId),
-        }))
-      )
-      return { code, personId, enrolments: enrolmentsWithRealisations }
-    })
-  )
-  // Filter out possible nulls
-  res.send(output.filter(e => !!e))
+  if (data.some(row => !row.personId || !row.code))
+    throw new Error('Input should be a list of { personId, code } objects')
+
+  const k = await models.Enrolment.findAll({
+    where: {
+      [Op.or]: data.map(({ personId, code }) => ({
+        [Op.and]: [{ personId }, { '$courseUnit.code$': code }],
+      })),
+    },
+    include: [
+      {
+        model: models.AssessmentItem,
+        as: 'assessmentItem',
+        attributes: ['credits', 'gradeScaleId'],
+      },
+      {
+        model: models.CourseUnitRealisation,
+        as: 'courseUnitRealisation',
+        attributes: ['activityPeriod', 'name'],
+      },
+      { model: models.CourseUnit, as: 'courseUnit', attributes: ['credits', 'gradeScaleId'] },
+    ],
+    raw: true,
+    nest: true,
+  })
+  return res.send(k)
 })
 
 router.post('/acceptors', async (req, res) => {
