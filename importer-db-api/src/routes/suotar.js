@@ -21,9 +21,9 @@ const getHeaders = () => {
 
 const agent = hasCerts
   ? new https.Agent({
-      cert: fs.readFileSync(CERT_PATH, 'utf8'),
-      key: fs.readFileSync(KEY_PATH, 'utf8'),
-    })
+    cert: fs.readFileSync(CERT_PATH, 'utf8'),
+    key: fs.readFileSync(KEY_PATH, 'utf8'),
+  })
   : new https.Agent()
 
 const sisApi = axios.create({
@@ -175,7 +175,7 @@ router.post('/verify', async (req, res) => {
       attainment => (
         attainment.personId === entry.personId && attainment.type === 'CourseUnitAttainment',
         Array.isArray(attainment.assessmentItemAttainmentIds) &&
-          attainment.assessmentItemAttainmentIds.includes(entry.id)
+        attainment.assessmentItemAttainmentIds.includes(entry.id)
       )
     )
 
@@ -232,7 +232,15 @@ router.post('/enrolments', async (req, res) => {
     else item.enrolments.push(e)
     return acc
   }, [])
-  return res.send(output)
+
+  // Ad empty rows for input rows with no enrolments
+  return res.send(
+    output.concat(
+      data
+        .filter(row => !output.find(enrolment => row.personId === enrolment.personId && row.code === enrolment.code))
+        .map(({ personId, code }) => ({ personId, code, enrolments: [] }))
+    )
+  )
 })
 
 router.post('/acceptors', async (req, res) => {
