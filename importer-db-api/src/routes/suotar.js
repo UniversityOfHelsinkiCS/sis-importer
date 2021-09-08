@@ -199,7 +199,7 @@ router.post('/enrolments', async (req, res) => {
   if (data.some(row => !row.personId || !row.code))
     throw new Error('Input should be a list of { personId, code } objects')
 
-  const k = await models.Enrolment.findAll({
+  const enrolments = await models.Enrolment.findAll({
     where: {
       [Op.or]: data.map(({ personId, code }) => ({
         [Op.and]: [{ personId }, { '$courseUnit.code$': code }],
@@ -216,12 +216,23 @@ router.post('/enrolments', async (req, res) => {
         as: 'courseUnitRealisation',
         attributes: ['activityPeriod', 'name'],
       },
-      { model: models.CourseUnit, as: 'courseUnit', attributes: ['credits', 'gradeScaleId'] },
+      { model: models.CourseUnit, as: 'courseUnit', attributes: ['credits', 'gradeScaleId', 'code'] },
     ],
     raw: true,
     nest: true,
   })
-  return res.send(k)
+  const output = enrolments.reduce((acc, e) => {
+    const item = acc.find(i => i.personId === e.personId && i.code === e.courseUnit.code)
+    if (!item)
+      acc.push({
+        personId: e.personId,
+        code: e.courseUnit.code,
+        enrolments: [e],
+      })
+    else item.enrolments.push(e)
+    return acc
+  }, [])
+  return res.send(output)
 })
 
 router.post('/acceptors', async (req, res) => {
