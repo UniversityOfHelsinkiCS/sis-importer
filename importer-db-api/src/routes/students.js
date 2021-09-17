@@ -2,7 +2,7 @@ const router = require('express').Router()
 const sequelize = require('sequelize')
 const { Op } = require('sequelize')
 const models = require('../models')
-const { Organisation, Education, CourseUnitRealisation } = require('../models')
+const { Organisation, Education, CourseUnitRealisation, Person } = require('../models')
 
 const MATLU = 'H50'
 
@@ -28,6 +28,38 @@ const isExchangeEducationType = educationTypeUrn => {
 const filterOutExchangeStudentStudyRights = studyrights => {
   return studyrights.filter(({ education }) => !education || !isExchangeEducationType(education.educationType))
 }
+
+/**
+ * Post list of persons and get list of students with their CS study right id
+ */
+router.post('/study-rights', async (req, res) => {
+  const studentNumbers = req.body
+  if (!Array.isArray(studentNumbers)) return res.status(400).send({ error: 'Input should be an array' })
+  const studyRights = await models.StudyRight.findAll({
+    where: {
+      '$person.student_number$': { [Op.in]: studentNumbers },
+      '$organisation.code$': MATLU,
+    },
+    attributes: [sequelize.literal('DISTINCT ON (studyright.id) *')],
+    order: [
+      ['id', 'DESC'],
+      ['modificationOrdinal', 'DESC'],
+    ],
+    include: [Organisation, Education, Person],
+    raw: true,
+    nest: true,
+  })
+  res.send(
+    studyRights.reduce((acc, { id: studyRightId, person }) => {
+      const { id: personId, studentNumber } = person
+      acc[studentNumber] = {
+        studyRightId,
+        personId,
+      }
+      return acc
+    }, {})
+  )
+})
 
 router.use('/:studentNumber', async (req, res, next) => {
   const student = await models.Person.findOne({
