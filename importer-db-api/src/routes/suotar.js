@@ -21,9 +21,9 @@ const getHeaders = () => {
 
 const agent = hasCerts
   ? new https.Agent({
-    cert: fs.readFileSync(CERT_PATH, 'utf8'),
-    key: fs.readFileSync(KEY_PATH, 'utf8'),
-  })
+      cert: fs.readFileSync(CERT_PATH, 'utf8'),
+      key: fs.readFileSync(KEY_PATH, 'utf8'),
+    })
   : new https.Agent()
 
 const sisApi = axios.create({
@@ -175,7 +175,7 @@ router.post('/verify', async (req, res) => {
       attainment => (
         attainment.personId === entry.personId && attainment.type === 'CourseUnitAttainment',
         Array.isArray(attainment.assessmentItemAttainmentIds) &&
-        attainment.assessmentItemAttainmentIds.includes(entry.id)
+          attainment.assessmentItemAttainmentIds.includes(entry.id)
       )
     )
 
@@ -259,6 +259,27 @@ router.post('/acceptors', async (req, res) => {
           roleUrn === 'urn:code:course-unit-realisation-responsibility-info-type:teacher' ||
           roleUrn === 'urn:code:course-unit-realisation-responsibility-info-type:responsible-teacher'
       )
+      .map(({ personId }) => ({
+        roleUrn: 'urn:code:attainment-acceptor-type:approved-by',
+        personId,
+      }))
+    return acc
+  }, {})
+  return res.send(acceptors)
+})
+
+router.post('/acceptors/course-unit', async (req, res) => {
+  const data = req.body
+  if (!Array.isArray(data)) return res.status(400).send({ error: 'Input should be an array' })
+  const courseUnits = await models.CourseUnit.findAll({
+    where: { id: data },
+    raw: true,
+  })
+  if (!courseUnits.length) return res.status(404).send('No course units found')
+
+  const acceptors = courseUnits.reduce((acc, { id, responsibilityInfos }) => {
+    acc[id] = responsibilityInfos
+      .filter(({ roleUrn }) => roleUrn === 'urn:code:module-responsibility-info-type:responsible-teacher')
       .map(({ personId }) => ({
         roleUrn: 'urn:code:attainment-acceptor-type:approved-by',
         personId,
