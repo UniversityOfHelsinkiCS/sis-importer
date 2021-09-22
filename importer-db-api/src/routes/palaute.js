@@ -16,6 +16,7 @@ const relevantAttributes = {
   ],
   courseUnitRealisation: [
     'id',
+    'flowState',
     'name',
     'nameSpecifier',
     'assessmentItemIds',
