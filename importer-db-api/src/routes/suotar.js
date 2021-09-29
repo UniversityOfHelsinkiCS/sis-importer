@@ -6,6 +6,7 @@ const fs = require('fs')
 const https = require('https')
 const _ = require('lodash')
 var sub = require('date-fns/sub')
+var isBefore = require('date-fns/isBefore')
 
 const logger = require('../utils/logger')
 
@@ -370,6 +371,26 @@ router.get('/responsibles/:courseCode', async (req, res) => {
   }, {})
 
   return res.send(personsWithRoles)
+})
+
+router.get('/study-right/:id', async (req, res) => {
+  const { id } = req.params
+  if (!id) return res.status(400).send('Missing course code')
+
+  const studyRights = await models.StudyRight.findAll({
+    where: {
+      id,
+    },
+    raw: true,
+  })
+
+  const out = studyRights.filter(r => r.snapshotDateTime)
+  if (!out.length) return res.send(studyRights[0])
+  const sorted = out
+    .filter(r => isBefore(new Date(r.snapshotDateTime), new Date()))
+    .sort((a, b) => new Date(b.snapshotDateTime) - new Date(a.snapshotDateTime))
+
+  return res.send(sorted[0] || {})
 })
 
 // Currently not used
