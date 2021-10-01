@@ -27,7 +27,17 @@ const relevantAttributes = {
     'responsibilityInfos',
   ],
   assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],
-  person: ['id', 'studentNumber', 'employeeNumber', 'eduPersonPrincipalName', 'firstNames', 'lastName', 'primaryEmail', 'secondaryEmail', 'preferredLanguageUrn'],
+  person: [
+    'id',
+    'studentNumber',
+    'employeeNumber',
+    'eduPersonPrincipalName',
+    'firstNames',
+    'lastName',
+    'primaryEmail',
+    'secondaryEmail',
+    'preferredLanguageUrn',
+  ],
   organisation: ['id', 'code', 'name', 'parentId'],
 }
 
