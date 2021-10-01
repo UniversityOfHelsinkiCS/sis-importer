@@ -62,6 +62,9 @@ AssessmentItem.init(
     primaryCourseUnitGroupId: {
       type: STRING,
     },
+    snapshotDateTime: {
+      type: DATE,
+    },
     createdAt: {
       type: DATE,
     },
