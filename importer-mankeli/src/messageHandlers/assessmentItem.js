@@ -13,12 +13,14 @@ const parseAssessmentItem = assessmentItem => {
     organisations: assessmentItem.organisations,
     primaryCourseUnitGroupId: assessmentItem.primaryCourseUnitGroupId,
     documentState: assessmentItem.documentState,
+    snapshotDateTime: assessmentItem.snapshotDateTime,
     modificationOrdinal: assessmentItem.metadata.modificationOrdinal
   }
 }
 
 // Assessment items need to be written into
 // the db in a similar fashion as studyrights.
+// ^ yes, assessment items are snapshot data ¯\_(ツ)_/¯
 module.exports = async ({ active, deleted }, transaction) => {
   const parsedAssessmentItems = [...active, ...deleted].map(parseAssessmentItem)
   await bulkCreate(AssessmentItem, parsedAssessmentItems, transaction, ['id', 'modificationOrdinal', 'autoId'])
