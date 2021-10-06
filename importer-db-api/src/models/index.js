@@ -21,6 +21,13 @@ StudyRight.hasOne(Education, { sourceKey: 'educationId', foreignKey: 'id' })
 
 AssessmentItem.belongsTo(CourseUnit, { foreignKey: 'primaryCourseUnitGroupId', targetKey: 'groupId', as: 'courseUnit' })
 
+Attainment.hasOne(CourseUnit, { sourceKey: 'courseUnitId', foreignKey: 'id', as: 'courseUnit' })
+Attainment.hasOne(CourseUnitRealisation, {
+  foreignKey: 'id',
+  sourceKey: 'courseUnitRealisationId',
+  as: 'courseUnitRealisation',
+})
+
 Enrolment.belongsTo(AssessmentItem, { foreignKey: 'assessmentItemId', targetKey: 'id', as: 'assessmentItem' })
 Enrolment.belongsTo(CourseUnitRealisation, {
   foreignKey: 'courseUnitRealisationId',

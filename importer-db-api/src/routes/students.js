@@ -2,7 +2,7 @@ const router = require('express').Router()
 const sequelize = require('sequelize')
 const { Op } = require('sequelize')
 const models = require('../models')
-const { Organisation, Education, CourseUnitRealisation, Person } = require('../models')
+const { Organisation, Education, CourseUnitRealisation, Person, CourseUnit } = require('../models')
 
 const MATLU = 'H50'
 
@@ -312,6 +312,53 @@ router.get('/:studentNumber/course-unit/:courseCode/enrolments', async (req, res
       },
     },
     raw: true,
+  })
+  return res.send(enrollments)
+})
+
+router.get('/:studentNumber/course-unit/:courseCode/attainments', async (req, res) => {
+  const { courseCode: code } = req.params
+  const courseUnits = await models.CourseUnit.findAll({
+    where: { code },
+    attributes: ['id'],
+    raw: true,
+  })
+  const attainments = await models.Attainment.findAll({
+    where: {
+      personId: req.student.id,
+      courseUnitId: courseUnits.map(({ id }) => id),
+    },
+    raw: true,
+  })
+  return res.send(attainments)
+})
+
+router.get('/:studentNumber/attainments', async (req, res) => {
+  const attainments = await models.Attainment.findAll({
+    where: {
+      personId: req.student.id,
+    },
+    include: [
+      { model: CourseUnit, as: 'courseUnit' },
+      { model: CourseUnitRealisation, as: 'courseUnitRealisation' },
+    ],
+    raw: true,
+    nest: true,
+  })
+  return res.send(attainments)
+})
+
+router.get('/:studentNumber/enrollments', async (req, res) => {
+  const enrollments = await models.Enrolment.findAll({
+    where: {
+      personId: req.student.id,
+    },
+    include: [
+      { model: CourseUnit, as: 'courseUnit' },
+      { model: CourseUnitRealisation, as: 'courseUnitRealisation' },
+    ],
+    raw: true,
+    nest: true,
   })
   return res.send(enrollments)
 })
