@@ -373,6 +373,28 @@ router.get('/responsibles/:courseCode', async (req, res) => {
   return res.send(personsWithRoles)
 })
 
+router.post('/study-rights', async (req, res) => {
+  const data = req.body
+  if (!Array.isArray(data)) return res.status(400).send({ error: 'Input should be an array' })
+  const studyRights = await models.StudyRight.findAll({
+    where: {
+      id: data,
+    },
+    attributes: ['id', 'personId', 'valid', 'snapshotDateTime'],
+    raw: true,
+  })
+  const studyRightsById = _.groupBy(studyRights, 'id')
+  const activeSnapshots = Object.keys(studyRightsById)
+    .map(
+      key =>
+        studyRightsById[key]
+          .filter(r => isBefore(new Date(r.snapshotDateTime), new Date()))
+          .sort((a, b) => new Date(b.snapshotDateTime) - new Date(a.snapshotDateTime))[0] || null
+    )
+    .filter(s => !!s) // Filter out study rights where snapshots only in future
+  return res.send(activeSnapshots)
+})
+
 router.get('/study-right/:id', async (req, res) => {
   const { id } = req.params
   if (!id) return res.status(400).send('Missing course code')
