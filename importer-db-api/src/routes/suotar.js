@@ -53,6 +53,25 @@ router.post('/', async (req, res) => {
 })
 
 /**
+ * Send erilliskirjaus to Sisu
+ */
+router.post('/send/course-unit-attainment', async (req, res) => {
+  const { body } = req
+  logger.info(`Sending to Sisu: ${JSON.stringify(body)}`)
+  try {
+    const { data } = await sisApi.post('/hy-custom/assessments/send/courseUnitAttainment', body)
+    return res.status(200).json(data)
+  } catch (e) {
+    if (e.response) {
+      const { response } = e
+      logger.info(`Sending course unit attainments to Sisu failed: ${JSON.stringify(response.data)}`)
+      return res.status(response.status).json(response.data)
+    }
+    throw new Error(`Sending course unit attainments to Sisu failed: ${e.toString()}`)
+  }
+})
+
+/**
  * Post list of {courseCode, studentNumber} pairs here to get their attainments.
  *
  * Use req param noSubstitutions=true to include attainments for the course code only.
