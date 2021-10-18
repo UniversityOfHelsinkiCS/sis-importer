@@ -447,6 +447,19 @@ router.get('/:code/course-units', async (req, res) => {
   )
 })
 
+router.post('/course-unit-ids', async (req, res) => {
+  const code = req.body
+  if (!Array.isArray(code)) return res.status(400).send({ error: 'Input should be an array' })
+  const units = await models.CourseUnit.findAll({
+    where: {
+      code,
+    },
+    attributes: ['id', 'name', 'validityPeriod', 'code'],
+    raw: true,
+  })
+  return res.send(_.groupBy(units, 'code'))
+})
+
 // Currently not used
 router.post('/substitutions', async (req, res) => {
   const codes = req.body
