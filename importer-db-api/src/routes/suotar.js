@@ -434,6 +434,19 @@ router.get('/study-right/:id', async (req, res) => {
   return res.send(sorted[0] || {})
 })
 
+router.get('/:code/course-units', async (req, res) => {
+  const { code } = req.params
+  return res.send(
+    await models.CourseUnit.findAll({
+      where: {
+        code,
+      },
+      attributes: ['id', 'name', 'validityPeriod'],
+      raw: true,
+    })
+  )
+})
+
 // Currently not used
 router.post('/substitutions', async (req, res) => {
   const codes = req.body
