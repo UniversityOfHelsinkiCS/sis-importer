@@ -40,7 +40,6 @@ router.post('/study-rights', async (req, res) => {
       '$person.student_number$': { [Op.in]: studentNumbers },
       '$organisation.code$': MATLU,
     },
-    attributes: [sequelize.literal('DISTINCT ON (studyright.id) *')],
     order: [
       ['id', 'DESC'],
       ['modificationOrdinal', 'DESC'],
