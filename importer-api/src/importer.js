@@ -60,7 +60,6 @@ const serviceUpdateFun = serviceId => {
       logger.error({ message: 'Importing failed', meta: err.stack })
       errorCounter.inc({ service: serviceId })
 
-
       if (resourceWasForbidden(serviceId, err)) return
       if (attempt > UPDATE_RETRY_LIMIT) return
 

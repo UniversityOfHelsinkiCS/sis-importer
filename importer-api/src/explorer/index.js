@@ -28,7 +28,7 @@ const knex = require('knex')({
 })
 
 app.get('/metrics', async (req, res) => {
-  res.setHeader('content-type', 'text/plain');
+  res.setHeader('content-type', 'text/plain')
   res.send(await prom.register.metrics())
 })
 
