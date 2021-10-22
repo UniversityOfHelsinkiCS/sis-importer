@@ -13,6 +13,8 @@ const { logger } = require('./utils/logger')
 const chunkify = require('./utils/chunkify')
 const requestBuffer = require('./utils/requestBuffer')
 
+const { successCounter } = require('./prom')
+
 const API_MAPPING = {
   [APIS.ori]: oriRequest,
   [APIS.kori]: koriRequest,
@@ -81,6 +83,7 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinis
           total: amountScheduled,
           serviceId
         })
+        successCounter.inc({ service: serviceId }, amount)
       }
       if (result === Number(amountScheduled)) {
         handleFinish()
