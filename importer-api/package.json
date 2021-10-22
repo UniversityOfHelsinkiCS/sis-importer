@@ -20,6 +20,7 @@
     "lodash": "^4.17.21",
     "node-nats-streaming": "^0.2.6",
     "pg": "^8.0.2",
+    "prom-client": "^14.0.0",
     "redis": "^2.8.0",
     "winston": "^3.2.1"
   },

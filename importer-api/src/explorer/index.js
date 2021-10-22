@@ -7,6 +7,8 @@ const { IS_DEV } = require('../config')
 const { logger } = require('../utils/logger')
 const { del: redisDel } = require('../utils/redis')
 
+const { prom } = require('../prom')
+
 const { DB_USERNAME, DB_PASSWORD, DB_PORT, DB_HOST, DB_DATABASE } = process.env
 
 const knex = require('knex')({
@@ -23,6 +25,11 @@ const knex = require('knex')({
     min: 0,
     max: 5
   }
+})
+
+app.get('/metrics', async (req, res) => {
+  res.setHeader('content-type', 'text/plain')
+  res.send(await prom.register.metrics())
 })
 
 app.use((req, res, next) => {

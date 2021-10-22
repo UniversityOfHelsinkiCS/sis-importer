@@ -7,6 +7,7 @@ const { sleep } = require('./utils')
 const postUpdate = require('./utils/postUpdate')
 const { logger } = require('./utils/logger')
 const requestBuffer = require('./utils/requestBuffer')
+const { errorCounter } = require('./prom')
 
 let forbiddenServiceIds = []
 let isImporting = false
@@ -57,6 +58,7 @@ const serviceUpdateFun = serviceId => {
       return recursivelyUpdateResource()
     } catch (err) {
       logger.error({ message: 'Importing failed', meta: err.stack })
+      errorCounter.inc({ service: serviceId })
 
       if (resourceWasForbidden(serviceId, err)) return
       if (attempt > UPDATE_RETRY_LIMIT) return
