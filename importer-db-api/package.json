@@ -18,7 +18,7 @@
   "dependencies": {
     "@sentry/node": "^6.3.6",
     "@sentry/tracing": "^6.3.6",
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "babel-eslint": "^10.1.0",
     "date-fns": "^2.16.1",
     "es6-error": "^4.1.1",
