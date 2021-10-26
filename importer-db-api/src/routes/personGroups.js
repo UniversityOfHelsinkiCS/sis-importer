@@ -56,12 +56,8 @@ router.get('/person/:personId', async (req, res) => {
 
   const members = await Promise.all(
     groupsForPerson.map(async ({ id }) => {
-      try {
-        const { data } = await sisApi.get(`/ori/api/person-groups/v1/${id}/memberships`)
-        return Promise.resolve(data)
-      } catch {
-        return Promise.reject([])
-      }
+      const { data } = await sisApi.get(`/ori/api/person-groups/v1/${id}/memberships`)
+      return Promise.resolve(data)
     })
   )
   members.flat().forEach(member => groupsById[member.personGroupId].members.push(member))
