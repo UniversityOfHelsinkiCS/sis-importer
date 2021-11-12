@@ -221,6 +221,7 @@ router.post('/enrolments', async (req, res) => {
 
   const enrolments = await models.Enrolment.findAll({
     where: {
+      state: 'ENROLLED',
       [Op.or]: data.map(({ personId, code }) => ({
         [Op.and]: [{ personId }, { '$courseUnit.code$': code }],
       })),
