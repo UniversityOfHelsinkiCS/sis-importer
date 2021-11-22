@@ -18,6 +18,7 @@ StudyRight.belongsTo(Organisation, { foreignKey: 'organisationId', targetKey: 'i
 Organisation.hasMany(StudyRight, { foreignKey: 'id', targetKey: 'organisationId' })
 
 StudyRight.hasOne(Education, { sourceKey: 'educationId', foreignKey: 'id' })
+StudyRight.hasMany(TermRegistrations, { sourceKey: 'id', foreignKey: 'studyRightId' })
 
 AssessmentItem.belongsTo(CourseUnit, { foreignKey: 'primaryCourseUnitGroupId', targetKey: 'groupId', as: 'courseUnit' })
 

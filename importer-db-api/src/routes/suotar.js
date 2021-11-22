@@ -221,9 +221,8 @@ router.post('/enrolments', async (req, res) => {
 
   const enrolments = await models.Enrolment.findAll({
     where: {
-      state: 'ENROLLED',
       [Op.or]: data.map(({ personId, code }) => ({
-        [Op.and]: [{ personId }, { '$courseUnit.code$': code }],
+        [Op.and]: [{ personId }, { '$courseUnit.code$': code }, { state: 'ENROLLED' }],
       })),
     },
     include: [
@@ -403,6 +402,29 @@ router.post('/study-rights', async (req, res) => {
     attributes: ['id', 'personId', 'valid', 'snapshotDateTime'],
     raw: true,
   })
+  const studyRightsById = _.groupBy(studyRights, 'id')
+  const activeSnapshots = Object.keys(studyRightsById)
+    .map(
+      key =>
+        studyRightsById[key]
+          .filter(r => isBefore(new Date(r.snapshotDateTime), new Date()))
+          .sort((a, b) => new Date(b.snapshotDateTime) - new Date(a.snapshotDateTime))[0] || null
+    )
+    .filter(s => !!s) // Filter out study rights where snapshots only in future
+  return res.send(activeSnapshots)
+})
+
+router.post('/study-rights-by-person', async (req, res) => {
+  const data = req.body
+  if (!Array.isArray(data)) return res.status(400).send({ error: 'Input should be an array' })
+  const studyRights = await models.StudyRight.findAll({
+    where: { personId: data },
+    attributes: ['id', 'personId', 'valid', 'snapshotDateTime'],
+    include: [{ model: models.Organisation, attributes: ['code'] }, { model: models.TermRegistrations }],
+    nest: true,
+    raw: true,
+  })
+
   const studyRightsById = _.groupBy(studyRights, 'id')
   const activeSnapshots = Object.keys(studyRightsById)
     .map(
