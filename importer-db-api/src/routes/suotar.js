@@ -191,13 +191,14 @@ router.post('/verify', async (req, res) => {
   })
 
   const output = data.map(entry => {
-    const courseUnitAttainment = attainments.find(
-      attainment => (
+    const courseUnitAttainment = attainments.find(attainment => {
+      if (attainment.id === entry.id && attainment.type === 'CourseUnitAttainment') return true
+      return (
         attainment.personId === entry.personId && attainment.type === 'CourseUnitAttainment',
         Array.isArray(attainment.assessmentItemAttainmentIds) &&
-          (attainment.assessmentItemAttainmentIds.includes(entry.id) || !attainment.assessmentItemAttainmentIds.length)
+          attainment.assessmentItemAttainmentIds.includes(entry.id)
       )
-    )
+    })
 
     if (courseUnitAttainment) return { ...entry, registered: courseUnitAttainment.type }
 
