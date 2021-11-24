@@ -195,7 +195,7 @@ router.post('/verify', async (req, res) => {
       attainment => (
         attainment.personId === entry.personId && attainment.type === 'CourseUnitAttainment',
         Array.isArray(attainment.assessmentItemAttainmentIds) &&
-          attainment.assessmentItemAttainmentIds.includes(entry.id)
+          (attainment.assessmentItemAttainmentIds.includes(entry.id) || !attainment.assessmentItemAttainmentIds.length)
       )
     )
 
