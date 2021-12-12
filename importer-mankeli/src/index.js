@@ -137,7 +137,6 @@ const handleMessage = (channel, msgHandler) => async msg => {
     if (transaction) transaction.rollback()
   }
 
-  console.log(SCHEDULER_STATUS_CHANNEL, response)
   stan.publish(SCHEDULER_STATUS_CHANNEL, JSON.stringify(response), err => {
     if (err) logger.error({ message: 'Failed publishing', meta: err.stack })
     else msg.ack()
@@ -155,14 +154,12 @@ stan.on('connect', async ({ clientID }) => {
   await onCurrentExecutionHashChange(hash => {
     if (!currentExecutionHash && hash) {
       Object.entries(channels).forEach(([CHANNEL, msgHandler]) => {
-        console.log(`subscribing to ${CHANNEL}`)
         const channel = stan.subscribe(CHANNEL, NATS_GROUP, opts)
         channel.on('message', handleMessage(CHANNEL, msgHandler))
       })
     }
     currentExecutionHash = hash
   })
-  console.log(`initialized`)
   initializePostUpdateChannel()
 })
 
