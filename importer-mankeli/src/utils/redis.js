@@ -21,6 +21,11 @@ const client = redis.createClient({
   retry_strategy: redisRetry
 })
 
+client.on('connect', () => console.log("REDIS CONNECTED"))
+client.on('ready', () => console.log("REDIS READY"))
+client.on('error', () => console.log("REDIS ERROR"))
+
+
 const lock = promisify(redisLock(client))
 
 const redisPromisify = async (func, ...params) =>
