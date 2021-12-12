@@ -114,7 +114,7 @@ const handleMessage = (channel, msgHandler) => async msg => {
     console.log(`got msg`)
 
     if (!data || data.executionHash !== currentExecutionHash) {
-      console.log("ACK no mankel", currentExecutionHash, data.executionHash)
+      console.log('ACK no mankel', currentExecutionHash, data.executionHash)
       transaction.rollback()
       msg.ack()
       return
