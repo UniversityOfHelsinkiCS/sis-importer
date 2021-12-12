@@ -15,7 +15,7 @@ const APIS = {
   graphql: 'GRAPHQL'
 }
 const UPDATE_RETRY_LIMIT = 6
-const PANIC_TIMEOUT = IS_DEV || SONIC ? 60 * 1000 : 60 * 1000 * 5
+const PANIC_TIMEOUT = IS_DEV || SONIC ? 60 * 1000 : 15 * 1000 // * 5
 
 module.exports = {
   PORT,

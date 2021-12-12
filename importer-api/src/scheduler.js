@@ -39,7 +39,10 @@ const updateServiceStatus = async (key, { updated = undefined, scheduled = undef
 const createJobs = async (channel, entities, executionHash) =>
   new Promise((res, rej) => {
     stan.publish(channel, JSON.stringify({ entities, executionHash }), err => {
-      if (err) return rej(err)
+      if (err) {
+        logger.error(err)
+        return rej(err)
+      }
       res()
     })
   })
