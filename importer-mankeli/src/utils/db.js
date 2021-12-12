@@ -25,6 +25,7 @@ const createTransaction = async () => {
   try {
     return await connection.sequelize.transaction()
   } catch (e) {
+    console.log(e)
     return null
   }
 }

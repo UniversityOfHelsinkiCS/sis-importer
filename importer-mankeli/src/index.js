@@ -111,6 +111,8 @@ const handleMessage = (channel, msgHandler) => async msg => {
   try {
     if (!transaction) throw new Error('Creating transaction failed')
     const data = JSON.parse(msg.getData())
+    console.log(`got msg ${data}`)
+
     if (!data || data.executionHash !== currentExecutionHash) {
       transaction.rollback()
       msg.ack()
@@ -130,11 +132,13 @@ const handleMessage = (channel, msgHandler) => async msg => {
     }
     transaction.commit()
   } catch (e) {
+    console.log(e)
     logger.error({ message: 'Handling message failed', meta: e.stack })
     response = { ...JSON.parse(msg.getData()), status: 'FAIL', amount: 0, channel, stack: e.stack }
     if (transaction) transaction.rollback()
   }
 
+  console.log(SCHEDULER_STATUS_CHANNEL, response)
   stan.publish(SCHEDULER_STATUS_CHANNEL, JSON.stringify(response), err => {
     if (err) logger.error({ message: 'Failed publishing', meta: err.stack })
     else msg.ack()
@@ -152,12 +156,14 @@ stan.on('connect', async ({ clientID }) => {
   await onCurrentExecutionHashChange(hash => {
     if (!currentExecutionHash && hash) {
       Object.entries(channels).forEach(([CHANNEL, msgHandler]) => {
+        console.log(`subscribing to ${CHANNEL}`)
         const channel = stan.subscribe(CHANNEL, NATS_GROUP, opts)
         channel.on('message', handleMessage(CHANNEL, msgHandler))
       })
     }
     currentExecutionHash = hash
   })
+  console.log(`initialized`)
   initializePostUpdateChannel()
 })
 
