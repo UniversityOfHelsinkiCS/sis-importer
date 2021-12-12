@@ -111,9 +111,10 @@ const handleMessage = (channel, msgHandler) => async msg => {
   try {
     if (!transaction) throw new Error('Creating transaction failed')
     const data = JSON.parse(msg.getData())
-    console.log(`got msg ${data}`)
+    console.log(`got msg`)
 
     if (!data || data.executionHash !== currentExecutionHash) {
+      console.log("ACK no mankel", currentExecutionHash, data.executionHash)
       transaction.rollback()
       msg.ack()
       return
