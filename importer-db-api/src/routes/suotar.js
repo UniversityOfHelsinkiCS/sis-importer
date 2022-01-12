@@ -188,6 +188,7 @@ router.post('/verify', async (req, res) => {
       attainmentDate: { [Op.gt]: sub(new Date(), { years: 10 }) },
       misregistration: false,
     },
+    raw: true,
   })
 
   const output = data.map(entry => {
@@ -482,6 +483,39 @@ router.post('/course-unit-ids', async (req, res) => {
     raw: true,
   })
   return res.send(_.groupBy(units, 'code'))
+})
+
+router.get('/course-unit-enrolments/:code/', async (req, res) => {
+  const { code } = req.params
+  const courseUnits = await models.CourseUnit.findAll({ where: { code }, attributes: ['groupId'] })
+  const groupIds = _.uniq(courseUnits.map(({ groupId }) => groupId))
+  const assessmentItems = await models.AssessmentItem.findAll({
+    where: { primaryCourseUnitGroupId: groupIds },
+    attributes: ['id'],
+  })
+  const courseUnitRealisations = await models.CourseUnitRealisation.scope([
+    { method: ['assessmentItemIdsOverlap', assessmentItems.map(({ id }) => id)] },
+  ]).findAll({ raw: true, attributes: ['name', 'id', 'activityPeriod'] })
+  const enrollments = await models.Enrolment.findAll({
+    where: {
+      courseUnitRealisationId: courseUnitRealisations.map(({ id }) => id),
+      state: 'ENROLLED',
+    },
+    include: [{ model: models.Person, attributes: ['studentNumber', 'firstNames', 'lastName'] }],
+    raw: true,
+    nest: true,
+  })
+  const grouped = _.groupBy(enrollments, 'courseUnitRealisationId')
+  return res.send(
+    Object.keys(grouped).map(key => {
+      const { name, activityPeriod } = courseUnitRealisations.find(r => r.id === key)
+      return {
+        enrollments: grouped[key],
+        name,
+        activityPeriod,
+      }
+    })
+  )
 })
 
 // Currently not used
