@@ -2,7 +2,6 @@ const router = require('express').Router()
 const models = require('../models')
 const { Op, QueryTypes } = require('sequelize')
 const { sequelize } = require('../config/db')
-const { flatten } = require('lodash')
 
 const getEducationByIdForStudyright = async id => {
   try {
@@ -454,10 +453,15 @@ router.get('/:personId/person-groups', async (req, res) => {
 })
 
 router.get('/wat', async (req, res) => {
-  const groups = await models.PersonGroup.findAll({ where: { type: 'TUTORING_STUDENT_GROUP' }, raw: true })
-  const ids = flatten(groups.map(({ responsibilityInfos }) => responsibilityInfos.map(({ personId }) => personId)))
-  const ss = new Set(ids)
-  res.send({ set: ss.size, items: Array.from(ss) })
+  const curs = await models.CourseUnitRealisation.findAll({ attributes: ['id', 'organisations'], raw: true })
+  const w = curs.reduce((acc, cur) => {
+    const o = cur.organisations.find(o => o.roleUrn === 'urn:code:organisation-role:coordinating-organisation')
+    if (o) {
+      acc[o.organisationId] = (acc[o.organisationId] || 0) + 1
+    }
+    return acc
+  }, {})
+  res.send(w)
 })
 
 module.exports = router
