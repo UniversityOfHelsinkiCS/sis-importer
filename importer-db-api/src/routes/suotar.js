@@ -491,11 +491,12 @@ router.get('/course-unit-enrolments/:code/', async (req, res) => {
   const groupIds = _.uniq(courseUnits.map(({ groupId }) => groupId))
   const assessmentItems = await models.AssessmentItem.findAll({
     where: { primaryCourseUnitGroupId: groupIds },
-    attributes: ['id'],
+    attributes: ['id', 'gradeScaleId'],
+    raw: true,
   })
   const courseUnitRealisations = await models.CourseUnitRealisation.scope([
     { method: ['assessmentItemIdsOverlap', assessmentItems.map(({ id }) => id)] },
-  ]).findAll({ raw: true, attributes: ['name', 'id', 'activityPeriod'] })
+  ]).findAll({ raw: true, attributes: ['name', 'id', 'activityPeriod', 'assessmentItemIds'] })
   const enrollments = await models.Enrolment.findAll({
     where: {
       courseUnitRealisationId: courseUnitRealisations.map(({ id }) => id),
@@ -508,11 +509,13 @@ router.get('/course-unit-enrolments/:code/', async (req, res) => {
   const grouped = _.groupBy(enrollments, 'courseUnitRealisationId')
   return res.send(
     Object.keys(grouped).map(key => {
-      const { name, activityPeriod } = courseUnitRealisations.find(r => r.id === key)
+      const { name, activityPeriod, assessmentItemIds } = courseUnitRealisations.find(r => r.id === key)
+      const { gradeScaleId } = assessmentItems.find(a => assessmentItemIds.includes(a.id))
       return {
         enrollments: grouped[key],
         name,
         activityPeriod,
+        gradeScaleId,
       }
     })
   )
