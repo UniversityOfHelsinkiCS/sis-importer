@@ -509,11 +509,12 @@ router.get('/course-unit-enrolments/:code/', async (req, res) => {
   const grouped = _.groupBy(enrollments, 'courseUnitRealisationId')
   return res.send(
     Object.keys(grouped).map(key => {
-      const { name, activityPeriod, assessmentItemIds } = courseUnitRealisations.find(r => r.id === key)
+      const { name, activityPeriod, assessmentItemIds, id } = courseUnitRealisations.find(r => r.id === key)
       const { gradeScaleId } = assessmentItems.find(a => assessmentItemIds.includes(a.id))
       return {
         enrollments: grouped[key],
         name,
+        id,
         activityPeriod,
         gradeScaleId,
       }
