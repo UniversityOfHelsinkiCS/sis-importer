@@ -1,5 +1,6 @@
 const express = require('express')
 const logger = require('morgan')
+const os = require('os')
 const Sentry = require('@sentry/node')
 require('express-async-errors')
 
@@ -16,6 +17,7 @@ const palauteRouter = require('./routes/palaute')
 const personGroupsRouter = require('./routes/personGroups')
 const { ApplicationError } = require('./errors')
 const initializeSentry = require('./utils/sentry')
+const { dbHealth } = require('./config/db')
 
 const app = express()
 
@@ -30,6 +32,17 @@ app.use(express.json({ limit: '50mb' }))
 app.get('/ping', (req, res) => {
   res.send('pong')
 })
+
+app.get('/health', async (req, res) =>
+  res.send({
+    system: {
+      uptime: `${os.uptime()}`,
+      release: `${os.version()}`,
+      load: `${os.loadavg()}`,
+    },
+    db: { pass: await dbHealth() },
+  })
+)
 
 app.use((req, res, next) => {
   const { TOKEN } = process.env

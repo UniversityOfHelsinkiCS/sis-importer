@@ -16,6 +16,13 @@ const sequelize = new Sequelize({
   database: process.env.DB_DATABASE,
 })
 
+const dbHealth = async () => {
+  const res = await sequelize.query('SELECT 1 as pass', { raw: true })
+  if (!res) return false
+  return !!res[0][0]
+}
+
 module.exports = {
   sequelize,
+  dbHealth,
 }
