@@ -1,6 +1,7 @@
 const { Op } = require('sequelize')
 const express = require('express')
 const models = require('../models')
+const { sequelize } = require('../config/db')
 
 const relevantAttributes = {
   enrolment: ['id', 'personId', 'assessmentItemId', 'courseUnitRealisationId', 'courseUnitId', 'studySubGroups'],
@@ -49,6 +50,16 @@ const validRealisationTypes = [
   'urn:code:course-unit-realisation-type:teaching-participation-lectures',
   'urn:code:course-unit-realisation-type:teaching-participation-small-group',
   'urn:code:course-unit-realisation-type:teaching-participation-seminar',
+]
+
+const validEducations = [
+  'urn:code:education-type:degree-education:lic',
+  'urn:code:education-type:degree-education:bachelors-and-masters-degree',
+  'urn:code:education-type:degree-education:specialisation-in-medicine-and-dentistry',
+  'urn:code:education-type:degree-education:masters-degree',
+  'urn:code:education-type:degree-education',
+  'urn:code:education-type:degree-education:doctor',
+  'urn:code:education-type:degree-education:bachelors-degree',
 ]
 
 const addCourseUnitsToRealisations = async courseUnitRealisations => {
@@ -253,14 +264,31 @@ updaterRouter.get('/persons', async (req, res) => {
   const { limit, offset } = req.query
   if (!limit || !offset) return res.sendStatus(400)
 
-  const persons = await models.Person.findAll({
+  /* const persons = await models.Person.findAll({
     attributes: relevantAttributes.person,
     limit,
     offset,
     order: [['id', 'DESC']],
-  })
+  }) */
 
-  res.send(persons)
+  const personsWithStudyRight = await sequelize.query(
+    `SELECT P.id, P.student_number, P.employee_number, P.edu_person_principal_name,
+    P.first_names, P.last_name, P.primary_email, P.secondary_email, P.preferred_language_urn, 
+      (select (select count(E.*) from studyrights S, educations E where S.person_id = P.id and S.education_id = E.id and E.education_type 
+      IN (:validEducations) LIMIT 1) > 0) as has_study_right
+    FROM persons P ORDER BY P.id DESC LIMIT :limit OFFSET :offset`,
+    {
+      replacements: {
+        validEducations,
+        limit,
+        offset,
+      },
+      mapToModel: true,
+      model: models.Person,
+    }
+  )
+
+  res.send(personsWithStudyRight)
 })
 
 updaterRouter.get('/organisations', async (req, res) => {
