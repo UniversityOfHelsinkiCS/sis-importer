@@ -45,6 +45,9 @@ CourseUnitRealisation.init(
     responsibilityInfos: {
       type: JSONB
     },
+    customCodeUrns: {
+      type: JSONB
+    },
     createdAt: {
       type: DATE
     },
