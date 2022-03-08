@@ -26,6 +26,7 @@ const relevantAttributes = {
     'studyGroupSets',
     'organisations',
     'responsibilityInfos',
+    'customCodeUrns',
   ],
   assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],
   person: [
