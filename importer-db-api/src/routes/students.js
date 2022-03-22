@@ -224,7 +224,7 @@ router.get('/:studentNumber/rapo_semester_enrollments', async (req, res) => {
   }
 
 
-  res.status(200).send(termRegistrations.map(studyright => mangel(studyright)))
+  res.status(200).send(termRegistrations.map(studyright => mangel(studyright)).filter(s => s.terms.length>0))
 })
 
 router.get('/:studentNumber/has_passed_course/:code', async (req, res) => {
