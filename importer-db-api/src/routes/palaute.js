@@ -274,10 +274,22 @@ updaterRouter.get('/persons', async (req, res) => {
 
   const personsWithStudyRight = await sequelize.query(
     `SELECT P.id, P.student_number, P.employee_number, P.edu_person_principal_name,
-    P.first_names, P.last_name, P.primary_email, P.secondary_email, P.preferred_language_urn, 
-      (select (select count(E.*) from studyrights S, educations E where S.person_id = P.id and S.education_id = E.id and E.education_type 
-      IN (:validEducations) LIMIT 1) > 0) as has_study_right
-    FROM persons P ORDER BY P.id DESC LIMIT :limit OFFSET :offset`,
+      P.first_names, P.last_name, P.primary_email, P.secondary_email, P.preferred_language_urn, 
+      (
+        SELECT (
+          SELECT COUNT(E.*) 
+          FROM studyrights S, educations E 
+          WHERE S.person_id = P.id AND S.education_id = E.id 
+          AND E.education_type IN (:validEducations)
+          AND TO_DATE(valid->>'endDate', 'YYYY-MM-DD') >= NOW()
+          AND TO_DATE(valid->>'startDate', 'YYYY-MM-DD') <= NOW()
+          AND S.snapshot_date_time <= NOW()
+          LIMIT 1
+        ) > 0
+      ) AS has_study_right
+      FROM persons P 
+      ORDER BY P.id DESC 
+      LIMIT :limit OFFSET :offset`,
     {
       replacements: {
         validEducations,
