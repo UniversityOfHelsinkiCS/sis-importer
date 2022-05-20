@@ -12,12 +12,12 @@ const router = express.Router()
 router.get('/courses', async (req, res) => {
   const { year, term } = req.query
 
-  if (!term) {
-    throw new UserInputError('Term is required')
-  }
-
   if (!year) {
     throw new UserInputError('Year is required')
+  }
+
+  if (!term) {
+    throw new UserInputError('Term is required')
   }
 
   const CODES = ['TKT20002', 'TKT20010', 'TKT20011']
@@ -53,15 +53,18 @@ router.get('/courses', async (req, res) => {
 
 router.get('/courses/:id', async (req, res) => {
   const { id } = req.params
-  const { code, year, number } = parseCourseId(id)
+  const { code, term, year, type, number } = parseCourseId(id)
 
   let courseUnitRealisations = await getCourseRealisationsByCode(code, `${year}-01-01`)
 
-  courseUnitRealisations = courseUnitRealisations.sort(
-    (a, b) => new Date(a.activityPeriod.startDate) - new Date(b.activityPeriod.startDate)
+  courseUnitRealisations = courseUnitRealisations.filter(
+    courseUnitRealisation =>
+      getAcademicYear(courseUnitRealisation.activityPeriod.startDate) === year &&
+      getTerm(courseUnitRealisation.activityPeriod.startDate) === term &&
+      getCourseType(courseUnitRealisation.courseUnitRealisationTypeUrn) === type
   )
 
-  const courseUnitRealisation = courseUnitRealisations[number - 1]
+  const courseUnitRealisation = courseUnitRealisations[courseUnitRealisations.length - number]
 
   if (!courseUnitRealisation) {
     throw new NotFoundError(`Course ${id} is not found`)
@@ -235,7 +238,7 @@ const parseCourseId = id => {
     throw new UserInputError('Invalid course id')
   }
 
-  return { code, term, year: parsedYear, type, number: parsedNumber }
+  return { code, term, year, type, number }
 }
 
 module.exports = router
