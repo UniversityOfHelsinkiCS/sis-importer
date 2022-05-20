@@ -24,7 +24,14 @@ class NotFoundError extends ApplicationError {
   }
 }
 
+class UserInputError extends ApplicationError {
+  constructor(message, properties) {
+    super(message, properties, 400)
+  }
+}
+
 module.exports = {
   ApplicationError,
   NotFoundError,
+  UserInputError,
 }

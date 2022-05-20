@@ -1,0 +1,214 @@
+const express = require('express')
+const { Op } = require('sequelize')
+const { isString } = require('lodash')
+const dateFns = require('date-fns')
+const { getYear, isValid, getMonth, getDate } = require('date-fns')
+
+const models = require('../models')
+const { NotFoundError, UserInputError } = require('../errors')
+
+const router = express.Router()
+
+router.get('/courses', async (req, res) => {
+  const { year, term } = req.query
+
+  const CODES = ['TKT20002', 'TKT20010', 'TKT20011']
+
+  let courseUnitRealisations = []
+
+  for (const code of CODES) {
+    let newCourseUnitRealisations = await getCourseRealisationsByCode(code, `${year}-01-01`)
+
+    newCourseUnitRealisations = newCourseUnitRealisations
+      .filter(
+        courseUnitRealisation =>
+          getAcademicYear(courseUnitRealisation.activityPeriod.startDate) === year &&
+          getTerm(courseUnitRealisation.activityPeriod.startDate) === term
+      )
+      .sort((a, b) => new Date(a.activityPeriod.startDate) - new Date(b.activityPeriod.startDate))
+      .map((courseUnitRealisation, index) => ({
+        id: [
+          code,
+          getAcademicYear(courseUnitRealisation.activityPeriod.startDate),
+          getTerm(courseUnitRealisation.activityPeriod.startDate),
+          getCourseType(courseUnitRealisation.courseUnitRealisationTypeUrn),
+          index + 1,
+        ].join('.'),
+        name: courseUnitRealisation.name.fi,
+        starts: new Date(courseUnitRealisation.activityPeriod.startDate),
+        ends: new Date(courseUnitRealisation.activityPeriod.endDate),
+      }))
+
+    courseUnitRealisations = courseUnitRealisations.concat(newCourseUnitRealisations)
+  }
+
+  res.send(courseUnitRealisations)
+})
+
+router.get('/courses/:id', async (req, res) => {
+  const { id } = req.params
+  const { code, year, number } = parseCourseId(id)
+
+  let courseUnitRealisations = await getCourseRealisationsByCode(code, `${year}-01-01`)
+
+  courseUnitRealisations = courseUnitRealisations.sort(
+    (a, b) => new Date(a.activityPeriod.startDate) - new Date(b.activityPeriod.startDate)
+  )
+
+  const courseUnitRealisation = courseUnitRealisations[number - 1]
+
+  if (!courseUnitRealisation) {
+    throw new NotFoundError(`Course ${id} is not found`)
+  }
+
+  const personIds = courseUnitRealisation.responsibilityInfos.map(responsibilityInfo => responsibilityInfo.personId)
+
+  const persons = await models.Person.findAll({
+    attributes: ['eduPersonPrincipalName'],
+    where: {
+      id: {
+        [Op.in]: personIds,
+      },
+    },
+  })
+
+  const teachers = persons.map(person => person.eduPersonPrincipalName.split('@')[0])
+
+  res.send({ teachers })
+})
+
+const getCourseRealisationsByCode = async (code, activityPeriodEndDateAfter) => {
+  const courseUnit = await models.CourseUnit.findOne({
+    where: {
+      code,
+    },
+  })
+
+  if (!courseUnit) {
+    throw new NotFoundError(`Course unit with code ${code} is not found`)
+  }
+
+  const { groupId } = courseUnit
+
+  const assessmentItems = await models.AssessmentItem.findAll({
+    where: {
+      primary_course_unit_group_id: groupId,
+      assessment_item_type: {
+        [Op.in]: ['urn:code:assessment-item-type:exam', 'urn:code:assessment-item-type:teaching-participation'],
+      },
+    },
+    attributes: ['id'],
+    raw: true,
+  })
+
+  if (!assessmentItems) {
+    return []
+  }
+
+  const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
+    where: {
+      assessmentItemIds: {
+        [Op.overlap]: assessmentItems.map(({ id }) => id),
+      },
+      ...(activityPeriodEndDateAfter && {
+        [Op.and]: [
+          { activityPeriod: { endDate: { [Op.ne]: null } } },
+          {
+            activityPeriod: {
+              endDate: {
+                [Op.gt]: dateFns.format(new Date(activityPeriodEndDateAfter), 'yyyy-MM-dd'),
+              },
+            },
+          },
+        ],
+      }),
+    },
+  })
+
+  return courseUnitRealisations
+}
+
+const getAcademicYear = dateLike => {
+  const date = new Date(dateLike)
+
+  if (!isValid(date)) {
+    return undefined
+  }
+
+  return getYear(date).toString()
+}
+
+const getTerm = dateLike => {
+  const date = new Date(dateLike)
+
+  if (!isValid(date)) {
+    return undefined
+  }
+
+  // Month index starts at 0
+  const month = getMonth(date) + 1
+  const dayOfMonth = getDate(date)
+
+  if (month < 5) {
+    return 'K'
+  } else if (month > 8 || (month === 8 && dayOfMonth > 20)) {
+    return 'S'
+  }
+
+  return 'V'
+}
+
+const getCourseType = courseUnitRealisationTypeUrn => {
+  const typeByCourseUnitRealisationType = {
+    'independent-work-essay': 'K',
+    'exam-electronic': 'L',
+    'exam-final': 'L',
+    'teaching-participation-field-course': 'K',
+    'teaching-participation-small-group': 'K',
+    'independent-work-project': 'A',
+    'teaching-participation-seminar': 'S',
+    'thesis-doctoral': 'Y',
+    'licentiate-thesis': 'Y',
+    'independent-work-presentation': 'K',
+    'training-training': 'K',
+    'exam-exam': 'L',
+    'teaching-participation-lab': 'A',
+    'exam-midterm': 'L',
+    'independent-work-learning-diary': 'K',
+    'teaching-participation-lectures': 'K',
+    'teaching-participation-online': 'K',
+  }
+
+  if (!courseUnitRealisationTypeUrn) {
+    return undefined
+  }
+
+  const parts = courseUnitRealisationTypeUrn.split(':')
+  const courseUnitRealisationType = parts[parts.length - 1]
+
+  return typeByCourseUnitRealisationType[courseUnitRealisationType] || 'K'
+}
+
+const parseCourseId = id => {
+  if (!isString(id)) {
+    throw new UserInputError('Invalid course id')
+  }
+
+  const parts = id.split('.')
+  const [code, year, term, type, number] = parts
+
+  if (!code || !term || !year || !type || !number) {
+    throw new UserInputError('Invalid course id')
+  }
+
+  const parsedYear = parseInt(year)
+  const parsedNumber = parseInt(number)
+
+  if (isNaN(parsedYear) || isNaN(parsedNumber)) {
+    throw new UserInputError('Invalid course id')
+  }
+
+  return { code, term, year: parsedYear, type, number: parsedNumber }
+}
+
+module.exports = router
