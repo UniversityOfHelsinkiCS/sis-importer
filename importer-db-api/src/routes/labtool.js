@@ -12,6 +12,14 @@ const router = express.Router()
 router.get('/courses', async (req, res) => {
   const { year, term } = req.query
 
+  if (!term) {
+    throw new UserInputError('Term is required')
+  }
+
+  if (!year) {
+    throw new UserInputError('Year is required')
+  }
+
   const CODES = ['TKT20002', 'TKT20010', 'TKT20011']
 
   let courseUnitRealisations = []
@@ -25,20 +33,18 @@ router.get('/courses', async (req, res) => {
           getAcademicYear(courseUnitRealisation.activityPeriod.startDate) === year &&
           getTerm(courseUnitRealisation.activityPeriod.startDate) === term
       )
-      .sort((a, b) => new Date(a.activityPeriod.startDate) - new Date(b.activityPeriod.startDate))
-      .map((courseUnitRealisation, index) => ({
+      .map(courseUnitRealisation => ({
         id: [
           code,
           getAcademicYear(courseUnitRealisation.activityPeriod.startDate),
           getTerm(courseUnitRealisation.activityPeriod.startDate),
           getCourseType(courseUnitRealisation.courseUnitRealisationTypeUrn),
-          index + 1,
         ].join('.'),
         name: courseUnitRealisation.name.fi,
         starts: new Date(courseUnitRealisation.activityPeriod.startDate),
         ends: new Date(courseUnitRealisation.activityPeriod.endDate),
       }))
-
+    newCourseUnitRealisations = addCourseNumbers(newCourseUnitRealisations).sort((a, b) => (a.id > b.id ? 1 : -1))
     courseUnitRealisations = courseUnitRealisations.concat(newCourseUnitRealisations)
   }
 
@@ -187,6 +193,27 @@ const getCourseType = courseUnitRealisationTypeUrn => {
   const courseUnitRealisationType = parts[parts.length - 1]
 
   return typeByCourseUnitRealisationType[courseUnitRealisationType] || 'K'
+}
+
+const addCourseNumbers = courseUnitRealisations => {
+  const courseIds = courseUnitRealisations.map(courseUnitRealisation => courseUnitRealisation.id)
+
+  let count = {}
+  for (const courseId of new Set(courseIds)) {
+    const sameIds = courseIds.filter(id => id === courseId)
+    count[courseId] = sameIds.length
+  }
+
+  courseUnitRealisations = courseUnitRealisations.map(courseUnitRealisation => {
+    const { id } = courseUnitRealisation
+    const courseUnitRealisationWithNumber = { ...courseUnitRealisation, id: `${id}.${count[id]}` }
+
+    count[id] -= 1
+
+    return courseUnitRealisationWithNumber
+  })
+
+  return courseUnitRealisations
 }
 
 const parseCourseId = id => {
