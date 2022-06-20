@@ -265,13 +265,6 @@ updaterRouter.get('/persons', async (req, res) => {
   const { limit, offset } = req.query
   if (!limit || !offset) return res.sendStatus(400)
 
-  /* const persons = await models.Person.findAll({
-    attributes: relevantAttributes.person,
-    limit,
-    offset,
-    order: [['id', 'DESC']],
-  }) */
-
   const personsWithStudyRight = await sequelize.query(
     `SELECT P.id, P.student_number, P.employee_number, P.edu_person_principal_name,
       P.first_names, P.last_name, P.primary_email, P.secondary_email, P.preferred_language_urn, 
@@ -360,6 +353,26 @@ updaterRouter.get('/enrolments', async (req, res) => {
     offset,
     order: [['id', 'DESC']],
   })
+
+  res.send(enrolments)
+})
+
+updaterRouter.get('/enrolments/:courseRealisationId', async (req, res) => {
+  const id = req.params?.courseRealisationId
+  if (!id) return res.sendStatus(400)
+
+  const enrolments = await models.Enrolment.findAll({
+    where: {
+      state: 'ENROLLED',
+      courseUnitRealisationId: id,
+    },
+    attributes: relevantAttributes.enrolment,
+    order: [['id', 'DESC']],
+  })
+
+  if (!enrolments?.length > 0) {
+    return res.status(404).send({ message: 'Course unit realisation not found or has no enrolments' })
+  }
 
   res.send(enrolments)
 })
