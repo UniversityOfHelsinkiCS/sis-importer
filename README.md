@@ -1,5 +1,29 @@
 # SIS-IMPORTER
 
+## What is importer?
+
+Importer fetches data from Sisu using the export apis. See [example](https://sis-helsinki.funidata.fi/kori/docs/index.html#_export_assessment_items) of export api, importer uses only `since` (modification ordinal) and `limit` parameters.  The fetched data is processed in mankelis and saved to PostgreSQL db. 
+
+New data from Sisu is fetched once in hour.
+
+[Architecture of importer](./how_tos/importer.png)
+
+## Caveats
+
+* Document state: `documentState` field present in all data defines shoudl the data be used or not. Mainly importer ignores any other data than `ACTIVE` (`DRAFT` and `DELETED` in most cases should be ignored).
+* Snapshot vs _regular_ data: Snapshot data is described as following: 
+
+  ```Start of validity for the snapshot. End of validity is defined by the snapshotDateTime of a possible later snapshot```
+
+  Meaning one needs to find the most recent non-future snapshot date time and active document state to find the correct instance of given object. For normal data the same is gretest modification ordinal (=newest version of the object) with active doment state.
+
+  With snapshot data in the db is multiple rows (versions) of the object where as with the regular data there is inly present the latest version.
+
+## Tricks & Tips
+
+* https://importer.cs.helsinkif/exploder/reset/:table?token= deletes a single table and triggers fetch. See tables [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/importer-api/src/explorer/index.js#L53) and toke from the server.
+* https://importer.cs.helsinkif/exploder/force_update?token= triggers a fetch for all tables
+
 ### Local development
 
 1. See initial setup in https://version.helsinki.fi/toska/dokumentaatio/-/blob/master/guides/how_to_sis-importer_locally.md - contains too much secret data to have here
@@ -68,10 +92,6 @@ http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public
 ### NATS-streaming-console ###
 
 http://localhost:8282/  
-
-### Degree structure ###
-
-In dev mode see http://localhost:3002/structure/:code (eg KH50_005 for Computer sciencebachelor) for decree structures.
 
 ## CI ##
 
