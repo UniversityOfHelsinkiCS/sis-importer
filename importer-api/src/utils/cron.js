@@ -1,6 +1,11 @@
-const CronJob = require('cron').CronJob
+const cron = require('node-cron')
 
-const schedule = (cronTime, job) => new CronJob(cronTime, job, null, true, 'Europe/Helsinki')
+const schedule = (cronTime, job) => {
+  cron.schedule(cronTime, job, {
+    scheduled: true,
+    timezone: 'Europe/Helsinki'
+  })
+}
 
 module.exports = {
   schedule
