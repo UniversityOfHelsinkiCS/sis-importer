@@ -22,6 +22,8 @@ router.get('/courses', async (req, res) => {
 
   const CODES = ['TKT20002', 'TKT20010', 'TKT20011']
 
+  const useNameSpecifier = Number(year) > 2022 || (Number(year) === 2022 && term !== 'K')
+
   let courseUnitRealisations = []
 
   for (const code of CODES) {
@@ -40,7 +42,7 @@ router.get('/courses', async (req, res) => {
           getTerm(courseUnitRealisation.activityPeriod.startDate),
           getCourseType(courseUnitRealisation.courseUnitRealisationTypeUrn),
         ].join('.'),
-        name: courseUnitRealisation.name.fi,
+        name: useNameSpecifier ? courseUnitRealisation.nameSpecifier.fi : courseUnitRealisation.name.fi,
         starts: new Date(courseUnitRealisation.activityPeriod.startDate),
         ends: new Date(courseUnitRealisation.activityPeriod.endDate),
       }))
