@@ -4,26 +4,38 @@
 
 Importer fetches data from Sisu using the export apis. See [example](https://sis-helsinki.funidata.fi/kori/docs/index.html#_export_assessment_items) of export api, importer uses only `since` (modification ordinal) and `limit` parameters.  The fetched data is processed in mankelis and saved to PostgreSQL db. 
 
-New data from Sisu is fetched once in hour.
+New data from Sisu is fetched once an hour.
 
 [Architecture of importer](./how_tos/importer.png)
 
 ## Caveats
 
-* Document state: `documentState` field present in all data defines shoudl the data be used or not. Mainly importer ignores any other data than `ACTIVE` (`DRAFT` and `DELETED` in most cases should be ignored).
-* Snapshot vs _regular_ data: Snapshot data is described as following: 
+* Document state: `documentState` field present in all data defines should the data be used or not. Mainly importer ignores any other data than `ACTIVE` (`DRAFT` and `DELETED` in most cases should be ignored).
+* Snapshot vs _regular_ data: Snapshot data is described as follows: 
 
   ```Start of validity for the snapshot. End of validity is defined by the snapshotDateTime of a possible later snapshot```
 
-  Meaning one needs to find the most recent non-future snapshot date time and active document state to find the correct instance of given object. For normal data the same is gretest modification ordinal (=newest version of the object) with active doment state.
+  Meaning one needs to find the most recent non-future snapshot date time and active document state to find the correct instance of the given object. For normal data, the same is greatest modification ordinal (=newest version of the object) with active document state.
 
-  With snapshot data in the db is multiple rows (versions) of the object where as with the regular data there is inly present the latest version.
+  With snapshot data in the db is multiple rows (versions) of the object whereas with the regular data there is only present the latest version.
+
+* Manage production and staging environments: use scripts `run_scaled.sh` and `wipe_ordinals.sh` located in the server to manage importer. It is important that mankelis are scaled properly in production. 
 
 ## Tricks & Tips
 
-* https://importer.cs.helsinkif/exploder/reset/:table?token= deletes a single table and triggers fetch. See tables [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/importer-api/src/explorer/index.js#L53) and toke from the server.
+* https://importer.cs.helsinkif/exploder/reset/:table?token= deletes a single table and triggers fetch. See tables [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/importer-api/src/explorer/index.js#L53) and token from the server.
 * https://importer.cs.helsinkif/exploder/force_update?token= triggers a fetch for all tables
 * **To add new fields to be fetched from Sisu:** Modify [message handlers](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-mankeli/src/messageHandlers). Remember to add any new columns to models importer-mankeli models.
+* **To fetch new model from Sisu:** Crate new [message handler](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-mankeli/src/messageHandlers) and [service](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-api/src/services)
+
+
+## API catalogs
+
+* ORI (student data) https://sis-helsinki.funidata.fi/ori/docs/index.html
+* KORI (course data) https://sis-helsinki.funidata.fi/kori/docs/index.html
+* ILMO (course enrolments) https://sis-helsinki.funidata.fi/ilmo/docs/index.html
+* OSUVA (study plans) https://sis-helsinki.funidata.fi/osuva/docs/index.html
+* ARTO (???) https://sis-helsinki.funidata.fi/arto/docs/index.html
 
 ### Local development
 
@@ -100,6 +112,7 @@ All three services (api, mankeli and db-api) go through individual github action
 Master branch docker images are tagged as `latest` importer automatically pulls new `latest` -images.
 
 Trunk branch is also built with tag `trunk`. But is not currently used.
+
 
 
 
