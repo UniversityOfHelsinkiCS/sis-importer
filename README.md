@@ -26,7 +26,7 @@ New data from Sisu is fetched once an hour.
 * https://importer.cs.helsinkif/exploder/reset/:table?token= deletes a single table and triggers fetch. See tables [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/importer-api/src/explorer/index.js#L53) and token from the server.
 * https://importer.cs.helsinkif/exploder/force_update?token= triggers a fetch for all tables
 * **To add new fields to be fetched from Sisu:** Modify [message handlers](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-mankeli/src/messageHandlers). Remember to add any new columns to models importer-mankeli models.
-* **To fetch new model from Sisu:** Crate new [message handler](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-mankeli/src/messageHandlers) and [service](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-api/src/services)
+* **To fetch new model from Sisu:** Crate new [message handler](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-mankeli/src/messageHandlers) and [service](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-api/src/services). Finaly add new service to [index.js](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/importer-api/src/services/index.js) and test locally that importing works.
 
 
 ## API catalogs
