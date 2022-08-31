@@ -23,13 +23,15 @@ const {
   URN_STUDY_RIGHT_EXPIRATION_RULE_CHANNEL,
   URN_ADMISSION_TYPE_CHANNEL,
   OSUVA_PLAN_CHANNEL,
-  ORI_PERSON_GROUP_CHANNEL
+  ORI_PERSON_GROUP_CHANNEL,
+  KORI_STUDY_EVENT_CHANNEL
 } = require('./utils/stan')
 const personHandler = require('./messageHandlers/person')
 const attainmentHandler = require('./messageHandlers/attainment')
 const studyRightHandler = require('./messageHandlers/studyRight')
 const courseUnitHandler = require('./messageHandlers/courseUnit')
 const courseUnitRealisationHandler = require('./messageHandlers/courseUnitRealisation')
+const studyEventHandler = require('./messageHandlers/studyEvent')
 const assessmentItemHandler = require('./messageHandlers/assessmentItem')
 const educationHandler = require('./messageHandlers/education')
 const moduleHandler = require('./messageHandlers/module')
@@ -66,6 +68,7 @@ const channels = {
   [ORI_STUDY_RIGHT_CHANNEL]: studyRightHandler,
   [KORI_COURSE_UNIT_CHANNEL]: courseUnitHandler,
   [KORI_COURSE_UNIT_REALISATION_CHANNEL]: courseUnitRealisationHandler,
+  [KORI_STUDY_EVENT_CHANNEL]: studyEventHandler,
   [KORI_ASSESSMENT_ITEM_CHANNEL]: assessmentItemHandler,
   [KORI_EDUCATION_CHANNEL]: educationHandler,
   [KORI_MODULE_CHANNEL]: moduleHandler,

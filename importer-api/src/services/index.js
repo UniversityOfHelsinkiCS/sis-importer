@@ -24,6 +24,7 @@ const {
   info: studyRightExpirationRuleInfo
 } = require('./studyRightExpirationRule')
 const { ADMISSION_TYPE_SCHEDULE_ID, info: admissionTypeInfo } = require('./admissionType')
+const { STUDY_EVENT_SCHEDULE_ID, info: studyEventInfo } = require('./studyEvents')
 
 const services = {
   [ATTAINMENT_SCHEDULE_ID]: attainmentInfo,
@@ -31,6 +32,7 @@ const services = {
   [STUDY_RIGHT_SCHEDULE_ID]: studyRightInfo,
   [COURSE_UNIT_SCHEDULE_ID]: courseUnitInfo,
   [COURSE_UNIT_REALISATION_SCHEDULE_ID]: courseUnitRealisationInfo,
+  [STUDY_EVENT_SCHEDULE_ID]: studyEventInfo,
   [ASSESSMENT_ITEM_SCHEDULE_ID]: assessmentItemInfo,
   [EDUCATION_SCHEDULE_ID]: educationInfo,
   [MODULE_SCHEDULE_ID]: moduleInfo,
@@ -52,15 +54,16 @@ const services = {
 
 // Imported in this order
 const serviceIds = [
-  PERSON_SCHEDULE_ID,
+  /*PERSON_SCHEDULE_ID,
   ORGANISATION_SCHEDULE_ID,
   COURSE_UNIT_SCHEDULE_ID,
   EDUCATION_SCHEDULE_ID,
   STUDY_RIGHT_SCHEDULE_ID,
   TERM_REGISTRATION_SCHEDULE_ID,
   ASSESSMENT_ITEM_SCHEDULE_ID,
-  COURSE_UNIT_REALISATION_SCHEDULE_ID,
-  ATTAINMENT_SCHEDULE_ID,
+  COURSE_UNIT_REALISATION_SCHEDULE_ID,*/
+  STUDY_EVENT_SCHEDULE_ID,
+  /*ATTAINMENT_SCHEDULE_ID,
   MODULE_SCHEDULE_ID,
   STUDY_RIGHT_PRIMALITY_SCHEDULE_ID,
   STUDY_LEVEL_SCHEDULE_ID,
@@ -73,7 +76,7 @@ const serviceIds = [
   STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID,
   ADMISSION_TYPE_SCHEDULE_ID,
   PLAN_SCHEDULE_ID,
-  PERSON_GROUP_SCHEDULE_ID
+  PERSON_GROUP_SCHEDULE_ID*/
 ]
 
 module.exports = {

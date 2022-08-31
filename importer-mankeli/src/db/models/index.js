@@ -21,6 +21,7 @@ const StudyRightExpirationRule = require('./studyRightExpirationRule')
 const AdmissionType = require('./admissionType')
 const Plan = require('./plan')
 const PersonGroup = require('./personGroup')
+const StudyEvent = require('./studyEvent')
 
 Person.hasMany(StudyRight)
 Education.hasMany(StudyRight)
@@ -51,5 +52,6 @@ module.exports = {
   StudyRightExpirationRule,
   AdmissionType,
   Plan,
-  PersonGroup
+  PersonGroup,
+  StudyEvent,
 }
