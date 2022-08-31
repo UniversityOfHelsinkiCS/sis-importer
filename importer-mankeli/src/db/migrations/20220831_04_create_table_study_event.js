@@ -9,10 +9,10 @@ module.exports = {
           primaryKey: true
         },
         university_org_ids: {
-          type: ARRAY(STRING),
+          type: ARRAY(STRING)
         },
         primary_course_unit_realisation_id: {
-          type: STRING,
+          type: STRING
         },
         name: {
           type: JSONB
@@ -21,25 +21,25 @@ module.exports = {
           type: ARRAY(STRING)
         },
         recurs_every: {
-          type: STRING,
+          type: STRING
         },
         start_time: {
-          type: DATE,
+          type: DATE
         },
         duration: {
-          type: STRING,
+          type: STRING
         },
         recurs_until: {
-          type: DATE,
+          type: DATE
         },
         exceptions: {
-          type: ARRAY(DATE),
+          type: ARRAY(DATE)
         },
         cancellations: {
-          type: ARRAY(DATE),
+          type: ARRAY(DATE)
         },
         overrides: {
-          type: JSONB,
+          type: JSONB
         },
         created_at: {
           type: DATE

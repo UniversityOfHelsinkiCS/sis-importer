@@ -5,57 +5,57 @@ const { connection } = require('../connection')
 class StudyEvent extends Model {}
 
 StudyEvent.init(
-{
-  id: {
-    type: STRING,
-    primaryKey: true
+  {
+    id: {
+      type: STRING,
+      primaryKey: true
+    },
+    universityOrgIds: {
+      type: ARRAY(STRING)
+    },
+    primaryCourseUnitRealisationId: {
+      type: STRING
+    },
+    name: {
+      type: JSONB
+    },
+    locationIds: {
+      type: ARRAY(STRING)
+    },
+    recursEvery: {
+      type: STRING
+    },
+    startTime: {
+      type: DATE
+    },
+    duration: {
+      type: STRING
+    },
+    recursUntil: {
+      type: DATE
+    },
+    exceptions: {
+      type: ARRAY(DATE)
+    },
+    cancellations: {
+      type: ARRAY(DATE)
+    },
+    overrides: {
+      type: JSONB
+    },
+    createdAt: {
+      type: DATE
+    },
+    updatedAt: {
+      type: DATE
+    }
   },
-  universityOrgIds: {
-    type: ARRAY(STRING),
-  },
-  primaryCourseUnitRealisationId: {
-    type: STRING,
-  },
-  name: {
-    type: JSONB
-  },
-  locationIds: {
-    type: ARRAY(STRING),
-  },
-  recursEvery: {
-    type: STRING,
-  },
-  startTime: {
-    type: DATE,
-  },
-  duration: {
-    type: STRING,
-  },
-  recursUntil: {
-    type: DATE,
-  },
-  exceptions: {
-    type: ARRAY(DATE),
-  },
-  cancellations: {
-    type: ARRAY(DATE),
-  },
-  overrides: {
-    type: JSONB,
-  },
-  createdAt: {
-    type: DATE
-  },
-  updatedAt: {
-    type: DATE
+  {
+    underscored: true,
+    sequelize: connection.sequelize,
+    modelName: 'study_event',
+    tableName: 'study_events'
   }
-},
-{
-  underscored: true,
-  sequelize: connection.sequelize,
-  modelName: 'study_event',
-  tableName: 'study_events'
-}
 )
 
 module.exports = StudyEvent

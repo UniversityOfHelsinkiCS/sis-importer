@@ -53,5 +53,5 @@ module.exports = {
   AdmissionType,
   Plan,
   PersonGroup,
-  StudyEvent,
+  StudyEvent
 }
