@@ -25,7 +25,7 @@ const {
   URN_STUDY_RIGHT_EXPIRATION_RULE_CHANNEL,
   URN_ADMISSION_TYPE_CHANNEL,
   OSUVA_PLAN_CHANNEL,
-  ORI_PERSON_GROUP_CHANNEL,
+  ORI_PERSON_GROUP_CHANNEL
 } = require('./utils/stan')
 
 const personHandler = require('./messageHandlers/person')

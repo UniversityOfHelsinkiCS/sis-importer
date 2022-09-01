@@ -7,7 +7,7 @@ const parseLocation = location => {
     universityOrgIds: location.universityOrgIds,
     name: location.name,
     capacity: location.capacity,
-    buildingId: location.buildingId,
+    buildingId: location.buildingId
   }
 }
 

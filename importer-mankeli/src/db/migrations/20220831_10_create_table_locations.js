@@ -15,10 +15,10 @@ module.exports = {
           type: JSONB
         },
         capacity: {
-          type: INTEGER,
+          type: INTEGER
         },
         building_id: {
-          type: STRING,
+          type: STRING
         },
         created_at: {
           type: DATE

@@ -55,5 +55,5 @@ module.exports = {
   Plan,
   PersonGroup,
   StudyEvent,
-  Location,
+  Location
 }

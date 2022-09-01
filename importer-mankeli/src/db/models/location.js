@@ -18,10 +18,10 @@ Location.init(
       type: JSONB
     },
     capacity: {
-      type: INTEGER,
+      type: INTEGER
     },
     buildingId: {
-      type: STRING,
+      type: STRING
     },
     createdAt: {
       type: DATE
