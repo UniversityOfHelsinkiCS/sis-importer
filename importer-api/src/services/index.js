@@ -3,6 +3,8 @@ const { PERSON_SCHEDULE_ID, info: personInfo } = require('./person')
 const { STUDY_RIGHT_SCHEDULE_ID, info: studyRightInfo } = require('./studyRight')
 const { COURSE_UNIT_SCHEDULE_ID, info: courseUnitInfo } = require('./courseUnit')
 const { COURSE_UNIT_REALISATION_SCHEDULE_ID, info: courseUnitRealisationInfo } = require('./courseUnitRealisation')
+const { STUDY_EVENT_SCHEDULE_ID, info: studyEventInfo } = require('./studyEvents')
+const { LOCATION_SCHEDULE_ID, info: locationInfo } = require('./locations')
 const { ASSESSMENT_ITEM_SCHEDULE_ID, info: assessmentItemInfo } = require('./assessmentItem')
 const { EDUCATION_SCHEDULE_ID, info: educationInfo } = require('./education')
 const { MODULE_SCHEDULE_ID, info: moduleInfo } = require('./module')
@@ -18,13 +20,9 @@ const { DEGREE_TITLE_SCHEDULE_ID, info: degreeTitleInfo } = require('./degreeTit
 const { EDUCATION_CLASSIFICATION_SCHEDULE_ID, info: educationClassificationInfo } = require('./educationClassification')
 const { PLAN_SCHEDULE_ID, info: planInfo } = require('./plan')
 const { PERSON_GROUP_SCHEDULE_ID, info: personGroupInfo } = require('./personGroups')
-
-const {
-  STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID,
-  info: studyRightExpirationRuleInfo
-} = require('./studyRightExpirationRule')
+const { STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID, info: studyRightExpirationRuleInfo } = require('./studyRightExpirationRule')
 const { ADMISSION_TYPE_SCHEDULE_ID, info: admissionTypeInfo } = require('./admissionType')
-const { STUDY_EVENT_SCHEDULE_ID, info: studyEventInfo } = require('./studyEvents')
+
 
 const services = {
   [ATTAINMENT_SCHEDULE_ID]: attainmentInfo,
@@ -33,6 +31,7 @@ const services = {
   [COURSE_UNIT_SCHEDULE_ID]: courseUnitInfo,
   [COURSE_UNIT_REALISATION_SCHEDULE_ID]: courseUnitRealisationInfo,
   [STUDY_EVENT_SCHEDULE_ID]: studyEventInfo,
+  [LOCATION_SCHEDULE_ID]: locationInfo,
   [ASSESSMENT_ITEM_SCHEDULE_ID]: assessmentItemInfo,
   [EDUCATION_SCHEDULE_ID]: educationInfo,
   [MODULE_SCHEDULE_ID]: moduleInfo,
@@ -54,16 +53,17 @@ const services = {
 
 // Imported in this order
 const serviceIds = [
-  /*PERSON_SCHEDULE_ID,
+  PERSON_SCHEDULE_ID,
   ORGANISATION_SCHEDULE_ID,
   COURSE_UNIT_SCHEDULE_ID,
   EDUCATION_SCHEDULE_ID,
   STUDY_RIGHT_SCHEDULE_ID,
   TERM_REGISTRATION_SCHEDULE_ID,
   ASSESSMENT_ITEM_SCHEDULE_ID,
-  COURSE_UNIT_REALISATION_SCHEDULE_ID,*/
+  COURSE_UNIT_REALISATION_SCHEDULE_ID,
+  LOCATION_SCHEDULE_ID,
   STUDY_EVENT_SCHEDULE_ID,
-  /*ATTAINMENT_SCHEDULE_ID,
+  ATTAINMENT_SCHEDULE_ID,
   MODULE_SCHEDULE_ID,
   STUDY_RIGHT_PRIMALITY_SCHEDULE_ID,
   STUDY_LEVEL_SCHEDULE_ID,
@@ -76,7 +76,7 @@ const serviceIds = [
   STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID,
   ADMISSION_TYPE_SCHEDULE_ID,
   PLAN_SCHEDULE_ID,
-  PERSON_GROUP_SCHEDULE_ID*/
+  PERSON_GROUP_SCHEDULE_ID
 ]
 
 module.exports = {

@@ -7,6 +7,8 @@ const {
   ORI_STUDY_RIGHT_CHANNEL,
   KORI_COURSE_UNIT_CHANNEL,
   KORI_COURSE_UNIT_REALISATION_CHANNEL,
+  KORI_STUDY_EVENT_CHANNEL,
+  KORI_LOCATION_CHANNEL,
   KORI_ASSESSMENT_ITEM_CHANNEL,
   KORI_EDUCATION_CHANNEL,
   KORI_MODULE_CHANNEL,
@@ -24,14 +26,15 @@ const {
   URN_ADMISSION_TYPE_CHANNEL,
   OSUVA_PLAN_CHANNEL,
   ORI_PERSON_GROUP_CHANNEL,
-  KORI_STUDY_EVENT_CHANNEL
 } = require('./utils/stan')
+
 const personHandler = require('./messageHandlers/person')
 const attainmentHandler = require('./messageHandlers/attainment')
 const studyRightHandler = require('./messageHandlers/studyRight')
 const courseUnitHandler = require('./messageHandlers/courseUnit')
 const courseUnitRealisationHandler = require('./messageHandlers/courseUnitRealisation')
 const studyEventHandler = require('./messageHandlers/studyEvent')
+const locationHandler = require('./messageHandlers/location')
 const assessmentItemHandler = require('./messageHandlers/assessmentItem')
 const educationHandler = require('./messageHandlers/education')
 const moduleHandler = require('./messageHandlers/module')
@@ -69,6 +72,7 @@ const channels = {
   [KORI_COURSE_UNIT_CHANNEL]: courseUnitHandler,
   [KORI_COURSE_UNIT_REALISATION_CHANNEL]: courseUnitRealisationHandler,
   [KORI_STUDY_EVENT_CHANNEL]: studyEventHandler,
+  [KORI_LOCATION_CHANNEL]: locationHandler,
   [KORI_ASSESSMENT_ITEM_CHANNEL]: assessmentItemHandler,
   [KORI_EDUCATION_CHANNEL]: educationHandler,
   [KORI_MODULE_CHANNEL]: moduleHandler,
