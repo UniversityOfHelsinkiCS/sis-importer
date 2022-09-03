@@ -43,6 +43,9 @@ StudyEvent.init(
     overrides: {
       type: JSONB
     },
+    events: {
+      type: JSONB,
+    },
     createdAt: {
       type: DATE
     },

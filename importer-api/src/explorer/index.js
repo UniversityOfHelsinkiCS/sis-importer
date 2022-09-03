@@ -55,6 +55,7 @@ const tableNameToOrdinalName = {
   attainments: 'LATEST_ATTAINMENT_ORDINAL',
   course_unit_realisations: 'LATEST_COURSE_UNIT_REALISATION_ORDINAL',
   study_events: 'LATEST_STUDY_EVENT_ORDINAL',
+  locations: 'LATEST_LOCATION_ORDINAL',
   course_units: 'LATEST_COURSE_UNIT_ORDINAL',
   educations: 'LATEST_EDUCATION_ORDINAL',
   enrolments: 'LATEST_ENROLMENT_ORDINAL',
