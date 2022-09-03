@@ -196,35 +196,34 @@ router.get('/:studentNumber/semester_enrollments', async (req, res) => {
 })
 
 router.get('/:studentNumber/rapo_semester_enrollments', async (req, res) => {
-  const termRegistrations = (
-    await models.TermRegistrations.findAll({
-      where: {
-        studentId: req.student.id,
-      },
-    })
-  )
+  const termRegistrations = await models.TermRegistrations.findAll({
+    where: {
+      studentId: req.student.id,
+    },
+  })
 
-  const mangel = (studyright) => {
-    const innerMangel = (t) => {
+  const mangel = studyright => {
+    const innerMangel = t => {
       const semester_code =
-      t.studyTerm.termIndex === 0
-        ? getFallSemesterCode(t.studyTerm.studyYearStartYear)
-        : getSpringSemesterCode(t.studyTerm.studyYearStartYear)
+        t.studyTerm.termIndex === 0
+          ? getFallSemesterCode(t.studyTerm.studyYearStartYear)
+          : getSpringSemesterCode(t.studyTerm.studyYearStartYear)
 
       return {
         date: t.registrationDate,
         type: t.termRegistrationType,
-        semester_code
+        semester_code,
       }
     }
     return {
       studyright: studyright.studyRightId,
-      terms: studyright.termRegistrations.map(t => innerMangel(t)).sort((c1, c2) => c2.semester_code-c1.semester_code )
+      terms: studyright.termRegistrations
+        .map(t => innerMangel(t))
+        .sort((c1, c2) => c2.semester_code - c1.semester_code),
     }
   }
 
-
-  res.status(200).send(termRegistrations.map(studyright => mangel(studyright)).filter(s => s.terms.length>0))
+  res.status(200).send(termRegistrations.map(studyright => mangel(studyright)).filter(s => s.terms.length > 0))
 })
 
 router.get('/:studentNumber/has_passed_course/:code', async (req, res) => {

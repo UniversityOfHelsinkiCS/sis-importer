@@ -20,9 +20,11 @@ const { DEGREE_TITLE_SCHEDULE_ID, info: degreeTitleInfo } = require('./degreeTit
 const { EDUCATION_CLASSIFICATION_SCHEDULE_ID, info: educationClassificationInfo } = require('./educationClassification')
 const { PLAN_SCHEDULE_ID, info: planInfo } = require('./plan')
 const { PERSON_GROUP_SCHEDULE_ID, info: personGroupInfo } = require('./personGroups')
-const { STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID, info: studyRightExpirationRuleInfo } = require('./studyRightExpirationRule')
+const {
+  STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID,
+  info: studyRightExpirationRuleInfo
+} = require('./studyRightExpirationRule')
 const { ADMISSION_TYPE_SCHEDULE_ID, info: admissionTypeInfo } = require('./admissionType')
-
 
 const services = {
   [ATTAINMENT_SCHEDULE_ID]: attainmentInfo,

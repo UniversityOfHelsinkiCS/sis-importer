@@ -44,7 +44,7 @@ StudyEvent.init(
       type: JSONB
     },
     events: {
-      type: JSONB,
+      type: JSONB
     },
     createdAt: {
       type: DATE

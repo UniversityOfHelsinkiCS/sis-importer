@@ -6,7 +6,7 @@ const info = {
   API: APIS.kori,
   CHANNEL: KORI_LOCATION_CHANNEL,
   REDIS_KEY: 'LATEST_LOCATION_ORDINAL',
-  API_URL: '/locations/v1/export',
+  API_URL: '/locations/v1/export'
 }
 
 module.exports = {

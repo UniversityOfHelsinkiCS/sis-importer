@@ -6,7 +6,7 @@ const info = {
   API: APIS.kori,
   CHANNEL: KORI_STUDY_EVENT_CHANNEL,
   REDIS_KEY: 'LATEST_STUDY_EVENT_ORDINAL',
-  API_URL: '/study-events/v1/export',
+  API_URL: '/study-events/v1/export'
 }
 
 module.exports = {
