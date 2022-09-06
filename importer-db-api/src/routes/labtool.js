@@ -22,7 +22,7 @@ router.get('/courses', async (req, res) => {
 
   const CODES = ['TKT20002', 'TKT20010', 'TKT20011']
 
-  const useNameSpecifier = Number(year) > 2022 || (Number(year) === 2022 && term !== 'K')
+  const useNameSpecifier = Number(year) === 2022 && term === 'V'
 
   let courseUnitRealisations = []
 
