@@ -2,7 +2,8 @@ const redis = require('redis')
 
 const redisRetry = ({ attempt, error }) => {
   if (attempt > 10) {
-    throw new Error('Lost connection to Redis...', error)
+    console.error('Lost connection to Redis...', error)
+    return
   }
 
   return Math.min(attempt * 100, 5000)
