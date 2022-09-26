@@ -14,6 +14,8 @@ const connectRedis = () => {
       url: process.env.REDIS_URI,
       retry_strategy: redisRetry,
     })
+    if (!client) throw new Error('redis broken or not available?')
+
     client.on('connect', () => console.log('REDIS CONNECTED'))
     client.on('ready', () => console.log('REDIS READY'))
     client.on('error', () => console.log('REDIS ERROR'))
