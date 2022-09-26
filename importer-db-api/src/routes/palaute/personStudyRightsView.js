@@ -31,7 +31,7 @@ const createPersonStudyRightsView = async () => {
         SELECT COUNT(E.*) 
         FROM studyrights S, educations E 
         WHERE S.person_id = P.id AND S.education_id = E.id 
-        --AND E.education_type IN (:validEducations)
+        AND E.education_type IN (:validEducations)
         AND TO_DATE(valid->>'endDate', 'YYYY-MM-DD') >= NOW()
         AND TO_DATE(valid->>'startDate', 'YYYY-MM-DD') <= NOW()
         AND S.snapshot_date_time <= NOW()

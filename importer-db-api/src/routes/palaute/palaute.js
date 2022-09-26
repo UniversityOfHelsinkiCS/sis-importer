@@ -218,7 +218,6 @@ updaterRouter.get('/persons', async (req, res) => {
       LIMIT :limit OFFSET :offset`,
     {
       replacements: {
-        validEducations,
         limit,
         offset,
       },
