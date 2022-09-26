@@ -48,4 +48,4 @@ select * from
 cur_data
 where start_date > DATE('2020-01-01')
 AND start_date < DATE('2023-01-01')
-and type like 'teaching%%'
+Joku ￼ ￼  koodannu paskaa siellä
