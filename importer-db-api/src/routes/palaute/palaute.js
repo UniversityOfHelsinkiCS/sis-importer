@@ -2,7 +2,7 @@ const { Op } = require('sequelize')
 const express = require('express')
 const models = require('../../models')
 const { sequelize } = require('../../config/db')
-const { relevantAttributes, validRealisationTypes, validEducations } = require('./config')
+const { relevantAttributes, validRealisationTypes } = require('./config')
 const { refreshPersonStudyRightsView } = require('./personStudyRightsView')
 
 const addCourseUnitsToRealisations = async courseUnitRealisations => {
