@@ -44,7 +44,7 @@ jobs:
           message-type: test-failure
       - name: Notify success
         uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
-        if: (needs.build-test-push.result != 'success')
+        if: (needs.build-test-push.result == 'success')
         with:
           webhook-url: ${{ secrets.SLACKBOT_URL }}
           message-type: deployment
