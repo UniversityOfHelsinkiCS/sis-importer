@@ -57,7 +57,7 @@ const serviceUpdateFun = serviceId => {
 
       return recursivelyUpdateResource()
     } catch (err) {
-      logger.error(err)
+      logger.error({ message: err.stack, meta: err.stack })
       logger.error({ message: 'Importing failed', meta: err.stack })
       errorCounter.inc({ service: serviceId })
 
