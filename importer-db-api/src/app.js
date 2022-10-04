@@ -45,17 +45,6 @@ app.get('/health', async (req, res) =>
   })
 )
 
-app.use((req, res, next) => {
-  const { TOKEN } = process.env
-  const { query, headers } = req
-
-  if (query.token !== TOKEN && headers['token'] !== TOKEN) {
-    console.log('no token', query.token, headers['token'])
-    return res.status(401).end()
-  }
-  next()
-})
-
 app.use('/course_units', courseUnitsRouter)
 app.use('/course_unit_realisations', courseUnitRealisationsRouter)
 app.use('/students', studentsRouter)
