@@ -309,6 +309,26 @@ updaterRouter.get('/enrolments/:courseRealisationId', async (req, res) => {
   res.send(enrolments)
 })
 
+updaterRouter.get('/enrolments-new', async (req, res) => {
+  const { since: sinceRaw } = req.query
+  const since = new Date(sinceRaw)
+  if (!sinceRaw || since == 'Invalid Date') {
+    return res.status(400).send({ message: 'Missing or invalid query parameter since' })
+  }
+  const enrolments = await models.Enrolment.findAll({
+    where: {
+      state: 'ENROLLED',
+      createdAt: {
+        [Op.gte]: since,
+      },
+    },
+    attributes: relevantAttributes.enrolment,
+    order: [['id', 'DESC']],
+  })
+
+  res.send(enrolments)
+})
+
 router.use('/updater', updaterRouter)
 
 module.exports = router
