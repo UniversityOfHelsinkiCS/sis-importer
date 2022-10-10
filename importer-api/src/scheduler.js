@@ -40,7 +40,7 @@ const createJobs = async (channel, entities, executionHash) =>
   new Promise((res, rej) => {
     stan.publish(channel, JSON.stringify({ entities, executionHash }), err => {
       if (err) {
-        logger.error(err)
+        logger.error({ message: err.message, meta: err.stack })
         return rej(err)
       }
       res()
