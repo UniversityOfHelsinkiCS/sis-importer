@@ -402,7 +402,7 @@ router.post('/study-rights', async (req, res) => {
       id: data,
       documentState: 'ACTIVE',
     },
-    attributes: ['id', 'personId', 'valid', 'snapshotDateTime'],
+    attributes: ['id', 'personId', 'valid', 'snapshotDateTime', 'grantDate'],
     raw: true,
   })
   const studyRightsById = _.groupBy(studyRights, 'id')
@@ -422,7 +422,7 @@ router.post('/study-rights-by-person', async (req, res) => {
   if (!Array.isArray(data)) return res.status(400).send({ error: 'Input should be an array' })
   const studyRights = await models.StudyRight.findAll({
     where: { personId: data, documentState: 'ACTIVE' },
-    attributes: ['id', 'personId', 'valid', 'snapshotDateTime'],
+    attributes: ['id', 'personId', 'valid', 'snapshotDateTime', 'grantDate'],
     include: [{ model: models.Organisation, attributes: ['code'] }, { model: models.TermRegistrations }],
     nest: true,
     raw: true,
