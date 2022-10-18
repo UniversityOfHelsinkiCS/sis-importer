@@ -211,7 +211,7 @@ updaterRouter.get('/persons', async (req, res) => {
 
   const personsWithStudyRight = await sequelize.query(
     `SELECT P.id, P.student_number, P.employee_number, P.edu_person_principal_name,
-      P.first_names, P.last_name, P.primary_email, P.secondary_email, P.preferred_language_urn, psr.has_study_right
+      P.first_names, P.last_name, P.call_name, P.primary_email, P.secondary_email, P.preferred_language_urn, psr.has_study_right
       FROM persons P
       INNER JOIN person_study_rights_view psr ON psr.person_id = P.id
       ORDER BY P.id DESC 
