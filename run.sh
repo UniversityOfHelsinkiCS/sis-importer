@@ -15,7 +15,7 @@ then
   docker-compose down "${@:3}"
 elif [[ $option == db ]];
 then
-  docker-compose "${@:2}" importer-db importer-adminer importer-db-api
+  docker-compose "${@:2}" importer-redis importer-db importer-adminer importer-db-api
 elif [[ $option == ci ]];
 then
   docker-compose -f "$SCRIPT_DIR"/docker-compose.ci.yml "${@:2}"
