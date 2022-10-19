@@ -40,6 +40,6 @@ const request = async (instance, path, attemps = 6) => {
 
 module.exports = {
   sleep,
-  request,
-  retry
+  // request,
+  // retry
 }

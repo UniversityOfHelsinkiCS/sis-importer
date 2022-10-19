@@ -137,6 +137,7 @@ const handleMessage = (channel, msgHandler) => async msg => {
       executionHash: data.executionHash
     }
     transaction.commit()
+    logger.info(`${data.executionHash} ${data.entities.length} ${channel}`)
   } catch (e) {
     console.log(e)
     logger.error({ message: 'Handling message failed', meta: e.stack })

@@ -1,22 +1,21 @@
 const { sequelize } = require('../../config/db')
-const { redisClient } = require('../../utils/redisClient')
 const { validEducations } = require('./config')
 
-const VIEW_TIMESTAMP_KEY = 'person_study_rights_view_created_at'
 const VIEW_EXPIRATION_TIME = 1000 * 60 * 60 * 6 // 6 hours
 
-const updateCreatedAt = async () => {
-  await redisClient.set(VIEW_TIMESTAMP_KEY, Date.now())
+let createdAt = null
+
+const updateCreatedAt = () => {
+  createdAt = Date.now()
 }
 
-const isExpired = async () => {
-  const createdAt = (await redisClient.get(VIEW_TIMESTAMP_KEY)) || 0
-
+const isExpired = () => {
+  if (!createdAt) return false
   return Date.now() - createdAt > VIEW_EXPIRATION_TIME
 }
 
 const createPersonStudyRightsView = async () => {
-  if (!(await isExpired())) return
+  if (!isExpired()) return
 
   console.log('Creating person study rights view...')
 
@@ -48,19 +47,19 @@ const createPersonStudyRightsView = async () => {
     }
   )
 
-  await updateCreatedAt()
+  updateCreatedAt()
 }
 
 /**
  * Refresh person_study_rights_view if it is old
  */
 const refreshPersonStudyRightsView = async () => {
-  if (await isExpired()) {
+  if (isExpired()) {
     console.log('Refreshing person study rights view...')
     await sequelize.query(`
       REFRESH MATERIALIZED VIEW person_study_rights_view;
     `)
-    await updateCreatedAt()
+    updateCreatedAt()
   }
 }
 

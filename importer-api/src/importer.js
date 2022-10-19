@@ -18,6 +18,7 @@ const updateOrdinalFrom = async (total, redisKey, ordinal) => {
 
 const updateHash = async () => {
   const generatedHash = randomBytes(12).toString('hex')
+  console.log(`CURRENT EXECUTION HASH ON REDIS ${generatedHash}`)
   await redisSet(CURRENT_EXECUTION_HASH, generatedHash)
   await redisPublish(CURRENT_EXECUTION_HASH, generatedHash)
   return generatedHash

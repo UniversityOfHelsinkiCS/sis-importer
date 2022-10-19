@@ -9,6 +9,7 @@ const redisRetry = ({ attempt, error }) => {
   return Math.min(attempt * 100, 5000)
 }
 
+// eslint-disable-next-line no-unused-vars
 const connectRedis = () => {
   try {
     const client = redis.createClient({
@@ -29,7 +30,7 @@ const connectRedis = () => {
   }
 }
 
-const client = connectRedis()
+const client = null // connectRedis()
 
 const redisPromisify = async (func, ...params) =>
   new Promise((res, rej) => {
