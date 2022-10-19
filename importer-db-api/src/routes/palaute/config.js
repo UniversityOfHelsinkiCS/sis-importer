@@ -31,6 +31,7 @@ const relevantAttributes = {
     'eduPersonPrincipalName',
     'firstNames',
     'lastName',
+    'callName',
     'primaryEmail',
     'secondaryEmail',
     'preferredLanguageUrn',

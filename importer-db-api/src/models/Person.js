@@ -21,6 +21,9 @@ Person.init(
     lastName: {
       type: STRING,
     },
+    callName: {
+      type: STRING,
+    },
     eduPersonPrincipalName: {
       type: String,
     },
