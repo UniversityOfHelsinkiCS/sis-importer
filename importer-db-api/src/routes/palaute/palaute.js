@@ -1,13 +1,35 @@
-const { Op } = require('sequelize')
+const { Op, QueryTypes } = require('sequelize')
 const express = require('express')
 const models = require('../../models')
 const { sequelize } = require('../../config/db')
 const { relevantAttributes, validRealisationTypes } = require('./config')
 const { refreshPersonStudyRightsView } = require('./personStudyRightsView')
+const _ = require('lodash')
+
+const attributesToSql = (table, attributes) => {
+  return attributes.map(attribute => `${table}.${_.snakeCase(attribute)} "${attribute}"`).join(', ')
+}
+
+const getCourseRealisationsWithCourseUnits = async (limit, offset) => {
+  const sql = `
+    SELECT 
+      ${attributesToSql('cur', relevantAttributes.courseUnitRealisation)},
+      json_agg(ass) as "assessmentItems"
+    FROM course_unit_realisations cur
+    INNER JOIN assessment_items ass ON ass.id = ANY (cur.assessment_item_ids)
+    WHERE cur.course_unit_realisation_type_urn IN (:validRealisationTypes)
+    GROUP BY cur.id
+    LIMIT :limit OFFSET :offset
+  `
+
+  return await sequelize.query(sql, {
+    replacements: { limit, offset, validRealisationTypes },
+    queryType: QueryTypes.SELECT,
+  })
+}
 
 const addCourseUnitsToRealisations = async courseUnitRealisations => {
-  const assessmentItemIds = [].concat(...courseUnitRealisations.map(c => c.assessmentItemIds))
-
+  const assessmentItemIds = courseUnitRealisations.flatMap(c => c.assessmentItemIds)
   const assessmentItemsWithCrap = await models.AssessmentItem.findAll({
     attributes: relevantAttributes.assessmentItem,
     where: {
@@ -20,10 +42,10 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
         model: models.CourseUnit,
         attributes: relevantAttributes.courseUnit,
         as: 'courseUnit',
+        required: true,
       },
     ],
   })
-
   const assessmentItems = assessmentItemsWithCrap.filter(aItem => {
     if (!aItem.courseUnit) return false
     if (aItem.courseUnit.completionMethods.find(method => method.assessmentItemIds.includes(aItem.id))) return true
@@ -31,23 +53,22 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
     return false
   })
 
-  const realisationsWithCourseUnits = courseUnitRealisations.map(r => {
+  const realisationsWithCourseUnits = []
+  for (const r of courseUnitRealisations) {
     const realisation = r.get({ plain: true })
-    return {
-      ...realisation,
-      courseUnits: [].concat(
-        ...realisation.assessmentItemIds.map(aId =>
-          assessmentItems
-            .filter(aItem => aItem.id === aId)
-            .map(aItem => {
-              const courseUnit = aItem.get({ plain: true }).courseUnit
-              delete courseUnit.completionMethods
-              return courseUnit
-            })
-        )
-      ),
+
+    const courseUnits = []
+    for (const assessmentItem of assessmentItems) {
+      if (!realisation.assessmentItemIds.includes(assessmentItem.id)) continue
+      const courseUnit = assessmentItem.get({ plain: true }).courseUnit
+      delete courseUnit.completionMethods
+      courseUnits.push(courseUnit)
     }
-  })
+
+    realisation.courseUnits = courseUnits
+
+    realisationsWithCourseUnits.push(realisation)
+  }
 
   return realisationsWithCourseUnits
 }
@@ -213,7 +234,7 @@ updaterRouter.get('/persons', async (req, res) => {
     `SELECT P.id, P.student_number, P.employee_number, P.edu_person_principal_name,
       P.first_names, P.last_name, P.call_name, P.primary_email, P.secondary_email, P.preferred_language_urn, psr.has_study_right
       FROM persons P
-      INNER JOIN person_study_rights_view psr ON psr.person_id = P.id
+      LEFT JOIN person_study_rights_view psr ON psr.person_id = P.id
       ORDER BY P.id DESC 
       LIMIT :limit OFFSET :offset`,
     {
