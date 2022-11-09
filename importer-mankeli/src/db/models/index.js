@@ -23,6 +23,7 @@ const Plan = require('./plan')
 const PersonGroup = require('./personGroup')
 const StudyEvent = require('./studyEvent')
 const Location = require('./location')
+const Disclosure = require('./disclosure')
 
 Person.hasMany(StudyRight)
 Education.hasMany(StudyRight)
@@ -55,5 +56,6 @@ module.exports = {
   Plan,
   PersonGroup,
   StudyEvent,
-  Location
+  Location,
+  Disclosure
 }
