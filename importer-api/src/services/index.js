@@ -25,6 +25,7 @@ const {
   info: studyRightExpirationRuleInfo
 } = require('./studyRightExpirationRule')
 const { ADMISSION_TYPE_SCHEDULE_ID, info: admissionTypeInfo } = require('./admissionType')
+const { DISCLOSURE_SCHEDULE_ID, info: disclosureInfo } = require('./disclosure')
 
 const services = {
   [ATTAINMENT_SCHEDULE_ID]: attainmentInfo,
@@ -50,7 +51,8 @@ const services = {
   [STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID]: studyRightExpirationRuleInfo,
   [ADMISSION_TYPE_SCHEDULE_ID]: admissionTypeInfo,
   [PLAN_SCHEDULE_ID]: planInfo,
-  [PERSON_GROUP_SCHEDULE_ID]: personGroupInfo
+  [PERSON_GROUP_SCHEDULE_ID]: personGroupInfo,
+  [DISCLOSURE_SCHEDULE_ID]: disclosureInfo
 }
 
 // Imported in this order
@@ -78,7 +80,8 @@ const serviceIds = [
   STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID,
   ADMISSION_TYPE_SCHEDULE_ID,
   PLAN_SCHEDULE_ID,
-  PERSON_GROUP_SCHEDULE_ID
+  PERSON_GROUP_SCHEDULE_ID,
+  DISCLOSURE_SCHEDULE_ID
 ]
 
 module.exports = {
