@@ -2,7 +2,7 @@ const router = require('express').Router()
 const sequelize = require('sequelize')
 const { Op } = require('sequelize')
 const models = require('../models')
-const { Organisation, Education, CourseUnitRealisation, Person, CourseUnit } = require('../models')
+const { Organisation, Education, CourseUnitRealisation, Person, CourseUnit, Disclosure } = require('../models')
 
 const MATLU = 'H50'
 
@@ -391,6 +391,16 @@ router.get('/:studentNumber/enrollments', async (req, res) => {
     nest: true,
   })
   return res.send(enrollments)
+})
+
+router.get('/:studentNumber/disclosures', async (req, res) => {
+  const disclosures = await Disclosure.findAll({
+    where: {
+      personId: req.student.id,
+    },
+  })
+
+  return res.send(disclosures)
 })
 
 router.get('/:studentNumber/details', (req, res) => {
