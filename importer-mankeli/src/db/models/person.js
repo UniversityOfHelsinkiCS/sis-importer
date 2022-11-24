@@ -33,6 +33,9 @@ Person.init(
     primaryEmail: {
       type: STRING
     },
+    phoneNumber: {
+      type: STRING
+    },
     secondaryEmail: {
       type: STRING
     },

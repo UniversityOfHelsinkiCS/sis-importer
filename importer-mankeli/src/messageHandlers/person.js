@@ -12,6 +12,7 @@ const parsePerson = person => {
     eduPersonPrincipalName: person.eduPersonPrincipalName,
     employeeNumber: person.employeeNumber,
     primaryEmail: person.primaryEmail,
+    phoneNumber: person.phoneNumber,
     oppijaId: person.oppijaID,
     citizenships: person.citizenshipUrns,
     dead: person.dead,
