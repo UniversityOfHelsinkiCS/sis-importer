@@ -293,6 +293,22 @@ updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res
   res.send(courseUnitRealisationsWithCourseUnits)
 })
 
+updaterRouter.get('/course_unit_realisation_with_course_unit/:id', async (req, res) => {
+  const { id } = req.params
+
+  if (!id) return res.sendStatus(400)
+
+  const courseUnitRealisation = await models.CourseUnitRealisation.findByPk(id, {
+    attributes: relevantAttributes.courseUnitRealisation,
+  })
+
+  if (!courseUnitRealisation) return res.sendStatus(404)
+
+  const [courseUnitRealisationWithCourseUnits] = await addCourseUnitsToRealisations([courseUnitRealisation])
+
+  res.send(courseUnitRealisationWithCourseUnits)
+})
+
 updaterRouter.get('/enrolments', async (req, res) => {
   const { limit, offset } = req.query
   if (!limit || !offset) return res.sendStatus(400)
