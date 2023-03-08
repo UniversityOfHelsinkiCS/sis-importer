@@ -4,9 +4,15 @@ module.exports.MIGRATIONS_LOCK = 'MIGRATIONS_LOCK'
 
 const { DB_USERNAME, DB_PASSWORD, DB_PORT, DB_HOST, DB_DATABASE } = process.env
 
-module.exports.DB_CONNECTION_STRING = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}?targetServerType=primary&ssl=true`
+const IS_DEV = process.env.NODE_ENV === 'development'
 
-module.exports.IS_DEV = process.env.NODE_ENV === 'development'
+let DB_CONNECTION_STRING = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}?targetServerType=primary`
+
+if (!IS_DEV) DB_CONNECTION_STRING = `${DB_CONNECTION_STRING}&ssl=true`
+
+module.exports.DB_CONNECTION_STRING = DB_CONNECTION_STRING
+
+module.exports.IS_DEV = IS_DEV
 
 module.exports.DB_CONNECTION_RETRY_LIMIT = process.env.NODE_ENV === 'development' ? 6 : 20
 
