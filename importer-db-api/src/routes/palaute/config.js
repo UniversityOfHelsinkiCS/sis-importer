@@ -1,5 +1,13 @@
 const relevantAttributes = {
-  enrolment: ['id', 'personId', 'assessmentItemId', 'courseUnitRealisationId', 'courseUnitId', 'studySubGroups'],
+  enrolment: [
+    'id',
+    'personId',
+    'assessmentItemId',
+    'courseUnitRealisationId',
+    'courseUnitId',
+    'studySubGroups',
+    'confirmedStudySubGroupIds'
+  ],
   courseUnit: [
     'id',
     'groupId',
