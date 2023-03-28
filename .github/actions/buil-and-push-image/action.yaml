@@ -1,0 +1,34 @@
+name: 'Build and push image'
+description: 'Builds and pushes image to Quay.io'
+
+inputs:
+  tag:
+    required: true
+    description: 'Image tag'
+  password:
+    required: true
+    description: 'Toska Quay.io token'
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+
+    - name: Build image
+      id: build-image
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: importer-api
+        tags: ${{ inputs.tag }} ${{ github.sha }}
+        path: importer-api
+        containerfiles: |
+          Dockerfile
+
+      - name: Push to quay.io
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/toska
+          username: toska+github
+          password: ${{ inputs.password }}
