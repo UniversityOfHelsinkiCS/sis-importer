@@ -15,8 +15,6 @@ const isExpired = () => {
 }
 
 const createPersonStudyRightsView = async () => {
-  if (!isExpired()) return
-
   console.log('Creating person study rights view...')
 
   await sequelize.query(
@@ -54,6 +52,8 @@ const createPersonStudyRightsView = async () => {
  * Refresh person_study_rights_view if it is old
  */
 const refreshPersonStudyRightsView = async () => {
+  if (!createdAt) await createPersonStudyRightsView()
+
   if (isExpired()) {
     console.log('Refreshing person study rights view...')
     await sequelize.query(`
