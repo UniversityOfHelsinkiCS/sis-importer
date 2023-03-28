@@ -31,3 +31,4 @@ jobs:
           image: importer-mankeli
           tag: staging
           password: ${{ secrets.QUAY_IO_TOKEN }}
+
