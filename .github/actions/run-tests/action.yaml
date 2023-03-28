@@ -9,10 +9,10 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v3
-    
     - name: Install packages
+      shell: bash
       run: npm ci --prefix ${{ inputs.path }}
 
     - name: Run tests
+      shell: bash
       run: npm test --prefix ${{ inputs.path }}

@@ -1,12 +1,12 @@
-name: importer-api
+name: importer-mankeli
 
 on:
   push:
     branches:
-      - trunk
+      - master
     paths:
-      - importer-api/**
-      - .github/workflows/importer-api-staging.yaml
+      - importer-db-api/**
+      - .github/workflows/importer-mankeli-production.yaml
 
 jobs:
   test:
@@ -17,7 +17,7 @@ jobs:
       - name: Run tests
         uses: ./.github/actions/run-tests
         with:
-          path: importer-api
+          path: importer-mankeli
 
   build-and-push:
     runs-on: ubuntu-latest
@@ -28,6 +28,6 @@ jobs:
       - name: Build and push image
         uses: ./.github/actions/build-and-push-image
         with:
-          image: importer-api
-          tag: staging
+          image: importer-mankeli
+          tag: production
           password: ${{ secrets.QUAY_IO_TOKEN }}

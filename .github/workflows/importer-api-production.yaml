@@ -3,10 +3,10 @@ name: importer-api
 on:
   push:
     branches:
-      - trunk
+      - master
     paths:
       - importer-api/**
-      - .github/workflows/importer-api-staging.yaml
+      - .github/workflows/importer-api-production.yaml
 
 jobs:
   test:
@@ -29,5 +29,5 @@ jobs:
         uses: ./.github/actions/build-and-push-image
         with:
           image: importer-api
-          tag: staging
+          tag: production
           password: ${{ secrets.QUAY_IO_TOKEN }}
