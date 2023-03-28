@@ -1,0 +1,21 @@
+name: 'Run tests'
+description: 'Runs Cypress tests for service'
+
+inputs:
+  path:
+    required: true
+    description: 'Path to service folder'
+
+runs:
+  using: composite
+  steps:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install packages
+      run: npm ci --prefix ${{ inputs.path }}
+
+    - name: Test
+      run: npm test --prefix ${{ inputs.path }}
