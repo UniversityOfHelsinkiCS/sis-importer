@@ -31,4 +31,3 @@ jobs:
           image: importer-api
           tag: staging
           password: ${{ secrets.QUAY_IO_TOKEN }}
-
