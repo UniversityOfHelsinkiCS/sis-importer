@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - trunk 
     paths:
       - importer-api/**
       - .github/workflows/importer-api.yml
