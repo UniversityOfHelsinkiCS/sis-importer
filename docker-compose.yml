@@ -25,7 +25,7 @@ services:
     ports:
       - 3002:3002 # explorer at http://localhost:3002/
     volumes:
-      - ./importer-api:/usr/src/app
+      - ./importer-api:/opt/app-root/src
 
   importer-mankeli:
     build:
@@ -47,7 +47,7 @@ services:
       NATS_TOKEN: dev
       REDIS_URI: redis://importer-redis:6379
     volumes:
-      - ./importer-mankeli:/usr/src/app
+      - ./importer-mankeli:/opt/app-root/src
 
   importer-db:
     container_name: sis-importer-db
@@ -82,7 +82,7 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./importer-db-api:/usr/src/app
+      - ./importer-db-api:/opt/app-root/src
 
   importer-redis:
     command: ["redis-server", "--appendonly", "yes", "--port", "6379"]
