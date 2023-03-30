@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, BIGINT, JSONB, Op } = require('sequelize')
+const { Model, STRING, DATE, BIGINT, JSONB, ARRAY, Op } = require('sequelize')
 const { sequelize } = require('../config/db')
 
 class Enrolment extends Model {}
@@ -43,6 +43,12 @@ Enrolment.init(
     },
     studySubGroups: {
       type: JSONB,
+    },
+    confirmedStudySubGroupIds: {
+      type: ARRAY(STRING)
+    },
+    tentativeStudySubGroupIds: {
+      type: ARRAY(STRING)
     },
   },
   {
