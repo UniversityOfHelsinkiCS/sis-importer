@@ -198,9 +198,7 @@ const getCourseType = courseUnitRealisationTypeUrn => {
   return typeByCourseUnitRealisationType[courseUnitRealisationType] || 'K'
 }
 
-const getName = ({ nameSpecifier, name }) => (
-  nameSpecifier.fi.length > name.fi.length ? nameSpecifier.fi : name.fi
-)
+const getName = ({ nameSpecifier, name }) => (nameSpecifier.fi.length > name.fi.length ? nameSpecifier.fi : name.fi)
 
 const addCourseNumbers = courseUnitRealisations => {
   const courseIds = courseUnitRealisations.map(courseUnitRealisation => courseUnitRealisation.id)
