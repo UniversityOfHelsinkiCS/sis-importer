@@ -12,9 +12,9 @@ router.get('/courses/:personId', async (req, res) => {
   const currentDate = new Date()
   const limitDate = add(currentDate, { months: 6 })
 
-  const courses = await models.CourseUnitRealisation.findAll({
+  const courses = await models.CourseUnit.findAll({
     where: {
-      activityPeriod: {
+      validityPeriod: {
         startDate: {
           [Op.lt]: format(limitDate, 'yyyy-MM-dd'),
         },
