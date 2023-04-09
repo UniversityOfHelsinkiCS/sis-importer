@@ -1,7 +1,5 @@
 const express = require('express')
-const { Op } = require('sequelize')
-const { format, add } = require('date-fns')
-
+const { sequelize } = require('../config/db.js')
 const models = require('../models')
 
 const router = express.Router()
@@ -9,24 +7,22 @@ const router = express.Router()
 router.get('/courses/:personId', async (req, res) => {
   const { personId: teacherId } = req.params
 
-  const currentDate = new Date()
-  const limitDate = add(currentDate, { months: 6 })
-
-  const courses = await models.CourseUnit.findAll({
-    where: {
-      validityPeriod: {
-        startDate: {
-          [Op.lt]: format(limitDate, 'yyyy-MM-dd'),
-        },
-        endDate: {
-          [Op.gt]: format(currentDate, 'yyyy-MM-dd'),
-        },
-      },
-    },
-  })
-
-  const teacherCourses = courses.filter(({ responsibilityInfos }) =>
-    responsibilityInfos.some(({ personId }) => personId === teacherId)
+  const teacherCourses = await sequelize.query(
+    `
+    SELECT cu.*
+    FROM (
+      SELECT 
+      id, 
+      jsonb_array_elements(responsibility_infos)->>'personId' AS person_id 
+      FROM course_units
+    ) AS cu_persons
+    INNER JOIN course_units cu ON cu.id = cu_persons.id
+    WHERE person_id = :teacherId
+    AND DATE(cu.validity_period->>'endDate') > NOW()
+    AND DATE(cu.validity_period->>'startDate') < NOW() + interval '6 months'
+    ORDER BY cu.code
+  `,
+    { mapToModel: true, model: models.CourseUnit, type: sequelize.QueryTypes.SELECT, replacements: { teacherId } }
   )
 
   res.send(teacherCourses)
