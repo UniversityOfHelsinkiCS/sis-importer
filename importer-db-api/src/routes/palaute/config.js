@@ -5,8 +5,7 @@ const relevantAttributes = {
     'assessmentItemId',
     'courseUnitRealisationId',
     'courseUnitId',
-    'studySubGroups',
-    'confirmedStudySubGroupIds'
+    'confirmedStudySubGroupIds',
   ],
   courseUnit: [
     'id',
