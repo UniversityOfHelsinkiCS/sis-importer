@@ -5,7 +5,8 @@ const { sequelize } = require('../../config/db')
 const { relevantAttributes, validRealisationTypes } = require('./config')
 const { isRefreshingPersonStudyRightsView } = require('./personStudyRightsView')
 const _ = require('lodash')
-const { subMonths } = require('date-fns')
+
+const defaultSince = new Date('2021-01-01')
 
 const attributesToSql = (table, attributes) => {
   return attributes.map(attribute => `${table}.${_.snakeCase(attribute)} "${attribute}"`).join(', ')
@@ -133,13 +134,21 @@ updaterRouter.get('/organisations', async (req, res) => {
 })
 
 updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res) => {
-  const { limit, offset } = req.query
+  const { limit, offset, since: sinceRaw } = req.query
   if (!limit || !offset) return res.sendStatus(400)
+
+  let since = new Date(sinceRaw)
+  if (!sinceRaw || since == 'Invalid Date') {
+    since = defaultSince
+  }
 
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     where: {
       courseUnitRealisationTypeUrn: {
         [Op.in]: validRealisationTypes,
+      },
+      lastModifiedOn: {
+        [Op.gte]: since,
       },
     },
     attributes: relevantAttributes.courseUnitRealisation,
@@ -175,7 +184,7 @@ updaterRouter.get('/enrolments', async (req, res) => {
 
   let since = new Date(sinceRaw)
   if (!sinceRaw || since == 'Invalid Date') {
-    since = new Date('2021-01-01')
+    since = defaultSince
   }
 
   const enrolments = await models.Enrolment.findAll({
