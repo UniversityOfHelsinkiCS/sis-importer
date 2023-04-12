@@ -189,7 +189,7 @@ updaterRouter.get('/enrolments', async (req, res) => {
   const enrolments = await models.Enrolment.findAll({
     where: {
       state: 'ENROLLED',
-      lastModifiedOn: {
+      updatedAt: {
         [Op.gte]: since,
       },
     },
