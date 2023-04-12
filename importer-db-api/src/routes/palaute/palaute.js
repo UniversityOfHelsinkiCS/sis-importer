@@ -3,7 +3,7 @@ const express = require('express')
 const models = require('../../models')
 const { sequelize } = require('../../config/db')
 const { relevantAttributes, validRealisationTypes } = require('./config')
-const { refreshPersonStudyRightsView } = require('./personStudyRightsView')
+const { isRefreshingPersonStudyRightsView } = require('./personStudyRightsView')
 const _ = require('lodash')
 
 const attributesToSql = (table, attributes) => {
@@ -81,7 +81,13 @@ updaterRouter.get('/persons', async (req, res) => {
   const { limit, offset } = req.query
   if (!limit || !offset) return res.sendStatus(400)
 
-  await refreshPersonStudyRightsView()
+  if (isRefreshingPersonStudyRightsView()) {
+    return res.sendStatus({
+      waitAndRetry: true,
+      message: 'Person study rights view is being refreshed',
+      waitTime: 10_000,
+    })
+  }
 
   const personsWithStudyRight = await sequelize.query(
     `SELECT P.id, P.student_number, P.employee_number, P.edu_person_principal_name,
