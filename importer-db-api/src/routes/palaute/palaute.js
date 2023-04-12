@@ -5,6 +5,7 @@ const { sequelize } = require('../../config/db')
 const { relevantAttributes, validRealisationTypes } = require('./config')
 const { isRefreshingPersonStudyRightsView } = require('./personStudyRightsView')
 const _ = require('lodash')
+const { subMonths } = require('date-fns')
 
 const attributesToSql = (table, attributes) => {
   return attributes.map(attribute => `${table}.${_.snakeCase(attribute)} "${attribute}"`).join(', ')
@@ -169,12 +170,20 @@ updaterRouter.get('/course_unit_realisation_with_course_unit/:id', async (req, r
 })
 
 updaterRouter.get('/enrolments', async (req, res) => {
-  const { limit, offset } = req.query
+  const { limit, offset, since: sinceRaw } = req.query
   if (!limit || !offset) return res.sendStatus(400)
+
+  let since = new Date(sinceRaw)
+  if (!sinceRaw || since == 'Invalid Date') {
+    since = new Date('2021-01-01')
+  }
 
   const enrolments = await models.Enrolment.findAll({
     where: {
       state: 'ENROLLED',
+      lastModifiedOn: {
+        [Op.gte]: since,
+      },
     },
     attributes: relevantAttributes.enrolment,
     limit,
@@ -214,7 +223,7 @@ updaterRouter.get('/enrolments-new', async (req, res) => {
   const enrolments = await models.Enrolment.findAll({
     where: {
       state: 'ENROLLED',
-      createdAt: {
+      lastModifiedOn: {
         [Op.gte]: since,
       },
     },
