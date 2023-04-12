@@ -82,7 +82,7 @@ updaterRouter.get('/persons', async (req, res) => {
   if (!limit || !offset) return res.sendStatus(400)
 
   if (isRefreshingPersonStudyRightsView()) {
-    return res.sendStatus({
+    return res.send({
       waitAndRetry: true,
       message: 'Person study rights view is being refreshed',
       waitTime: 10_000,
