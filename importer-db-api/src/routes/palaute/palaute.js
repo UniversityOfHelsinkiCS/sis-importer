@@ -142,13 +142,12 @@ updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res
     since = defaultSince
   }
 
-  const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
+  const courseUnitRealisations = await models.CourseUnitRealisation.scope({
+    method: ['activityPeriodEndDateAfter', since],
+  }).findAll({
     where: {
       courseUnitRealisationTypeUrn: {
         [Op.in]: validRealisationTypes,
-      },
-      lastModifiedOn: {
-        [Op.gte]: since,
       },
     },
     attributes: relevantAttributes.courseUnitRealisation,
