@@ -45,7 +45,11 @@ router.get('/person/:personId', async (req, res) => {
   })
   const groupsForPerson = groups.filter(group =>
     group.responsibilityInfos.some(
-      role => role.personId === personId && role.roleUrn === 'urn:code:group-responsibility-info-type:responsible-tutor'
+      role =>
+        role.personId === personId &&
+        (role.roleUrn === 'urn:code:group-responsibility-info-type:responsible-tutor' ||
+          role.roleUrn === 'urn:code:group-responsibility-info-type:tutor' ||
+          role.roleUrn === 'urn:code:group-responsibility-info-type:administrative-person')
     )
   )
 

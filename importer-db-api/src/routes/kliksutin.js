@@ -1,33 +1,28 @@
 const express = require('express')
 const { Op } = require('sequelize')
-const { format, add } = require('date-fns')
-
-const models = require('../models')
+const { addMonths } = require('date-fns')
+const models = require('../models/index.js')
 
 const router = express.Router()
 
 router.get('/courses/:personId', async (req, res) => {
   const { personId: teacherId } = req.params
 
-  const currentDate = new Date()
-  const limitDate = add(currentDate, { months: 6 })
-
-  const courses = await models.CourseUnit.findAll({
+  const teacherCourses = await models.CourseUnit.findAll({
     where: {
+      responsibilityInfos: {
+        [Op.contains]: [{ personId: teacherId }], // note that '{ personId: teacherId }' would not work. In pg, array containment is more like checking for union
+      },
       validityPeriod: {
-        startDate: {
-          [Op.lt]: format(limitDate, 'yyyy-MM-dd'),
-        },
         endDate: {
-          [Op.gt]: format(currentDate, 'yyyy-MM-dd'),
+          [Op.gt]: new Date(),
+        },
+        startDate: {
+          [Op.lt]: addMonths(new Date(), 6),
         },
       },
     },
   })
-
-  const teacherCourses = courses.filter(({ responsibilityInfos }) =>
-    responsibilityInfos.some(({ personId }) => personId === teacherId)
-  )
 
   res.send(teacherCourses)
 })

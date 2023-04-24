@@ -3,8 +3,10 @@ const express = require('express')
 const models = require('../../models')
 const { sequelize } = require('../../config/db')
 const { relevantAttributes, validRealisationTypes } = require('./config')
-const { refreshPersonStudyRightsView } = require('./personStudyRightsView')
+const { isRefreshingPersonStudyRightsView } = require('./personStudyRightsView')
 const _ = require('lodash')
+
+const defaultSince = new Date('2021-01-01')
 
 const attributesToSql = (table, attributes) => {
   return attributes.map(attribute => `${table}.${_.snakeCase(attribute)} "${attribute}"`).join(', ')
@@ -75,160 +77,19 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
 
 const router = express.Router()
 
-router.get('/enrolled/:personId', async (req, res) => {
-  const {
-    params: { personId },
-    query: { startDateBefore, startDateAfter, endDateBefore, endDateAfter },
-  } = req
-
-  const scopes = [
-    startDateBefore && { method: ['activityPeriodStartDateBefore', new Date(startDateBefore)] },
-    startDateAfter && { method: ['activityPeriodStartDateAfter', new Date(startDateAfter)] },
-    endDateBefore && { method: ['activityPeriodEndDateBefore', new Date(endDateBefore)] },
-    endDateAfter && { method: ['activityPeriodEndDateAfter', new Date(endDateAfter)] },
-  ].filter(Boolean)
-
-  const enrolments = await models.Enrolment.findAll({
-    where: {
-      personId,
-    },
-    attributes: relevantAttributes.enrolment,
-    include: [
-      {
-        model: models.CourseUnitRealisation.scope(scopes),
-        attributes: relevantAttributes.courseUnitRealisation,
-        as: 'courseUnitRealisation',
-      },
-      {
-        model: models.CourseUnit,
-        attributes: relevantAttributes.courseUnit,
-        as: 'courseUnit',
-      },
-    ],
-  })
-
-  res.send(enrolments)
-})
-
-router.get('/responsible/:personId', async (req, res) => {
-  const {
-    params: { personId },
-  } = req
-
-  const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
-    attributes: relevantAttributes.courseUnitRealisation,
-    where: {
-      responsibilityInfos: {
-        [Op.contains]: [
-          {
-            personId: personId,
-          },
-        ],
-      },
-    },
-  })
-
-  const courseUnits = await models.CourseUnit.findAll({
-    attributes: relevantAttributes.courseUnit,
-    where: {
-      responsibilityInfos: {
-        [Op.contains]: [
-          {
-            personId: personId,
-          },
-        ],
-      },
-    },
-  })
-
-  const realisationsWithCourseUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
-
-  res.send({
-    courseUnitRealisations: realisationsWithCourseUnits,
-    courseUnits,
-  })
-})
-
-router.get('/persons', async (req, res) => {
-  const where = {}
-
-  Object.entries(req.query).forEach(([key, value]) => {
-    if (key === 'token') return
-
-    where[key] = { [Op.iLike]: `%${value}%` }
-  })
-
-  const persons = await models.Person.findAll({
-    attributes: relevantAttributes.person,
-    limit: 100,
-    where,
-  })
-
-  res.send({
-    persons,
-  })
-})
-
-router.get('/organisations', async (req, res) => {
-  const organisations = await models.Organisation.findAll({
-    attributes: relevantAttributes.organisation,
-  })
-
-  res.send(organisations)
-})
-
-const programmeRouter = express.Router()
-
-const findProgramme = async (req, res, next) => {
-  const {
-    params: { programmeCode }, // '500-K005' = CS kandi
-  } = req
-
-  if (!programmeCode) return res.status(500).send('Missing programmeCode')
-
-  const organisation = await models.Organisation.findOne({
-    where: {
-      code: programmeCode,
-    },
-  })
-
-  if (!organisation) return res.status(404).send('No such organization, use different code e.g. 500-K005')
-
-  req.organisation = organisation
-
-  next()
-}
-
-programmeRouter.get('/course_unit_realisations', async (req, res) => {
-  const courseUnitRealisations = await req.organisation.getCourseUnitRealisations()
-
-  const withUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
-  res.send(withUnits)
-})
-
-programmeRouter.get('/course_units', async (req, res) => {
-  const courseUnits = await req.organisation.getCourseUnits()
-
-  res.send(courseUnits)
-})
-
-programmeRouter.get('/recursively/course_unit_realisations', async (req, res) => {
-  const { limit, offset } = req.query
-  const courseUnitRealisations = await req.organisation.getCourseUnitRealisationsRecursively(limit, offset)
-
-  const withUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
-  res.send(withUnits)
-})
-
-router.use('/programme/:programmeCode', findProgramme, programmeRouter)
-
 const updaterRouter = express.Router()
 
 updaterRouter.get('/persons', async (req, res) => {
   const { limit, offset } = req.query
   if (!limit || !offset) return res.sendStatus(400)
 
-  await refreshPersonStudyRightsView()
+  if (isRefreshingPersonStudyRightsView()) {
+    return res.send({
+      waitAndRetry: true,
+      message: 'Person study rights view is being refreshed',
+      waitTime: 10_000,
+    })
+  }
 
   const personsWithStudyRight = await sequelize.query(
     `SELECT P.id, P.student_number, P.employee_number, P.edu_person_principal_name,
@@ -273,10 +134,17 @@ updaterRouter.get('/organisations', async (req, res) => {
 })
 
 updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res) => {
-  const { limit, offset } = req.query
+  const { limit, offset, since: sinceRaw } = req.query
   if (!limit || !offset) return res.sendStatus(400)
 
-  const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
+  let since = new Date(sinceRaw)
+  if (!sinceRaw || since == 'Invalid Date') {
+    since = defaultSince
+  }
+
+  const courseUnitRealisations = await models.CourseUnitRealisation.scope({
+    method: ['activityPeriodEndDateAfter', since],
+  }).findAll({
     where: {
       courseUnitRealisationTypeUrn: {
         [Op.in]: validRealisationTypes,
@@ -310,12 +178,20 @@ updaterRouter.get('/course_unit_realisation_with_course_unit/:id', async (req, r
 })
 
 updaterRouter.get('/enrolments', async (req, res) => {
-  const { limit, offset } = req.query
+  const { limit, offset, since: sinceRaw } = req.query
   if (!limit || !offset) return res.sendStatus(400)
+
+  let since = new Date(sinceRaw)
+  if (!sinceRaw || since == 'Invalid Date') {
+    since = defaultSince
+  }
 
   const enrolments = await models.Enrolment.findAll({
     where: {
       state: 'ENROLLED',
+      updatedAt: {
+        [Op.gte]: since,
+      },
     },
     attributes: relevantAttributes.enrolment,
     limit,
@@ -355,7 +231,7 @@ updaterRouter.get('/enrolments-new', async (req, res) => {
   const enrolments = await models.Enrolment.findAll({
     where: {
       state: 'ENROLLED',
-      createdAt: {
+      updatedAt: {
         [Op.gte]: since,
       },
     },
