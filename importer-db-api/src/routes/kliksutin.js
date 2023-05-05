@@ -63,7 +63,23 @@ router.get('/courses/:personId', async (req, res) => {
     },
   })
 
-  res.send(teacherCourses)
+  const courseUnits = await models.CourseUnit.findAll({
+    where: {
+      responsibilityInfos: {
+        [Op.contains]: [{ personId: teacherId }], // note that '{ personId: teacherId }' would not work. In pg, array containment is more like checking for union
+      },
+      validityPeriod: {
+        endDate: {
+          [Op.gt]: new Date(),
+        },
+        startDate: {
+          [Op.lt]: addMonths(new Date(), timeTillCourseStart),
+        },
+      },
+    },
+  })
+
+  res.send(courseUnitRealisations)
 })
 
 module.exports = router
