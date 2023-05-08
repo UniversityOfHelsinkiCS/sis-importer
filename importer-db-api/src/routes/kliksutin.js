@@ -70,6 +70,7 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
       )
       .map(assessmentItem => {
         const courseUnit = assessmentItem.get({ plain: true }).courseUnit
+        delete courseUnit.completionMethods
         return courseUnit
       })
   
