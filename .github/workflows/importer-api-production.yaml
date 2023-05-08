@@ -1,4 +1,4 @@
-name: importer-api
+name: importer-api-production
 
 on:
   push:
