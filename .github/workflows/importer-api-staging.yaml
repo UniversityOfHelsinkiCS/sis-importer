@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - trunk
-    paths:
-      - importer-api/**
-      - .github/workflows/importer-api-staging.yaml
 
 jobs:
   test:
