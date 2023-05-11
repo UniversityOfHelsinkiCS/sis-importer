@@ -57,6 +57,9 @@ Person.init(
     secondaryEmail: {
       type: STRING,
     },
+    personalDataSafetyNonDisclosure: {
+      type: BOOLEAN
+    },
     createdAt: {
       type: DATE,
     },
