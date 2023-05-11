@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - trunk
+    paths:
+      - importer-db-api/**
+      - .github/workflows/importer-mankeli-staging.yaml
 
 jobs:
   test:

@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - trunk
+    paths:
+      - importer-db-api/**
+      - .github/workflows/importer-db-api-staging.yaml
 
 jobs:
   # test:
