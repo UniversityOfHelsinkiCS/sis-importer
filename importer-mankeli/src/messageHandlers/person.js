@@ -19,7 +19,8 @@ const parsePerson = person => {
     genderUrn: person.genderUrn,
     countryUrn: person.primaryAddress ? person.primaryAddress.countryUrn : null,
     preferredLanguageUrn: person.preferredLanguageUrn,
-    secondaryEmail: person.secondaryEmail
+    secondaryEmail: person.secondaryEmail,
+    personalDataSafetyNonDisclosure: person.personalDataSafetyNonDisclosure
   }
 }
 
