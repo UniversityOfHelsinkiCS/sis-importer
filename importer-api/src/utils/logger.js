@@ -1,3 +1,5 @@
+const os = require('os')
+
 const winston = require('winston')
 const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 
