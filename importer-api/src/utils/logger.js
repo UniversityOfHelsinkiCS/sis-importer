@@ -45,19 +45,21 @@ if (!IS_DEV) {
 
   transports.push(new winston.transports.Console({ format: prodFormat }))
 
-  transports.push(
-    new WinstonGelfTransporter({
-      handleExceptions: true,
-      host: 'svm-116.cs.helsinki.fi',
-      port: 9503,
-      protocol: 'udp',
-      hostName: os.hostname(),
-      additional: {
-        app: 'importer-api',
-        environment: 'production'
-      }
-    })
-  )
+  if (!process.env.STAGING) {
+    transports.push(
+      new WinstonGelfTransporter({
+        handleExceptions: true,
+        host: 'svm-116.cs.helsinki.fi',
+        port: 9503,
+        protocol: 'udp',
+        hostName: os.hostname(),
+        additional: {
+          app: 'importer-api',
+          environment: 'production'
+        }
+      })
+    )
+  }
 }
 
 const logger = winston.createLogger({ transports })
