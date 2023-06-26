@@ -1,12 +1,8 @@
 name: importer-db-api-production
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - importer-db-api/**
-      - .github/workflows/importer-db-api-production.yaml
+  release:
+    types: [published]
 
 jobs:
   # test:

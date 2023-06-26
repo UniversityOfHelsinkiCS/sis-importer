@@ -1,12 +1,8 @@
 name: importer-mankeli-production
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - importer-mankeli/**
-      - .github/workflows/importer-mankeli-production.yaml
+  release:
+    types: [published]
 
 jobs:
   test:

@@ -3,7 +3,7 @@ name: importer-api-staging
 on:
   push:
     branches:
-      - trunk
+      - master
     paths:
       - importer-api/**
       - .github/workflows/importer-api-staging.yaml

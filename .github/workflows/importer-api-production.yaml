@@ -1,12 +1,8 @@
 name: importer-api-production
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - importer-api/**
-      - .github/workflows/importer-api-production.yaml
+  release:
+    types: [published]
 
 jobs:
   test:

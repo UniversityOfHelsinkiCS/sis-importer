@@ -3,7 +3,7 @@ name: importer-mankeli-staging
 on:
   push:
     branches:
-      - trunk
+      - master
     paths:
       - importer-mankeli/**
       - .github/workflows/importer-mankeli-staging.yaml
