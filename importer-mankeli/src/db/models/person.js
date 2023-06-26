@@ -57,6 +57,9 @@ Person.init(
     preferredLanguageUrn: {
       type: STRING
     },
+    personalDataSafetyNonDisclosure: {
+      type: BOOLEAN
+    },
     createdAt: {
       type: DATE
     },

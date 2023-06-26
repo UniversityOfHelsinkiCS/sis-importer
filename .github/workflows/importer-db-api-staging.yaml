@@ -1,4 +1,4 @@
-name: importer-db-api
+name: importer-db-api-staging
 
 on:
   push:

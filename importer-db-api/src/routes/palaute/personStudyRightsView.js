@@ -14,8 +14,11 @@ const isExpired = () => {
   return Date.now() - createdAt > VIEW_EXPIRATION_TIME
 }
 
+let state = 'idle'
+
 const createPersonStudyRightsView = async () => {
   console.log('Creating person study rights view...')
+  state = 'creating'
 
   await sequelize.query(
     `
@@ -46,24 +49,40 @@ const createPersonStudyRightsView = async () => {
   )
 
   updateCreatedAt()
+  state = 'idle'
+}
+
+const refreshPersonStudyRightsView = async () => {
+  state = 'refreshing'
+  console.log('Refreshing person study rights view...')
+  await sequelize.query(`
+    REFRESH MATERIALIZED VIEW person_study_rights_view;
+  `)
+  updateCreatedAt()
+  state = 'idle'
 }
 
 /**
  * Refresh person_study_rights_view if it is old
+ * @returns {boolean} true if view is refreshing or started to refresh
  */
-const refreshPersonStudyRightsView = async () => {
-  if (!createdAt) await createPersonStudyRightsView()
+const isRefreshingPersonStudyRightsView = () => {
+  if (state !== 'idle') return true
+
+  if (!createdAt) {
+    createPersonStudyRightsView()
+    return true
+  }
 
   if (isExpired()) {
-    console.log('Refreshing person study rights view...')
-    await sequelize.query(`
-      REFRESH MATERIALIZED VIEW person_study_rights_view;
-    `)
-    updateCreatedAt()
+    refreshPersonStudyRightsView()
+    return true
   }
+
+  return false
 }
 
 module.exports = {
   createPersonStudyRightsView,
-  refreshPersonStudyRightsView,
+  isRefreshingPersonStudyRightsView,
 }

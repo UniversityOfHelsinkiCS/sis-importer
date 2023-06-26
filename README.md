@@ -108,12 +108,5 @@ http://localhost:8282/
 
 ## CI ##
 
-All three services (api, mankeli and db-api) go through individual github actions workflows, defined in .github/workflows.
-Master branch docker images are tagged as `latest` importer automatically pulls new `latest` -images.
-
-Trunk branch is also built with tag `trunk`. But is not currently used.
-
-
-
-
-
+All three services (api, mankeli and db-api) go through individual staging and production github actions workflows, defined in .github/workflows.
+Docker images are tagged as `production` and `staging` and are pulled automatically into the production and staging environments.
