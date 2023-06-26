@@ -58,7 +58,7 @@ Person.init(
       type: STRING,
     },
     personalDataSafetyNonDisclosure: {
-      type: BOOLEAN
+      type: BOOLEAN,
     },
     createdAt: {
       type: DATE,

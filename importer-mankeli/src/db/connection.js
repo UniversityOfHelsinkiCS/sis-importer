@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize')
 const Umzug = require('umzug')
-const { DB_CONFIG, DB_CONNECTION_RETRY_LIMIT, MIGRATIONS_LOCK } = require('../config')
+const { DB_CONNECTION_STRING, DB_CONNECTION_RETRY_LIMIT, MIGRATIONS_LOCK } = require('../config')
 const { lock } = require('../utils/redis')
 
 class Connection {
@@ -13,9 +13,7 @@ class Connection {
     this.error = false
     this.established = false
     try {
-      this.sequelize = new Sequelize({
-        ...DB_CONFIG
-      })
+      this.sequelize = new Sequelize(DB_CONNECTION_STRING, { logging: false })
       await this.sequelize.authenticate()
       console.log('Connected to database successfully!')
       await this.runMigrations()

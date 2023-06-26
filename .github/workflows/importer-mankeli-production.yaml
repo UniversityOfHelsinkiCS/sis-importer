@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - importer-db-api/**
+      - importer-mankeli/**
       - .github/workflows/importer-mankeli-production.yaml
 
 jobs:

@@ -19,7 +19,8 @@ const knex = require('knex')({
     user: DB_USERNAME,
     password: DB_PASSWORD,
     database: DB_DATABASE,
-    port: DB_PORT
+    port: DB_PORT,
+    ssl: !IS_DEV
   },
   pool: {
     min: 0,

@@ -1,20 +1,14 @@
 const Sequelize = require('sequelize')
 
-const sequelize = new Sequelize({
-  dialect: 'postgres',
-  pool: {
-    max: 10,
-    min: 0,
-    acquire: 10000,
-    idle: 300000000,
-  },
-  logging: process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test' ? false : true,
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-  host: process.env.DB_HOST,
-  database: process.env.DB_DATABASE,
-})
+const { IS_DEV } = require('../config')
+
+const { DB_USERNAME, DB_PASSWORD, DB_PORT, DB_HOST, DB_DATABASE } = process.env
+
+let DB_CONNECTION_STRING = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}?targetServerType=primary`
+
+if (!IS_DEV) DB_CONNECTION_STRING = `${DB_CONNECTION_STRING}&ssl=true`
+
+const sequelize = new Sequelize(DB_CONNECTION_STRING, { logging: false })
 
 const dbHealth = async () => {
   const res = await sequelize.query('SELECT 1 as pass', { raw: true })
