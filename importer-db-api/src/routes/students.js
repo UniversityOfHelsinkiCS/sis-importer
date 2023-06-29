@@ -6,34 +6,15 @@ const { Organisation, Education, CourseUnitRealisation, Person, CourseUnit, Disc
 
 const MATLU = 'H50'
 
-const EXCHANGE_STUDENT_EDUCATIONTYPE_URNS = [
-  'urn:code:education-type:non-degree-education:exchange-studies',
-  'urn:code:education-type:non-degree-education:exchange-studies-postgraduate',
-]
-
 const getFallSemesterCode = year => (year - 1950) * 2 + 1
 const getSpringSemesterCode = year => (year - 1950) * 2 + 2
-
-// const isBachelorsStudyRight = urn => {
-//   const splitted = urn.split(':')
-//   const educationType = splitted[3]
-//   const degree = splitted[4]
-//   return educationType === 'degree-education' && ['bachelors-and-masters-degree', 'bachelors-degree'].includes(degree)
-// }
-
-const isExchangeEducationType = educationTypeUrn => {
-  return EXCHANGE_STUDENT_EDUCATIONTYPE_URNS.includes(educationTypeUrn)
-}
-
-const filterOutExchangeStudentStudyRights = studyrights => {
-  return studyrights.filter(({ education }) => !education || !isExchangeEducationType(education.educationType))
-}
 
 /**
  * Post list of persons and get list of students with their CS study right id
  */
 router.post('/study-rights', async (req, res) => {
   const studentNumbers = req.body
+
   if (!Array.isArray(studentNumbers)) return res.status(400).send({ error: 'Input should be an array' })
   const studyRights = await models.StudyRight.findAll({
     where: {
@@ -105,9 +86,9 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
 
   if (!studyRights.length) return res.json([])
 
-  const filteredStudyRights = filterOutExchangeStudentStudyRights(studyRights)
   let result = []
-  for (const { valid, education, organisation } of filteredStudyRights) {
+
+  for (const { valid, education, organisation } of studyRights) {
     // Most old studyrights dont have educations
     const module = education
       ? await models.Module.findOne({
