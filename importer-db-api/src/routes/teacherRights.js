@@ -9,8 +9,7 @@ const router = require('express').Router()
  * @returns {{teacherId: any, studentNumbers: any[]}} the parsed body
  */
 const parseParams = req => {
-  const { teacherId } = req.params
-  const { studentNumbers } = req.body
+  const { teacherId, studentNumbers } = req.body
 
   if (!teacherId) {
     throw {
@@ -30,43 +29,46 @@ const parseParams = req => {
 }
 
 /**
- *
+ * Returns those student numbers to which the teacher (teacherId in body) has access,
+ * by the students having enrolled to courses teached by teacher.
  */
-router.get('/:teacherId', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { teacherId, studentNumbers } = parseParams(req)
 
     const students = await Person.findAll({
-      attributes: ['id'],
+      attributes: ['studentNumber'],
       where: {
         studentNumber: {
           [Op.in]: studentNumbers,
         },
       },
-    })
-
-    const courseUnitRealisations = await CourseUnitRealisation.findAll({
-      where: {
-        responsibilityInfos: {
-          [Op.contains]: [{ personId: teacherId }], // note that '{ personId: teacherId }' would not work. In pg, array containment is more like checking for intersection
+      include: [
+        {
+          model: Enrolment,
+          as: 'enrolments',
+          include: [
+            {
+              model: CourseUnitRealisation,
+              as: 'courseUnitRealisation',
+              required: true,
+              where: {
+                responsibilityInfos: {
+                  [Op.contains]: [
+                    {
+                      personId: teacherId,
+                      roleUrn: 'urn:code:course-unit-realisation-responsibility-info-type:responsible-teacher',
+                    },
+                  ],
+                },
+              },
+            },
+          ],
         },
-      },
+      ],
     })
 
-    const enrolments = await Enrolment.findAll({
-      where: {
-        courseUnitRealisationId: {
-          [Op.in]: courseUnitRealisations.map(cur => cur.id),
-        },
-      },
-    })
-
-    const accessStatuses = students.map(student => ({
-      id: student.id,
-      accessible: enrolments.some(enr => enr.personId === student.id),
-    }))
-
-    return res.send(accessStatuses)
+    return res.send(students.map(student => student.studentNumber))
   } catch (err) {
     if (err.status)
       // handle only this kind of error
