@@ -17,14 +17,7 @@ const validRealisationTypes = [
 ]
 
 const relevantAttributes = {
-  courseUnit: [
-    'id',
-    'code',
-    'responsibilityInfos',
-    'completionMethods',
-    'name',
-    'validityPeriod',
-  ],
+  courseUnit: ['id', 'code', 'responsibilityInfos', 'completionMethods', 'name', 'validityPeriod'],
   courseUnitRealisation: [
     'id',
     'name',
@@ -55,25 +48,25 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
         attributes: relevantAttributes.courseUnit,
         as: 'courseUnit',
         required: true,
-      }
+      },
     ],
   })
 
-  const assessmentItems = assessmentItemsWithCrap.filter(aItem => (aItem?.courseUnit.completionMethods.find(method => method.assessmentItemIds.includes(aItem.id))))
+  const assessmentItems = assessmentItemsWithCrap.filter(aItem =>
+    aItem?.courseUnit.completionMethods.find(method => method.assessmentItemIds.includes(aItem.id))
+  )
 
-  const realisationsWithCourseUnits = courseUnitRealisations.map((r) => {
+  const realisationsWithCourseUnits = courseUnitRealisations.map(r => {
     const realisation = r.get({ plain: true })
-  
+
     const courseUnits = assessmentItems
-      .filter(assessmentItem =>
-        realisation.assessmentItemIds.includes(assessmentItem.id)
-      )
+      .filter(assessmentItem => realisation.assessmentItemIds.includes(assessmentItem.id))
       .map(assessmentItem => {
         const courseUnit = assessmentItem.get({ plain: true }).courseUnit
         delete courseUnit.completionMethods
         return courseUnit
       })
-  
+
     return {
       ...realisation,
       courseUnits,
@@ -83,6 +76,21 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
   return realisationsWithCourseUnits
 }
 
+router.get('/course/:courseId', async (req, res) => {
+  const { courseId } = req.params
+
+  const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
+    attributes: relevantAttributes.courseUnitRealisation,
+    where: {
+      id: courseId,
+      courseUnitRealisationTypeUrn: {
+        [Op.in]: validRealisationTypes,
+      },
+    },
+  })
+
+  res.send(courseUnitRealisations)
+})
 
 router.get('/courses/:personId', async (req, res) => {
   const { personId: teacherId } = req.params
@@ -102,8 +110,8 @@ router.get('/courses/:personId', async (req, res) => {
         },
       },
       courseUnitRealisationTypeUrn: {
-        [Op.in]: validRealisationTypes
-      }
+        [Op.in]: validRealisationTypes,
+      },
     },
   })
 
