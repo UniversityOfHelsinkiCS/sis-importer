@@ -79,7 +79,7 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
 router.get('/course/:courseId', async (req, res) => {
   const { courseId } = req.params
 
-  const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
+  const courseUnitRealisations = await models.CourseUnitRealisation.findOne({
     attributes: relevantAttributes.courseUnitRealisation,
     where: {
       id: courseId,
