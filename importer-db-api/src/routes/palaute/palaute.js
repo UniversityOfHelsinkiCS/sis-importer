@@ -189,7 +189,7 @@ updaterRouter.get('/enrolments', async (req, res) => {
   const enrolments = await models.Enrolment.findAll({
     where: {
       state: 'ENROLLED',
-      updatedAt: {
+      enrolmentDateTime: {
         [Op.gte]: since,
       },
     },
@@ -231,7 +231,7 @@ updaterRouter.get('/enrolments-new', async (req, res) => {
   const enrolments = await models.Enrolment.findAll({
     where: {
       state: 'ENROLLED',
-      updatedAt: {
+      enrolmentDateTime: {
         [Op.gte]: since,
       },
     },
