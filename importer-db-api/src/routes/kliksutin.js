@@ -95,20 +95,28 @@ router.get('/course/:courseId', async (req, res) => {
 router.get('/courses/:personId', async (req, res) => {
   const { personId: teacherId } = req.params
 
+  const courseStartTreshold = addMonths(new Date(), timeTillCourseStart)
+
+  console.log(courseStartTreshold)
+
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     attributes: relevantAttributes.courseUnitRealisation,
     where: {
       responsibilityInfos: {
         [Op.contains]: [{ personId: teacherId }], // note that '{ personId: teacherId }' would not work. In pg, array containment is more like checking for union
       },
-      activityPeriod: {
-        endDate: {
-          [Op.gt]: new Date(),
+      [Op.and]: [
+        {
+          'activityPeriod.endDate': {
+            [Op.gte]: new Date(),
+          },
         },
-        startDate: {
-          [Op.lt]: addMonths(new Date(), timeTillCourseStart),
+        {
+          'activityPeriod.startDate': {
+            [Op.lte]: courseStartTreshold,
+          },
         },
-      },
+      ],
       courseUnitRealisationTypeUrn: {
         [Op.in]: validRealisationTypes,
       },
