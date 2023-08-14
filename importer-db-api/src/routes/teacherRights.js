@@ -28,9 +28,13 @@ const parseParams = req => {
   return { teacherId, studentNumbers }
 }
 
+const earliestDate = () => new Date(new Date().setMonth(new Date().getMonth() - 8))
+
 /**
  * Returns those student numbers to which the teacher (teacherId in body) has access,
  * by the students having enrolled to courses teached by teacher.
+ * Time is limited by course_unit_realisation -> enrolment_period -> (endDate-field in json)
+ * because just enrolments sometimes have null date
  */
 router.post('/', async (req, res) => {
   try {
@@ -61,6 +65,7 @@ router.post('/', async (req, res) => {
                     },
                   ],
                 },
+                enrolment_period: { endDateTime: { [Op.gte]: earliestDate() } },
               },
             },
           ],
