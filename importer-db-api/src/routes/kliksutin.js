@@ -128,4 +128,22 @@ router.get('/courses/:personId', async (req, res) => {
   res.send(courseUnitRealisationsWithCourseUnits)
 })
 
+router.get('/enrollments/:personId', async (req, res) => {
+  const { personId: studentId } = req.params
+
+  const enrollments = await models.Enrolment.findAll({
+    where: {
+      personId: studentId,
+    },
+    include: [
+      { model: models.CourseUnit, as: 'courseUnit' },
+      { model: models.CourseUnitRealisation, as: 'courseUnitRealisation' },
+    ],
+    raw: true,
+    nest: true,
+  })
+
+  return res.send(enrollments)
+})
+
 module.exports = router
