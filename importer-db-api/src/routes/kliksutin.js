@@ -30,6 +30,12 @@ const relevantAttributes = {
   assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],
 }
 
+const teacherUrns = [
+  'urn:code:course-unit-realisation-responsibility-info-type:teacher',
+  'urn:code:course-unit-realisation-responsibility-info-type:responsible-teacher',
+  'urn:code:course-unit-realisation-responsibility-info-type:administrative-person',
+]
+
 const timeTillCourseStart = 6
 
 const addCourseUnitsToRealisations = async courseUnitRealisations => {
@@ -144,6 +150,23 @@ router.get('/enrollments/:personId', async (req, res) => {
   })
 
   return res.send(enrollments)
+})
+
+router.get('/teachers/:courseId', async (req, res) => {
+  const { courseId } = req.params
+
+  const { responsibilityInfos } = await models.CourseUnitRealisation.findOne({
+    where: {
+      id: courseId,
+    },
+    attributes: ['responsibilityInfos'],
+  })
+
+  const teacherIds = responsibilityInfos
+    .filter(({ roleUrn }) => teacherUrns.includes(roleUrn))
+    .map(({ personId }) => personId)
+
+  res.send(teacherIds)
 })
 
 module.exports = router
