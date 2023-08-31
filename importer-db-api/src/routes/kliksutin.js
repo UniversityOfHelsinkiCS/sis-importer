@@ -155,26 +155,19 @@ router.get('/enrollments/:personId', async (req, res) => {
 router.get('/teachers/:courseId', async (req, res) => {
   const { courseId } = req.params
 
-  const { responsibilityInfos } = await models.CourseUnitRealisation.findOne({
-    where: {
-      id: courseId,
-    },
-    attributes: ['responsibilityInfos'],
-  })
+  const { responsibilityInfos = [] } =
+    (await models.CourseUnitRealisation.findOne({
+      where: {
+        id: courseId,
+      },
+      attributes: ['responsibilityInfos'],
+    })) || {}
 
   const teacherIds = responsibilityInfos
     .filter(({ roleUrn }) => teacherUrns.includes(roleUrn))
     .map(({ personId }) => personId)
 
   return res.send(teacherIds)
-})
-
-router.get('/courses/:id', async (req, res) => {
-  const { id } = req.params
-
-  const course = await models.CourseUnitRealisation.findByPk(id)
-
-  return res.send(course)
 })
 
 module.exports = router
