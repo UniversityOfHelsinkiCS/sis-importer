@@ -166,7 +166,15 @@ router.get('/teachers/:courseId', async (req, res) => {
     .filter(({ roleUrn }) => teacherUrns.includes(roleUrn))
     .map(({ personId }) => personId)
 
-  res.send(teacherIds)
+  return res.send(teacherIds)
+})
+
+router.get('/courses/:id', async (req, res) => {
+  const { id } = req.params
+
+  const course = await models.CourseUnitRealisation.findByPk(id)
+
+  return res.send(course)
 })
 
 module.exports = router
