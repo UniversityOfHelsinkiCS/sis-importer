@@ -14,6 +14,9 @@ const validRealisationTypes = [
   'urn:code:course-unit-realisation-type:teaching-participation-small-group',
   'urn:code:course-unit-realisation-type:teaching-participation-seminar',
   'urn:code:course-unit-realisation-type:independent-work-project',
+  'urn:code:course-unit-realisation-type:teaching-participation-blended',
+  'urn:code:course-unit-realisation-type:teaching-participation-contact',
+  'urn:code:course-unit-realisation-type:teaching-participation-distance',
 ]
 
 const relevantAttributes = {

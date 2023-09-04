@@ -56,6 +56,9 @@ const validRealisationTypes = [
   'urn:code:course-unit-realisation-type:teaching-participation-seminar',
   'urn:code:course-unit-realisation-type:independent-work-project', // ship these independent course things to the norppa side even if they arent widely used
   'urn:code:course-unit-realisation-type:independent-work-essay',
+  'urn:code:course-unit-realisation-type:teaching-participation-blended',
+  'urn:code:course-unit-realisation-type:teaching-participation-contact',
+  'urn:code:course-unit-realisation-type:teaching-participation-distance',
 ]
 
 const validEducations = [
