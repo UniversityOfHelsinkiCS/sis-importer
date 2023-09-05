@@ -20,7 +20,7 @@ router.get('/courses', async (req, res) => {
     throw new UserInputError('Term is required')
   }
 
-  const CODES = ['TKT20002', 'TKT20010', 'TKT20011']
+  const CODES = ['TKT20002', 'TKT20010', 'TKT20011', 'TKT20019']
 
   let courseUnitRealisations = []
 
