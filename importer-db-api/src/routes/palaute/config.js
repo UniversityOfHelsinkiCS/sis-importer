@@ -59,6 +59,7 @@ const validRealisationTypes = [
   'urn:code:course-unit-realisation-type:teaching-participation-blended',
   'urn:code:course-unit-realisation-type:teaching-participation-contact',
   'urn:code:course-unit-realisation-type:teaching-participation-distance',
+  'urn:code:course-unit-realisation-type:training-training',
 ]
 
 const validEducations = [
