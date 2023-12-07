@@ -14,9 +14,27 @@ const matcher = enrolment => {
   return enrolment.courseUnitRealisationId === curId
 }
 
-const debugHandler = enrolment => {
-  logger.info(`[ENROLMENT_DEBUGGER] Enrolment of interest found ${JSON.stringify(enrolment)}`)
-  Sentry.captureMessage(`[ENROLMENT_DEBUGGER] Enrolment of interest found ${JSON.stringify(enrolment)}`)
+const debugHandler = ({ id, state, personId, documentState, metadata }) => {
+  logger.info(
+    `[ENROLMENT_DEBUGGER] Enrolment of interest found ${JSON.stringify({
+      id,
+      state,
+      personId,
+      documentState,
+      lastModifiedOn: metadata.lastModifiedOn,
+      modificationOrdinal: metadata.modificationOrdinal
+    })}`
+  )
+  Sentry.captureMessage(
+    `[ENROLMENT_DEBUGGER] Enrolment of interest found ${JSON.stringify({
+      id,
+      state,
+      personId,
+      documentState,
+      lastModifiedOn: metadata.lastModifiedOn,
+      modificationOrdinal: metadata.modificationOrdinal
+    })}`
+  )
 }
 
 module.exports = {
@@ -24,7 +42,10 @@ module.exports = {
   handler: msg => {
     const entitiesOfInterest = msg.entities.filter(matcher)
     if (entitiesOfInterest.length > 0) {
-      entitiesOfInterest.forEach(debugHandler)
+      try {
+        entitiesOfInterest.forEach(debugHandler)
+        /* eslint-disable-next-line no-empty */
+      } catch (e) {}
     }
     return msg
   }

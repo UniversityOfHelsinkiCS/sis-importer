@@ -35,11 +35,6 @@ const parseEnrolment = ({
 })
 
 module.exports = async ({ active, deleted }, transaction) => {
-  const parsedStudyRights = [...active, ...deleted].map(parseEnrolment)
-  await bulkCreate(Enrolment, parsedStudyRights, transaction, [
-    'state',
-    'documentState',
-    'lastModifiedOn',
-    'modificationOrdinal'
-  ])
+  const parsedEnrolments = [...active, ...deleted].map(parseEnrolment)
+  await bulkCreate(Enrolment, parsedEnrolments, transaction, [])
 }
