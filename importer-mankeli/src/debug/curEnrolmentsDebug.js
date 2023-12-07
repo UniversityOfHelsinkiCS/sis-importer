@@ -11,7 +11,7 @@ const curId = 'hy-opt-cur-2324-f0c0d370-0087-4bb9-93aa-387e76bd11f2'
  * @param {*} enrolment
  */
 const matcher = enrolment => {
-  return enrolment.courseUnitRealisationId === curId
+  return true // enrolment.courseUnitRealisationId === curId
 }
 
 const debugHandler = enrolment => {
@@ -22,8 +22,9 @@ const debugHandler = enrolment => {
 module.exports = {
   channel,
   handler: msg => {
-    if (matcher(msg)) {
-      debugHandler(msg)
+    const entitiesOfInterest = msg.entities.filter(matcher)
+    if (entitiesOfInterest.length > 0) {
+      entitiesOfInterest.forEach(debugHandler)
     }
     return msg
   }
