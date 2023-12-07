@@ -22,7 +22,8 @@
     "sequelize": "^5.21.3",
     "umzug": "^2.2.0",
     "winston": "^3.3.3",
-    "winston-gelf-transporter": "^1.0.2"
+    "winston-gelf-transporter": "^1.0.2",
+    "@sentry/node": "^6.3.6"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
