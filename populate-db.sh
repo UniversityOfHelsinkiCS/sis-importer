@@ -17,7 +17,7 @@ mkdir -p backups
 echo "Enter your Uni Helsinki username:"
 read username
 echo "Fetching backup data"
-scp -r -o ProxyCommand="ssh -W %h:%p $username@melkki.cs.helsinki.fi" $username@toska-tmp.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/importer.sql.gz $BACKUP
+scp -r -o ProxyCommand="ssh -W %h:%p $username@melkki.cs.helsinki.fi" $username@toska.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/importer.sql.gz $BACKUP
 
 echo "Setting up db"
 docker-compose down
