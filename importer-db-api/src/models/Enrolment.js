@@ -45,10 +45,10 @@ Enrolment.init(
       type: JSONB,
     },
     confirmedStudySubGroupIds: {
-      type: ARRAY(STRING)
+      type: ARRAY(STRING),
     },
     tentativeStudySubGroupIds: {
-      type: ARRAY(STRING)
+      type: ARRAY(STRING),
     },
   },
   {
