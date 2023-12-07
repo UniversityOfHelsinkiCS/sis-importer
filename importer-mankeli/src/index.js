@@ -62,6 +62,7 @@ const { onCurrentExecutionHashChange } = require('./utils/redis')
 const { connection } = require('./db/connection')
 const { REJECT_UNAUTHORIZED, NATS_GROUP } = require('./config')
 const initializePostUpdateChannel = require('./lib/postUpdate')
+const { debugHandlers } = require('./debug')
 
 if (!REJECT_UNAUTHORIZED) {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
@@ -93,6 +94,17 @@ const channels = {
   [OSUVA_PLAN_CHANNEL]: planHandler,
   [ORI_PERSON_GROUP_CHANNEL]: personGroupHandler,
   [ORI_DISCLOSURE_CHANNEL]: disclosureHandler
+}
+
+const attachDebugHandler = (CHANNEL, handler) => {
+  const debugHandler = debugHandlers.find(({ channel }) => channel === CHANNEL)
+  const fullHandler = debugHandler
+    ? msg => {
+        debugHandler.handler(msg)
+        return handler(msg)
+      }
+    : handler
+  return fullHandler
 }
 
 let currentExecutionHash = null
@@ -165,8 +177,10 @@ stan.on('connect', async ({ clientID }) => {
   await onCurrentExecutionHashChange(hash => {
     if (!currentExecutionHash && hash) {
       Object.entries(channels).forEach(([CHANNEL, msgHandler]) => {
+        // Attach optional debug handler
+        const handler = attachDebugHandler(CHANNEL, msgHandler)
         const channel = stan.subscribe(CHANNEL, NATS_GROUP, opts)
-        channel.on('message', handleMessage(CHANNEL, msgHandler))
+        channel.on('message', handleMessage(CHANNEL, handler))
       })
     }
     currentExecutionHash = hash
