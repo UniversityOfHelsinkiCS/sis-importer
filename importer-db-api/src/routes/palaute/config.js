@@ -1,6 +1,7 @@
 const relevantAttributes = {
   enrolment: [
     'id',
+    'state',
     'personId',
     'assessmentItemId',
     'courseUnitRealisationId',
