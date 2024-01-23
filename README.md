@@ -26,8 +26,13 @@ New data from Sisu is fetched once an hour.
 * https://importer.cs.helsinkif/exploder/reset/:table?token= deletes a single table and triggers fetch. See tables [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/importer-api/src/explorer/index.js#L53) and token from the server.
 * https://importer.cs.helsinkif/exploder/force_update?token= triggers a fetch for all tables
 * **To add new fields to be fetched from Sisu:** Modify [message handlers](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-mankeli/src/messageHandlers). Remember to add any new columns to models importer-mankeli models.
-* **To fetch new model from Sisu:** Crate new [message handler](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-mankeli/src/messageHandlers) and [service](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-api/src/services). Finaly add new service to [index.js](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/importer-api/src/services/index.js) and test locally that importing works.
-
+* **To fetch new model from Sisu:** Create new [message handler](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-mankeli/src/messageHandlers) and [service](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-api/src/services). Finally add new service to [index.js](https://github.com/UniversityOfHelsinkiCS/sis-importer/blob/master/importer-api/src/services/index.js) and test locally that importing works.
+* **Debug data coming from specific channel**: 
+  + First, comment out any other channels in the serviceIds folder in [this](importer-api/src/services/index.js) file. 
+  + Then, go to [importer-mankeli/src/debug](importer-mankeli/src/debug). Add a custom debug handler into the customHandlers-folder: view the existing custom handlers for how-to.
+  + Add your handler to the index.js file in the debug-folder (in the array). 
+  + Run with "npm start". It will log stuff into console. If you want, make it write the relevant logs to a file for much better experience. (And please push that code to repo too)
+  + **Remember** to remove any sensitive identifiers in your matcher before pushing code. Also remove the handler from the array, but you can leave the file in the repository if it may be useful in the future.
 
 ## API catalogs
 
