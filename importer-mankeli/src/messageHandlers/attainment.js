@@ -16,7 +16,6 @@ const parseAttainment = attainment => {
     organisations: attainment.organisations,
     state: attainment.state,
     misregistration: attainment.misregistration,
-    misregistrationRationale: attainment.misregistrationRationale,
     primary: attainment.primary,
     credits: attainment.credits,
     studyWeeks: attainment.studyWeeks,

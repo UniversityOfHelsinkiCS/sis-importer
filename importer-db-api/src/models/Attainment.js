@@ -42,9 +42,6 @@ Attainment.init(
     misregistration: {
       type: BOOLEAN,
     },
-    misregistrationRationale: {
-      type: STRING,
-    },
     primary: {
       type: BOOLEAN,
     },
