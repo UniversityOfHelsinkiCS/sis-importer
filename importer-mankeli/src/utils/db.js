@@ -5,10 +5,10 @@ const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).fil
 
 const bulkCreate = async (model, entities, transaction, properties = ['id']) => {
   try {
-  await model.bulkCreate(entities, {
-    updateOnDuplicate: getColumnsToUpdate(model, properties),
-    transaction
-  })
+    await model.bulkCreate(entities, {
+      updateOnDuplicate: getColumnsToUpdate(model, properties),
+      transaction
+    })
   } catch (error) {
     // If one fails on bulkCreate, re-do them individually and report the individual failures.
     for (const entity of entities) {
@@ -18,8 +18,8 @@ const bulkCreate = async (model, entities, transaction, properties = ['id']) => 
           transaction
         })
       } catch (e) {
-        console.log("Single-entity upsert failed: ", JSON.stringify(e, null, 2))
-        console.log("Entity:")
+        console.log('Single-entity upsert failed: ', JSON.stringify(e, null, 2))
+        console.log('Entity:')
         console.log(JSON.stringify(entity, null, 2))
       }
     }

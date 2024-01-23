@@ -1,34 +1,11 @@
-const { Op, QueryTypes } = require('sequelize')
+const { Op } = require('sequelize')
 const express = require('express')
 const models = require('../../models')
 const { sequelize } = require('../../config/db')
 const { relevantAttributes, validRealisationTypes } = require('./config')
 const { isRefreshingPersonStudyRightsView } = require('./personStudyRightsView')
-const _ = require('lodash')
 
 const defaultSince = new Date('2021-01-01')
-
-const attributesToSql = (table, attributes) => {
-  return attributes.map(attribute => `${table}.${_.snakeCase(attribute)} "${attribute}"`).join(', ')
-}
-
-const getCourseRealisationsWithCourseUnits = async (limit, offset) => {
-  const sql = `
-    SELECT 
-      ${attributesToSql('cur', relevantAttributes.courseUnitRealisation)},
-      json_agg(ass) as "assessmentItems"
-    FROM course_unit_realisations cur
-    INNER JOIN assessment_items ass ON ass.id = ANY (cur.assessment_item_ids)
-    WHERE cur.course_unit_realisation_type_urn IN (:validRealisationTypes)
-    GROUP BY cur.id
-    LIMIT :limit OFFSET :offset
-  `
-
-  return await sequelize.query(sql, {
-    replacements: { limit, offset, validRealisationTypes },
-    queryType: QueryTypes.SELECT,
-  })
-}
 
 const addCourseUnitsToRealisations = async courseUnitRealisations => {
   const assessmentItemIds = courseUnitRealisations.flatMap(c => c.assessmentItemIds)
