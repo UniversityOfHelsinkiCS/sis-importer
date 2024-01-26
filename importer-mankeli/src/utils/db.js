@@ -23,7 +23,7 @@ const bulkCreate = async (model, entities, transaction, properties = ['id']) => 
         logger.error('Single-entity upsert failed: ', JSON.stringify(e, null, 2))
         logger.error('Entity:')
         logger.error(JSON.stringify(entity, null, 2))
-        let message = ""
+        let message = ''
         if (e) message = e.message
         Sentry.captureMessage(`Operation failed: ${message}`)
         Sentry.captureException(e)
