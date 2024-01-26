@@ -1,4 +1,5 @@
 const { Op } = require('sequelize')
+const Sentry = require('@sentry/node')
 const { connection } = require('../db/connection')
 
 const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).filter(a => !keys.includes(a))
@@ -18,9 +19,11 @@ const bulkCreate = async (model, entities, transaction, properties = ['id']) => 
           transaction
         })
       } catch (e) {
-        console.log('Single-entity upsert failed: ', JSON.stringify(e, null, 2))
-        console.log('Entity:')
-        console.log(JSON.stringify(entity, null, 2))
+        logger.error('Single-entity upsert failed: ', JSON.stringify(e, null, 2))
+        logger.error('Entity:')
+        logger.error(JSON.stringify(entity, null, 2))
+        Sentry.captureMessage(`Operation failed: ${e?.message}`)
+        Sentry.captureException(e)
       }
     }
   }
