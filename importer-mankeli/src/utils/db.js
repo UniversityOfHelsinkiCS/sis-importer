@@ -1,6 +1,7 @@
 const { Op } = require('sequelize')
 const Sentry = require('@sentry/node')
 const { connection } = require('../db/connection')
+const { logger } = require('../logger')
 
 const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).filter(a => !keys.includes(a))
 
