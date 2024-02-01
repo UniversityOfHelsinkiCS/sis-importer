@@ -88,7 +88,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
 
   let result = []
 
-  for (const { valid, education, organisation } of studyRights) {
+  for (const { id, valid, education, organisation } of studyRights) {
     // Most old studyrights dont have educations
     const module = education
       ? await models.Module.findOne({
@@ -111,6 +111,11 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
     result.push({
       faculty_code: organisation.code,
       elements,
+      id,
+      valid: {
+        start_date: valid.startDate,
+        end_date: valid.endDate,
+      },
     })
   }
 
@@ -163,8 +168,10 @@ router.get('/:studentNumber/semester_enrollments', async (req, res) => {
         : getSpringSemesterCode(studyTerm.studyYearStartYear)
 
     let semester_enrollment_type_code = 1 // present
-    if (statutoryAbsence || termRegistrationType === 'MISSING' || termRegistrationType === 'NONATTENDING') {
+    if (termRegistrationType === 'MISSING' || termRegistrationType === 'NONATTENDING') {
       semester_enrollment_type_code = 2 // absent
+    } else if (statutoryAbsence) {
+      semester_enrollment_type_code = 3 // absent but with a good reason
     }
 
     return {
@@ -175,6 +182,52 @@ router.get('/:studentNumber/semester_enrollments', async (req, res) => {
 
   res.status(200).send(mankeled)
 })
+
+/* */
+
+router.get('/:studentNumber/acual_semester_enrollments', async (req, res) => {
+  const studyrightTerms = await models.TermRegistrations.findAll({
+    where: {
+      studentId: req.student.id,
+    },
+  }).filter(r => !r.studyRightId.includes('hy-avoin-ew-sr'))
+
+  const termsPerRight = studyrightTerms.reduce((set, { termRegistrations, studyRightId }) => {
+    console.log(JSON.stringify(termRegistrations), null, 2)
+    const mankeled = termRegistrations.map(({ studyTerm, statutoryAbsence, termRegistrationType }) => {
+      const semester_code =
+        studyTerm.termIndex === 0
+          ? getFallSemesterCode(studyTerm.studyYearStartYear)
+          : getSpringSemesterCode(studyTerm.studyYearStartYear)
+
+      let semester_enrollment_type_code = 1 // present
+      if (statutoryAbsence) {
+        semester_enrollment_type_code = 3 // absent but with a good reason
+      } else if (
+        termRegistrationType === 'MISSING' ||
+        termRegistrationType === 'NEGLECTED' ||
+        termRegistrationType === 'NONATTENDING'
+      ) {
+        semester_enrollment_type_code = 2 // absent
+        console.log(termRegistrationType)
+      }
+
+      return {
+        semester_enrollment_type_code,
+        termRegistrationType,
+        semester_code,
+      }
+    })
+
+    set[studyRightId] = mankeled
+
+    return set
+  }, {})
+
+  res.status(200).send(termsPerRight)
+})
+
+/* */
 
 router.get('/:studentNumber/rapo_semester_enrollments', async (req, res) => {
   const termRegistrations = await models.TermRegistrations.findAll({
