@@ -245,7 +245,7 @@ router.post('/enrolments', async (req, res) => {
   })
   const output = enrolments
     // Sort by assessment item autoId to get the most recent snapshot of enrolment
-    .sort((a, b) => b.assessmentItem.autoId.localeCompare(a.assessmentItem.autoId))
+    .sort((a, b) => b.assessmentItem.autoId - a.assessmentItem.autoId)
     .reduce((acc, e) => {
       const item = acc.find(i => i.personId === e.personId && i.code === e.courseUnit.code)
       if (!item)
