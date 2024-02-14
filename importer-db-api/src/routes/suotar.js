@@ -231,7 +231,7 @@ router.post('/enrolments', async (req, res) => {
       {
         model: models.AssessmentItem,
         as: 'assessmentItem',
-        attributes: ['credits', 'gradeScaleId'],
+        attributes: ['credits', 'gradeScaleId', 'autoId'],
       },
       {
         model: models.CourseUnitRealisation,
@@ -243,17 +243,20 @@ router.post('/enrolments', async (req, res) => {
     raw: true,
     nest: true,
   })
-  const output = enrolments.reduce((acc, e) => {
-    const item = acc.find(i => i.personId === e.personId && i.code === e.courseUnit.code)
-    if (!item)
-      acc.push({
-        personId: e.personId,
-        code: e.courseUnit.code,
-        enrolments: [e],
-      })
-    else item.enrolments.push(e)
-    return acc
-  }, [])
+  const output = enrolments
+    // Sort by assessment item autoId to get the most recent snapshot of enrolment
+    .sort((a, b) => b.assessmentItem.autoId.localeCompare(a.assessmentItem.autoId))
+    .reduce((acc, e) => {
+      const item = acc.find(i => i.personId === e.personId && i.code === e.courseUnit.code)
+      if (!item)
+        acc.push({
+          personId: e.personId,
+          code: e.courseUnit.code,
+          enrolments: [e],
+        })
+      else item.enrolments.push(e)
+      return acc
+    }, [])
 
   // Ad empty rows for input rows with no enrolments
   return res.send(
