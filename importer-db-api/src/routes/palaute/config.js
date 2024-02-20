@@ -7,6 +7,7 @@ const relevantAttributes = {
     'courseUnitRealisationId',
     'courseUnitId',
     'confirmedStudySubGroupIds',
+    'documentState',
   ],
   courseUnit: [
     'id',
