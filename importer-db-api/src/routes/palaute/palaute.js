@@ -154,31 +154,12 @@ updaterRouter.get('/course_unit_realisation_with_course_unit/:id', async (req, r
   res.send(courseUnitRealisationWithCourseUnits)
 })
 
-updaterRouter.get('/enrolments', async (req, res) => {
-  const { limit, offset, since: sinceRaw } = req.query
-  if (!limit || !offset) return res.sendStatus(400)
-
-  let since = new Date(sinceRaw)
-  if (!sinceRaw || since == 'Invalid Date') {
-    since = defaultSince
-  }
-
-  const enrolments = await models.Enrolment.findAll({
-    where: {
-      enrolmentDateTime: {
-        [Op.gte]: since,
-      },
-      state: 'ENROLLED',
-    },
-    attributes: relevantAttributes.enrolment,
-    limit,
-    offset,
-    order: [['id', 'DESC']],
-  })
-
-  res.send(enrolments)
-})
-
+/**
+ * Gets all enrolments that should be deleted from palaute.
+ * Note that this includes documentState = DELETED && state = NOT_ENROLLED enrolments.
+ * Such enrolment should not normally be deleted, but the enrolments route will
+ * recreate any such enrolments that also have a state = ENROLLED && documentState = ACTIVE.
+ */
 updaterRouter.get('/deleted-enrolments', async (req, res) => {
   const { limit, offset, since: sinceRaw } = req.query
   if (!limit || !offset) return res.sendStatus(400)
@@ -196,6 +177,35 @@ updaterRouter.get('/deleted-enrolments', async (req, res) => {
       [Op.not]: {
         state: 'ENROLLED',
       },
+    },
+    attributes: relevantAttributes.enrolment,
+    limit,
+    offset,
+    order: [['id', 'DESC']],
+  })
+
+  res.send(enrolments)
+})
+
+/**
+ * Gets all enrolments that should exist in palaute.
+ */
+updaterRouter.get('/enrolments', async (req, res) => {
+  const { limit, offset, since: sinceRaw } = req.query
+  if (!limit || !offset) return res.sendStatus(400)
+
+  let since = new Date(sinceRaw)
+  if (!sinceRaw || since == 'Invalid Date') {
+    since = defaultSince
+  }
+
+  const enrolments = await models.Enrolment.unscoped().findAll({
+    where: {
+      enrolmentDateTime: {
+        [Op.gte]: since,
+      },
+      state: 'ENROLLED',
+      documentState: 'ACTIVE',
     },
     attributes: relevantAttributes.enrolment,
     limit,
