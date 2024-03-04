@@ -163,7 +163,7 @@ updaterRouter.get('/enrolments', async (req, res) => {
     since = defaultSince
   }
 
-  const enrolments = await models.Enrolment.unscoped().findAll({
+  const enrolments = await models.Enrolment.findAll({
     where: {
       enrolmentDateTime: {
         [Op.gte]: since,
@@ -188,7 +188,7 @@ updaterRouter.get('/deleted-enrolments', async (req, res) => {
     since = defaultSince
   }
 
-  const enrolments = await models.Enrolment.unscoped().findAll({
+  const enrolments = await models.Enrolment.findAll({
     where: {
       enrolmentDateTime: {
         [Op.gte]: since,
