@@ -168,6 +168,34 @@ updaterRouter.get('/enrolments', async (req, res) => {
       enrolmentDateTime: {
         [Op.gte]: since,
       },
+      state: 'ENROLLED',
+    },
+    attributes: relevantAttributes.enrolment,
+    limit,
+    offset,
+    order: [['id', 'DESC']],
+  })
+
+  res.send(enrolments)
+})
+
+updaterRouter.get('/deleted-enrolments', async (req, res) => {
+  const { limit, offset, since: sinceRaw } = req.query
+  if (!limit || !offset) return res.sendStatus(400)
+
+  let since = new Date(sinceRaw)
+  if (!sinceRaw || since == 'Invalid Date') {
+    since = defaultSince
+  }
+
+  const enrolments = await models.Enrolment.unscoped().findAll({
+    where: {
+      enrolmentDateTime: {
+        [Op.gte]: since,
+      },
+      [Op.not]: {
+        state: 'ENROLLED',
+      },
     },
     attributes: relevantAttributes.enrolment,
     limit,
