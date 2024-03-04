@@ -155,10 +155,7 @@ updaterRouter.get('/course_unit_realisation_with_course_unit/:id', async (req, r
 })
 
 /**
- * Gets all enrolments that should be deleted from palaute.
- * Note that this includes documentState = DELETED && state = NOT_ENROLLED enrolments.
- * Such enrolment should not normally be deleted, but the enrolments route will
- * recreate any such enrolments that also have a state = ENROLLED && documentState = ACTIVE.
+ * Gets all enrolments that might need to be deleted from palaute.
  */
 updaterRouter.get('/deleted-enrolments', async (req, res) => {
   const { limit, offset, since: sinceRaw } = req.query
@@ -174,9 +171,16 @@ updaterRouter.get('/deleted-enrolments', async (req, res) => {
       enrolmentDateTime: {
         [Op.gte]: since,
       },
-      [Op.not]: {
-        state: 'ENROLLED',
-      },
+      [Op.or]: [
+        {
+          [Op.not]: {
+            state: 'ENROLLED',
+          },
+        },
+        {
+          documentState: 'DELETED',
+        },
+      ],
     },
     attributes: relevantAttributes.enrolment,
     limit,
