@@ -40,7 +40,7 @@ New data from Sisu is fetched once an hour.
 * KORI (course data) https://sis-helsinki.funidata.fi/kori/docs/index.html
 * ILMO (course enrolments) https://sis-helsinki.funidata.fi/ilmo/docs/index.html
 * OSUVA (study plans) https://sis-helsinki.funidata.fi/osuva/docs/index.html
-* ARTO (???) https://sis-helsinki.funidata.fi/arto/docs/index.html
+* ARTO (assessments) https://sis-helsinki.funidata.fi/arto/docs/index.html
 
 ### Local development
 
