@@ -8,6 +8,10 @@ New data from Sisu is fetched once an hour.
 
 [Architecture of importer](./how_tos/importer.png)
 
+For step by step overview of how the importer works, see the following READMEs
+- [Fetcher's README](./importer-api/README.md)
+- [Mankeli's README](./importer-mankeli/README.md)
+
 ## Caveats
 
 * Document state: `documentState` field present in all data defines should the data be used or not. Mainly importer ignores any other data than `ACTIVE` (`DRAFT` and `DELETED` in most cases should be ignored).
