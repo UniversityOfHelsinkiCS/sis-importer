@@ -1,5 +1,7 @@
 # SIS-IMPORTER
 
+[Backlog](https://github.com/orgs/UniversityOfHelsinkiCS/projects/13)
+
 ## What is importer?
 
 Importer fetches data from Sisu using the export apis. See [example](https://sis-helsinki.funidata.fi/kori/docs/index.html#_export_assessment_items) of export api, importer uses only `since` (modification ordinal) and `limit` parameters.  The fetched data is processed in mankelis and saved to PostgreSQL db. 
