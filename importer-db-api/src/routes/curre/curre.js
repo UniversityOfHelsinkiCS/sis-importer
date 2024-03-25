@@ -103,16 +103,7 @@ curreRouter.get('/enrolments-new', async (req, res) => {
         [Op.gte]: since,
       },
     },
-    attributes: [
-      'id',
-      'state',
-      'personId',
-      'assessmentItemId',
-      'courseUnitRealisationId',
-      'courseUnitId',
-      'confirmedStudySubGroupIds',
-      'documentState',
-    ],
+    attributes: relevantAttributes.enrolments,
     order: [['id', 'DESC']],
   })
 

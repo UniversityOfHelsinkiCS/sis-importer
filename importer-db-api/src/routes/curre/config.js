@@ -1,4 +1,4 @@
-export const validRealisationTypes = [
+const validRealisationTypes = [
   'urn:code:course-unit-realisation-type:teaching-participation-lab',
   'urn:code:course-unit-realisation-type:teaching-participation-online',
   'urn:code:course-unit-realisation-type:teaching-participation-field-course',
@@ -12,7 +12,7 @@ export const validRealisationTypes = [
   'urn:code:course-unit-realisation-type:teaching-participation-distance',
 ]
 
-export const relevantAttributes = {
+const relevantAttributes = {
   courseUnit: ['id', 'code', 'responsibilityInfos', 'completionMethods', 'name', 'validityPeriod'],
   courseUnitRealisation: [
     'id',
@@ -24,12 +24,29 @@ export const relevantAttributes = {
     'responsibilityInfos',
   ],
   assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],
+  enrolments: [
+    'id',
+    'state',
+    'personId',
+    'assessmentItemId',
+    'courseUnitRealisationId',
+    'courseUnitId',
+    'confirmedStudySubGroupIds',
+    'documentState',
+  ],
 }
 
-export const teacherUrns = [
+const teacherUrns = [
   'urn:code:course-unit-realisation-responsibility-info-type:teacher',
   'urn:code:course-unit-realisation-responsibility-info-type:responsible-teacher',
   'urn:code:course-unit-realisation-responsibility-info-type:administrative-person',
 ]
 
-export const timeTillCourseStart = 6
+const timeTillCourseStart = 6
+
+module.exports = {
+  validRealisationTypes,
+  relevantAttributes,
+  teacherUrns,
+  timeTillCourseStart,
+}
