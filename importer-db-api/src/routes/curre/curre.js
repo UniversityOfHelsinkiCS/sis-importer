@@ -33,8 +33,8 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
     aItem?.courseUnit.completionMethods.find(method => method.assessmentItemIds.includes(aItem.id))
   )
 
-  const realisationsWithCourseUnits = courseUnitRealisations.map(r => {
-    const realisation = r.get({ plain: true })
+  const realisationsWithCourseUnits = courseUnitRealisations.map(aRealisation => {
+    const realisation = aRealisation.get({ plain: true })
 
     const courseUnits = assessmentItems
       .filter(assessmentItem => realisation.assessmentItemIds.includes(assessmentItem.id))
@@ -110,6 +110,6 @@ curreRouter.get('/enrolments-new', async (req, res) => {
   res.send(enrolments)
 })
 
-router.use('/updater', curreRouter)
+router.use('/', curreRouter)
 
 module.exports = router
