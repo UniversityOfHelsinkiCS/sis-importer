@@ -54,10 +54,15 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
 }
 
 router.get('/courses', async (req, res) => {
+  const { limit, offset } = req.query
+  if (!limit || !offset) return res.sendStatus(400)
+
   const courseStartTreshold = addMonths(new Date(), timeTillCourseStart)
 
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     attributes: relevantAttributes.courseUnitRealisation,
+    limit,
+    offset,
     where: {
       [Op.and]: [
         {
