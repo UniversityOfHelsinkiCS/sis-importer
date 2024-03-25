@@ -20,7 +20,6 @@ const relevantAttributes = {
     'nameSpecifier',
     'assessmentItemIds',
     'activityPeriod',
-    'courseUnitRealisationTypeUrn',
     'responsibilityInfos',
   ],
   assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],

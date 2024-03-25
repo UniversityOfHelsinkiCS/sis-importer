@@ -53,17 +53,12 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
   return realisationsWithCourseUnits
 }
 
-router.get('/courses/:personId', async (req, res) => {
-  const { personId: teacherId } = req.params
-
+router.get('/courses/', async (req, res) => {
   const courseStartTreshold = addMonths(new Date(), timeTillCourseStart)
 
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     attributes: relevantAttributes.courseUnitRealisation,
     where: {
-      responsibilityInfos: {
-        [Op.contains]: [{ personId: teacherId }],
-      },
       [Op.and]: [
         {
           'activityPeriod.endDate': {
