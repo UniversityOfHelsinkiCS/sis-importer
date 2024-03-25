@@ -53,7 +53,7 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
   return realisationsWithCourseUnits
 }
 
-router.get('/courses/', async (req, res) => {
+router.get('/courses', async (req, res) => {
   const courseStartTreshold = addMonths(new Date(), timeTillCourseStart)
 
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({

@@ -14,14 +14,7 @@ const validRealisationTypes = [
 
 const relevantAttributes = {
   courseUnit: ['id', 'code', 'responsibilityInfos', 'completionMethods', 'name', 'validityPeriod'],
-  courseUnitRealisation: [
-    'id',
-    'name',
-    'nameSpecifier',
-    'assessmentItemIds',
-    'activityPeriod',
-    'responsibilityInfos',
-  ],
+  courseUnitRealisation: ['id', 'name', 'nameSpecifier', 'assessmentItemIds', 'activityPeriod', 'responsibilityInfos'],
   assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],
   enrolments: [
     'id',
