@@ -4,7 +4,6 @@ const models = require('../../models')
 
 const { addMonths } = require('date-fns')
 const { timeTillCourseStart, relevantAttributes, validRealisationTypes } = require('./config')
-const { isRefreshingPersonStudyRightsView } = require('./personStudyRightsView')
 
 const router = express.Router()
 
@@ -114,14 +113,6 @@ curreRouter.get('/enrolments-new', async (req, res) => {
 curreRouter.get('/persons', async (req, res) => {
   const { limit, offset } = req.query
   if (!limit || !offset) return res.sendStatus(400)
-
-  if (isRefreshingPersonStudyRightsView()) {
-    return res.send({
-      waitAndRetry: true,
-      message: 'Person study rights view is being refreshed',
-      waitTime: 10_000,
-    })
-  }
 
   const persons = await models.Person.findAll({
     attributes: relevantAttributes.persons,
