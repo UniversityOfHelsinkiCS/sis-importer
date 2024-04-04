@@ -88,7 +88,8 @@ router.get('/courses', async (req, res) => {
 })
 
 curreRouter.get('/enrolments-new', async (req, res) => {
-  const { since: sinceRaw } = req.query
+  const { since: sinceRaw, limit, offset } = req.query
+  if (!limit || !offset) return res.sendStatus(400)
 
   const since = new Date(sinceRaw)
 
@@ -97,6 +98,8 @@ curreRouter.get('/enrolments-new', async (req, res) => {
   }
 
   const enrolments = await models.Enrolment.findAll({
+    limit,
+    offset,
     where: {
       state: 'ENROLLED',
       enrolmentDateTime: {
