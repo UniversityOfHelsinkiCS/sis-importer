@@ -11,7 +11,6 @@ const { services, serviceIds } = require('./services')
 const { FETCH_AMOUNT, MAX_CHUNK_SIZE, APIS, PANIC_TIMEOUT } = require('./config')
 const { logger } = require('./utils/logger')
 const chunkify = require('./utils/chunkify')
-const requestBuffer = require('./utils/requestBuffer')
 
 const { successCounter } = require('./prom')
 
@@ -112,7 +111,6 @@ const schedule = async (id, executionHash) => {
 
     try {
       const { hasMore, entities, greatestOrdinal } =
-        (await requestBuffer.read()) ||
         (await fetchBy(API, API_URL, latestOrdinal, customRequest, FETCH_AMOUNT, { QUERY, GRAPHQL_KEY }))
       if (!entities || !entities.length) return resolve(null)
 
@@ -142,9 +140,6 @@ const schedule = async (id, executionHash) => {
       })
 
       await createJobsFromEntities(CHANNEL, entities, executionHash)
-      if (![APIS.urn, APIS.custom, APIS.graphql].includes(API)) {
-        requestBuffer.fill(() => fetchBy(API, API_URL, greatestOrdinal, customRequest, FETCH_AMOUNT))
-      }
     } catch (e) {
       if (statusChannel) statusChannel.unsubscribe()
       reject(e)

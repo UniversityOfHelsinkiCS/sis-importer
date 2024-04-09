@@ -6,7 +6,6 @@ const { SONIC, IS_DEV, CURRENT_EXECUTION_HASH, UPDATE_RETRY_LIMIT } = require('.
 const { sleep } = require('./utils')
 const postUpdate = require('./utils/postUpdate')
 const { logger } = require('./utils/logger')
-const requestBuffer = require('./utils/requestBuffer')
 const { errorCounter } = require('./prom')
 
 let forbiddenServiceIds = []
@@ -73,7 +72,6 @@ const serviceUpdateFun = serviceId => {
 
 const update = async () => {
   for (const serviceId of serviceIds) {
-    requestBuffer.flush()
     if (forbiddenServiceIds.includes(serviceId)) {
       logger.info(`Skipping forbidden serviceId ${serviceId}`)
       continue
