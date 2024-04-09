@@ -110,8 +110,14 @@ const schedule = async (id, executionHash) => {
     if (ONETIME && latestOrdinal > 0) return resolve(null)
 
     try {
-      const { hasMore, entities, greatestOrdinal } =
-        (await fetchBy(API, API_URL, latestOrdinal, customRequest, FETCH_AMOUNT, { QUERY, GRAPHQL_KEY }))
+      const { hasMore, entities, greatestOrdinal } = await fetchBy(
+        API,
+        API_URL,
+        latestOrdinal,
+        customRequest,
+        FETCH_AMOUNT,
+        { QUERY, GRAPHQL_KEY }
+      )
       if (!entities || !entities.length) return resolve(null)
 
       await updateServiceStatus(REDIS_KEY, {
