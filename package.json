@@ -7,13 +7,18 @@
     "start": "./run.sh up --scale importer-mankeli=3 && ./run.sh logs -f",
     "build": "npm i && npm i --prefix ./importer-api && npm i --prefix ./importer-mankeli && npm i --prefix ./importer-db-api && ./run.sh build",
     "test": "npm test --prefix ./importer-api && npm test --prefix ./importer-mankeli && npm test --prefix ./importer-db-api",
-    "lintfix": "npm run lintfix --prefix ./importer-api && npm run lintfix --prefix ./importer-mankeli && npm run lint:fix --prefix ./importer-db-api",
     "reset": "./run.sh morning",
-    "restart": "./run.sh morning && npm start"
+    "restart": "./run.sh morning && npm start",
+    "eslint": "eslint",
+    "lint:all": "eslint .",
+    "lintfix:all": "eslint --fix .",
+    "prepare": "husky"
   },
-  "husky": {
-    "hooks": {
-    }
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   },
   "repository": {
     "type": "git",
@@ -26,7 +31,13 @@
   },
   "homepage": "https://github.com/UniversityOfHelsinkiCS/sis-importer#readme",
   "devDependencies": {
-    "husky": "^3.1.0"
+    "@babel/eslint-parser": "^7.24.5",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "3.2.5"
   },
   "dependencies": {
     "async": "^3.2.0"

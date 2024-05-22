@@ -6,13 +6,12 @@
   "scripts": {
     "start": "node ./src/index.js",
     "start:dev": "nodemon ./src/index.js",
-    "test": "npm run lint",
-    "lint": "eslint .",
-    "lintfix": "prettier --write **/*.{js,json} && eslint --fix ."
+    "test": "eslint ."
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@sentry/node": "^6.3.6",
     "axios": "^0.21.4",
     "lodash": "^4.17.21",
     "node-nats-streaming": "^0.2.6",
@@ -22,15 +21,9 @@
     "sequelize": "^5.21.3",
     "umzug": "^2.2.0",
     "winston": "^3.3.3",
-    "winston-gelf-transporter": "^1.0.2",
-    "@sentry/node": "^6.3.6"
+    "winston-gelf-transporter": "^1.0.2"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.3",
-    "eslint": "^6.7.1",
-    "eslint-config-prettier": "^6.7.0",
-    "eslint-plugin-prettier": "^3.1.1",
-    "nodemon": "^2.0.14",
-    "prettier-eslint": "^9.0.1"
+    "nodemon": "^2.0.14"
   }
 }

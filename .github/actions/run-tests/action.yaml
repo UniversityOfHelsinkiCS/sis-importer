@@ -11,7 +11,11 @@ runs:
   steps:
     - name: Install packages
       shell: bash
-      run: npm ci --prefix ${{ inputs.path }}
+      run: npm ci && npm ci --prefix ${{ inputs.path }}
+
+    - name: Lint files
+      shell: bash
+      run: npm run eslint -- ${{ inputs.path }}
 
     - name: Run tests
       shell: bash
