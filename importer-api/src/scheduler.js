@@ -55,9 +55,14 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinis
   const statusChannel = stan.subscribe(SCHEDULER_STATUS_CHANNEL, opts)
   statusChannel.on('message', async msg => {
     try {
-      const { channel: msgChannel, status, entities, amount, executionHash: msgExecutionHash, stack } = JSON.parse(
-        msg.getData()
-      )
+      const {
+        channel: msgChannel,
+        status,
+        entities,
+        amount,
+        executionHash: msgExecutionHash,
+        stack
+      } = JSON.parse(msg.getData())
       const amountScheduled = await redisGet(`${ordinalKey}_SCHEDULED`)
 
       if (msgExecutionHash !== executionHash || channel !== msgChannel) {

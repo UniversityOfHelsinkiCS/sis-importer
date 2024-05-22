@@ -14,8 +14,8 @@ router.get('/:id', async (req, res) => {
     if (!staffId) return res.send(null)
     const employee = await models.Person.findAll({
       where: {
-        employeeNumber: staffId,
-      },
+        employeeNumber: staffId
+      }
     })
     if (!employee) throw new NotFoundError(`Employee with id ${staffId} does not exist`)
 
@@ -34,7 +34,7 @@ router.get('/:id/is_employee', async (req, res) => {
   const { id } = req.params
 
   const employee = await models.Person.findByPk(id, {
-    attributes: ['employeeNumber'],
+    attributes: ['employeeNumber']
   })
 
   res.send(!!employee.employeeNumber)

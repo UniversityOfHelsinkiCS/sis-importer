@@ -8,14 +8,14 @@ const router = express.Router()
 
 router.get('/students/:id', async (req, res) => {
   const {
-    params: { id },
+    params: { id }
   } = req
 
   const student = await models.Person.findOne({
     where: {
-      id,
+      id
     },
-    include: [{ model: models.StudyRight, include: [models.Organisation] }],
+    include: [{ model: models.StudyRight, include: [models.Organisation] }]
   })
 
   if (!student) {
@@ -31,8 +31,8 @@ router.get('/course_unit_realisations/programme/:programmeCode', async (req, res
 
   const organisation = await models.Organisation.findOne({
     where: {
-      code: programmeCode,
-    },
+      code: programmeCode
+    }
   })
 
   if (!organisation) {
@@ -45,7 +45,7 @@ router.get('/course_unit_realisations/programme/:programmeCode', async (req, res
     name: unit.name,
     validityPeriod: unit.validityPeriod,
     groupId: unit.groupId,
-    credits: unit.credits,
+    credits: unit.credits
   }))
 
   const courseLookup = _.keyBy(courses, ({ groupId }) => groupId)
@@ -53,7 +53,7 @@ router.get('/course_unit_realisations/programme/:programmeCode', async (req, res
   const groupIds = courses.map(({ groupId }) => groupId)
 
   const assessmentItems = await models.AssessmentItem.scope('typeIsTeachingParticipation', {
-    method: ['primaryCourseUnitGroupIdIn', groupIds],
+    method: ['primaryCourseUnitGroupIdIn', groupIds]
   }).findAll()
 
   if (assessmentItems.length === 0) {
@@ -66,11 +66,11 @@ router.get('/course_unit_realisations/programme/:programmeCode', async (req, res
 
   const courseUnitRealisationScopes = [
     { method: ['assessmentItemIdsOverlap', assessmentItemIds] },
-    activityPeriodEndDateAfter && { method: ['activityPeriodEndDateAfter', new Date(activityPeriodEndDateAfter)] },
+    activityPeriodEndDateAfter && { method: ['activityPeriodEndDateAfter', new Date(activityPeriodEndDateAfter)] }
   ].filter(Boolean)
 
   const courseUnitRealisations = await models.CourseUnitRealisation.scope(courseUnitRealisationScopes).findAll({
-    raw: true,
+    raw: true
   })
 
   const courseUnitRealisationsWithCodes = courseUnitRealisations.map(c => {
@@ -79,7 +79,7 @@ router.get('/course_unit_realisations/programme/:programmeCode', async (req, res
 
     return {
       ...c,
-      courseUnitCode: _.get(courseUnit, 'code') || null,
+      courseUnitCode: _.get(courseUnit, 'code') || null
     }
   })
 

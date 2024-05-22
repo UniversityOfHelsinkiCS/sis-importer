@@ -16,17 +16,17 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
     attributes: relevantAttributes.assessmentItem,
     where: {
       id: {
-        [Op.in]: assessmentItemIds,
-      },
+        [Op.in]: assessmentItemIds
+      }
     },
     include: [
       {
         model: models.CourseUnit,
         attributes: relevantAttributes.courseUnit,
         as: 'courseUnit',
-        required: true,
-      },
-    ],
+        required: true
+      }
+    ]
   })
 
   const assessmentItems = assessmentItemsWithCrap.filter(aItem =>
@@ -46,7 +46,7 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
 
     return {
       ...realisation,
-      courseUnits,
+      courseUnits
     }
   })
 
@@ -67,19 +67,19 @@ router.get('/courses', async (req, res) => {
       [Op.and]: [
         {
           'activityPeriod.endDate': {
-            [Op.gte]: new Date(),
-          },
+            [Op.gte]: new Date()
+          }
         },
         {
           'activityPeriod.startDate': {
-            [Op.lte]: courseStartTreshold,
-          },
-        },
+            [Op.lte]: courseStartTreshold
+          }
+        }
       ],
       courseUnitRealisationTypeUrn: {
-        [Op.in]: validRealisationTypes,
-      },
-    },
+        [Op.in]: validRealisationTypes
+      }
+    }
   })
 
   const courseUnitRealisationsWithCourseUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
@@ -103,11 +103,11 @@ curreRouter.get('/enrolments-new', async (req, res) => {
     where: {
       state: 'ENROLLED',
       enrolmentDateTime: {
-        [Op.gte]: since,
-      },
+        [Op.gte]: since
+      }
     },
     attributes: relevantAttributes.enrolments,
-    order: [['id', 'DESC']],
+    order: [['id', 'DESC']]
   })
 
   res.send(enrolments)
@@ -121,7 +121,7 @@ curreRouter.get('/persons', async (req, res) => {
     attributes: relevantAttributes.persons,
     order: [['id', 'DESC']],
     limit,
-    offset,
+    offset
   })
 
   res.send(persons)

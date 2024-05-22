@@ -14,14 +14,14 @@ const parseParams = req => {
   if (!teacherId) {
     throw {
       status: 400,
-      message: 'Missing teacherId',
+      message: 'Missing teacherId'
     }
   }
 
   if (!Array.isArray(studentNumbers)) {
     throw {
       status: 400,
-      message: 'Invalid studentIds',
+      message: 'Invalid studentIds'
     }
   }
 
@@ -44,8 +44,8 @@ router.post('/', async (req, res) => {
       attributes: ['studentNumber'],
       where: {
         studentNumber: {
-          [Op.in]: studentNumbers,
-        },
+          [Op.in]: studentNumbers
+        }
       },
       include: [
         {
@@ -61,16 +61,16 @@ router.post('/', async (req, res) => {
                   [Op.contains]: [
                     {
                       personId: teacherId,
-                      roleUrn: 'urn:code:course-unit-realisation-responsibility-info-type:responsible-teacher',
-                    },
-                  ],
+                      roleUrn: 'urn:code:course-unit-realisation-responsibility-info-type:responsible-teacher'
+                    }
+                  ]
                 },
-                enrolment_period: { endDateTime: { [Op.gte]: earliestDate() } },
-              },
-            },
-          ],
-        },
-      ],
+                enrolment_period: { endDateTime: { [Op.gte]: earliestDate() } }
+              }
+            }
+          ]
+        }
+      ]
     })
 
     return res.send(students.map(student => student.studentNumber))

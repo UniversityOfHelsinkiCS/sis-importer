@@ -7,73 +7,73 @@ CourseUnit.init(
   {
     id: {
       type: STRING,
-      primaryKey: true,
+      primaryKey: true
     },
     groupId: {
-      type: STRING,
+      type: STRING
     },
     code: {
-      type: STRING,
+      type: STRING
     },
     credits: {
-      type: JSONB,
+      type: JSONB
     },
     name: {
-      type: JSONB,
+      type: JSONB
     },
     validityPeriod: {
-      type: JSONB,
+      type: JSONB
     },
     gradeScaleId: {
-      type: STRING,
+      type: STRING
     },
     studyLevel: {
-      type: STRING,
+      type: STRING
     },
     courseUnitType: {
-      type: STRING,
+      type: STRING
     },
     possibleAttainmentLanguages: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     assessmentItemOrder: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     organisations: {
-      type: JSONB,
+      type: JSONB
     },
     universityOrgIds: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     studyFields: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     substitutions: {
-      type: JSONB,
+      type: JSONB
     },
     completionMethods: {
-      type: JSONB,
+      type: JSONB
     },
     responsibilityInfos: {
-      type: JSONB,
+      type: JSONB
     },
     createdAt: {
-      type: DATE,
+      type: DATE
     },
     updatedAt: {
-      type: DATE,
-    },
+      type: DATE
+    }
   },
   {
     indexes: [
       {
-        fields: ['group_id'],
-      },
+        fields: ['group_id']
+      }
     ],
     underscored: true,
     sequelize,
     modelName: 'course_unit',
-    tableName: 'course_units',
+    tableName: 'course_units'
   }
 )
 

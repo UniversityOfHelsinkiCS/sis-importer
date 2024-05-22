@@ -43,8 +43,8 @@ const createPersonStudyRightsView = async () => {
   `,
     {
       replacements: {
-        validEducations,
-      },
+        validEducations
+      }
     }
   )
 
@@ -84,5 +84,5 @@ const isRefreshingPersonStudyRightsView = () => {
 
 module.exports = {
   createPersonStudyRightsView,
-  isRefreshingPersonStudyRightsView,
+  isRefreshingPersonStudyRightsView
 }

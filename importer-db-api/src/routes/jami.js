@@ -18,14 +18,14 @@ const getHeaders = () => {
 const agent = hasCerts
   ? new https.Agent({
       cert: fs.readFileSync(CERT_PATH, 'utf8'),
-      key: fs.readFileSync(KEY_PATH, 'utf8'),
+      key: fs.readFileSync(KEY_PATH, 'utf8')
     })
   : new https.Agent()
 
 const sisApi = axios.create({
   baseURL: SIS_API_URL,
   headers: getHeaders(),
-  httpsAgent: agent,
+  httpsAgent: agent
 })
 
 // Get person's roles from HY-Sisu custom API

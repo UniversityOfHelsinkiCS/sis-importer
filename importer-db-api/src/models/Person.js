@@ -7,71 +7,71 @@ Person.init(
   {
     id: {
       type: STRING,
-      primaryKey: true,
+      primaryKey: true
     },
     studentNumber: {
-      type: STRING,
+      type: STRING
     },
     dateOfBirth: {
-      type: DATE,
+      type: DATE
     },
     firstNames: {
-      type: STRING,
+      type: STRING
     },
     lastName: {
-      type: STRING,
+      type: STRING
     },
     callName: {
-      type: STRING,
+      type: STRING
     },
     eduPersonPrincipalName: {
-      type: String,
+      type: String
     },
     employeeNumber: {
-      type: STRING,
+      type: STRING
     },
     primaryEmail: {
-      type: STRING,
+      type: STRING
     },
     phoneNumber: {
-      type: STRING,
+      type: STRING
     },
     oppijaId: {
-      type: STRING,
+      type: STRING
     },
     genderUrn: {
-      type: STRING,
+      type: STRING
     },
     countryUrn: {
-      type: STRING,
+      type: STRING
     },
     citizenships: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     dead: {
-      type: BOOLEAN,
+      type: BOOLEAN
     },
     preferredLanguageUrn: {
-      type: STRING,
+      type: STRING
     },
     secondaryEmail: {
-      type: STRING,
+      type: STRING
     },
     personalDataSafetyNonDisclosure: {
-      type: BOOLEAN,
+      type: BOOLEAN
     },
     createdAt: {
-      type: DATE,
+      type: DATE
     },
     updatedAt: {
-      type: DATE,
-    },
+      type: DATE
+    }
   },
   {
     underscored: true,
     sequelize: sequelize,
     modelName: 'person',
-    tableName: 'persons',
+    tableName: 'persons'
   }
 )
 

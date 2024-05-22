@@ -9,12 +9,21 @@ const validRealisationTypes = [
   'urn:code:course-unit-realisation-type:independent-work-project',
   'urn:code:course-unit-realisation-type:teaching-participation-blended',
   'urn:code:course-unit-realisation-type:teaching-participation-contact',
-  'urn:code:course-unit-realisation-type:teaching-participation-distance',
+  'urn:code:course-unit-realisation-type:teaching-participation-distance'
 ]
 
 const relevantAttributes = {
   courseUnit: ['id', 'code', 'responsibilityInfos', 'completionMethods', 'name', 'validityPeriod'],
-  courseUnitRealisation: ['id', 'name', 'nameSpecifier', 'assessmentItemIds', 'activityPeriod', 'responsibilityInfos', 'courseUnitRealisationTypeUrn', 'flowState'],
+  courseUnitRealisation: [
+    'id',
+    'name',
+    'nameSpecifier',
+    'assessmentItemIds',
+    'activityPeriod',
+    'responsibilityInfos',
+    'courseUnitRealisationTypeUrn',
+    'flowState'
+  ],
   assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],
   enrolments: [
     'id',
@@ -24,15 +33,15 @@ const relevantAttributes = {
     'courseUnitRealisationId',
     'courseUnitId',
     'confirmedStudySubGroupIds',
-    'documentState',
+    'documentState'
   ],
-  persons: ['id', 'eduPersonPrincipalName', 'preferredLanguageUrn'],
+  persons: ['id', 'eduPersonPrincipalName', 'preferredLanguageUrn']
 }
 
 const teacherUrns = [
   'urn:code:course-unit-realisation-responsibility-info-type:teacher',
   'urn:code:course-unit-realisation-responsibility-info-type:responsible-teacher',
-  'urn:code:course-unit-realisation-responsibility-info-type:administrative-person',
+  'urn:code:course-unit-realisation-responsibility-info-type:administrative-person'
 ]
 
 const timeTillCourseStart = 6
@@ -41,5 +50,5 @@ module.exports = {
   validRealisationTypes,
   relevantAttributes,
   teacherUrns,
-  timeTillCourseStart,
+  timeTillCourseStart
 }

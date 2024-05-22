@@ -8,85 +8,85 @@ StudyRight.init(
     autoId: {
       type: BIGINT,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
     id: {
       type: STRING,
-      unique: true,
+      unique: true
     },
     personId: {
-      type: STRING,
+      type: STRING
     },
     state: {
-      type: STRING,
+      type: STRING
     },
     educationId: {
-      type: STRING,
+      type: STRING
     },
     organisationId: {
-      type: STRING,
+      type: STRING
     },
     modificationOrdinal: {
       type: BIGINT,
-      unique: true,
+      unique: true
     },
     documentState: {
-      type: STRING,
+      type: STRING
     },
     valid: {
-      type: JSONB,
+      type: JSONB
     },
     grantDate: {
-      type: DATE,
+      type: DATE
     },
     studyStartDate: {
-      type: DATE,
+      type: DATE
     },
     transferOutDate: {
-      type: DATE,
+      type: DATE
     },
     termRegistrations: {
-      type: JSONB,
+      type: JSONB
     },
     studyRightCancellation: {
-      type: JSONB,
+      type: JSONB
     },
     studyRightGraduation: {
-      type: JSONB,
+      type: JSONB
     },
     snapshotDateTime: {
-      type: DATE,
+      type: DATE
     },
     acceptedSelectionPath: {
-      type: JSONB,
+      type: JSONB
     },
     studyRightTransfer: {
-      type: JSONB,
+      type: JSONB
     },
     studyRightExtensions: {
-      type: JSONB,
+      type: JSONB
     },
     transferOutUniversityUrn: {
-      type: STRING,
+      type: STRING
     },
     requestedSelectionPath: {
-      type: JSONB,
+      type: JSONB
     },
     phase1MinorSelections: {
-      type: JSONB,
+      type: JSONB
     },
     phase2MinorSelections: {
-      type: JSONB,
+      type: JSONB
     },
     admissionTypeUrn: {
-      type: STRING,
+      type: STRING
     },
     createdAt: {
-      type: DATE,
+      type: DATE
     },
     updatedAt: {
-      type: DATE,
-    },
+      type: DATE
+    }
   },
   {
     underscored: true,
@@ -96,15 +96,15 @@ StudyRight.init(
     indexes: [
       {
         unique: true,
-        fields: ['id', 'modificationOrdinal'],
+        fields: ['id', 'modificationOrdinal']
       },
       {
-        fields: ['id'],
+        fields: ['id']
       },
       {
-        fields: ['person_id'],
-      },
-    ],
+        fields: ['person_id']
+      }
+    ]
   }
 )
 

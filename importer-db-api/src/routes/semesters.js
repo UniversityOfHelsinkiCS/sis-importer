@@ -10,7 +10,7 @@ router.get('/min_max_semesters', async (req, res) => {
 
   res.json({
     min,
-    max,
+    max
   })
 })
 

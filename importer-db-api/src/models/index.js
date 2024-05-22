@@ -27,14 +27,14 @@ Attainment.hasOne(CourseUnit, { sourceKey: 'courseUnitId', foreignKey: 'id', as:
 Attainment.hasOne(CourseUnitRealisation, {
   foreignKey: 'id',
   sourceKey: 'courseUnitRealisationId',
-  as: 'courseUnitRealisation',
+  as: 'courseUnitRealisation'
 })
 
 Enrolment.belongsTo(AssessmentItem, { foreignKey: 'assessmentItemId', targetKey: 'id', as: 'assessmentItem' })
 Enrolment.belongsTo(CourseUnitRealisation, {
   foreignKey: 'courseUnitRealisationId',
   targetKey: 'id',
-  as: 'courseUnitRealisation',
+  as: 'courseUnitRealisation'
 })
 Enrolment.belongsTo(CourseUnit, { foreignKey: 'courseUnitId', targetKey: 'id', as: 'courseUnit' })
 Enrolment.belongsTo(Person, { foreignKey: 'personId', targetKey: 'id' })
@@ -59,7 +59,7 @@ const models = {
   GradeScale,
   Plan,
   PersonGroup,
-  Disclosure,
+  Disclosure
 }
 
 module.exports = models

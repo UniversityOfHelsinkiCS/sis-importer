@@ -7,7 +7,7 @@ class SisClient {
 
     this.cache = new LRU({
       max: 30,
-      maxAge: 1800000, // 30 minutes
+      maxAge: 1800000 // 30 minutes
     })
   }
 

@@ -7,50 +7,50 @@ Plan.init(
   {
     id: {
       type: STRING,
-      primaryKey: true,
+      primaryKey: true
     },
     assessmentItemSelections: {
-      type: JSONB,
+      type: JSONB
     },
     courseUnitSelections: {
-      type: JSONB,
+      type: JSONB
     },
     curriculumPeriodId: {
-      type: STRING,
+      type: STRING
     },
     customCourseUnitAttainmentSelections: {
-      type: JSONB,
+      type: JSONB
     },
     customModuleAttainmentSelections: {
-      type: JSONB,
+      type: JSONB
     },
     learningOpportunityId: {
-      type: STRING,
+      type: STRING
     },
     moduleSelections: {
-      type: JSONB,
+      type: JSONB
     },
     primary: {
-      type: BOOLEAN,
+      type: BOOLEAN
     },
     rootId: {
-      type: STRING,
+      type: STRING
     },
     userId: {
-      type: STRING,
+      type: STRING
     },
     createdAt: {
-      type: DATE,
+      type: DATE
     },
     updatedAt: {
-      type: DATE,
-    },
+      type: DATE
+    }
   },
   {
     underscored: true,
     sequelize: sequelize,
     modelName: 'plan',
-    tableName: 'plans',
+    tableName: 'plans'
   }
 )
 

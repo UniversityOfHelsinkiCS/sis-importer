@@ -10,11 +10,11 @@ class Organisation extends Model {
         organisations: {
           [Op.contains]: [
             {
-              organisationId: this.id,
-            },
-          ],
-        },
-      },
+              organisationId: this.id
+            }
+          ]
+        }
+      }
     })
 
     return units
@@ -25,7 +25,7 @@ class Organisation extends Model {
       `select * from course_unit_realisations where assessment_item_ids && ARRAY((select id from assessment_items where primary_course_unit_group_id in (select group_id from course_units where organisations @> '[{ "organisationId": "${this.id}"}]')));`,
       {
         model: CourseUnitRealisation,
-        mapToModel: true,
+        mapToModel: true
       }
     )
 
@@ -46,7 +46,7 @@ class Organisation extends Model {
       ) OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY;;`,
       {
         model: CourseUnitRealisation,
-        mapToModel: true,
+        mapToModel: true
       }
     )
 
@@ -59,52 +59,52 @@ Organisation.init(
     autoId: {
       type: BIGINT,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
     id: {
       type: STRING,
-      unique: true,
+      unique: true
     },
     modificationOrdinal: {
       type: BIGINT,
-      unique: true,
+      unique: true
     },
     documentState: {
-      type: STRING,
+      type: STRING
     },
     snapshotDateTime: {
-      type: DATE,
+      type: DATE
     },
     universityOrgId: {
-      type: STRING,
+      type: STRING
     },
     parentId: {
-      type: STRING,
+      type: STRING
     },
     predecessorIds: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     code: {
-      type: STRING,
+      type: STRING
     },
     name: {
-      type: JSONB,
+      type: JSONB
     },
     abbreviation: {
-      type: JSONB,
+      type: JSONB
     },
     status: {
-      type: STRING,
+      type: STRING
     },
     educationalInstitutionUrn: {
-      type: STRING,
+      type: STRING
     },
     createdAt: {
-      type: DATE,
+      type: DATE
     },
     updatedAt: {
-      type: DATE,
-    },
+      type: DATE
+    }
   },
   {
     underscored: true,
@@ -114,12 +114,12 @@ Organisation.init(
     indexes: [
       {
         unique: true,
-        fields: ['id', 'modificationOrdinal'],
+        fields: ['id', 'modificationOrdinal']
       },
       {
-        fields: ['id'],
-      },
-    ],
+        fields: ['id']
+      }
+    ]
   }
 )
 

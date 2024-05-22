@@ -8,48 +8,48 @@ Enrolment.init(
     id: {
       type: STRING,
       primaryKey: true,
-      unique: true,
+      unique: true
     },
     modificationOrdinal: {
       type: BIGINT,
-      unique: true,
+      unique: true
     },
     personId: {
-      type: STRING,
+      type: STRING
     },
     verifierPersonId: {
-      type: STRING,
+      type: STRING
     },
     studyRightId: {
-      type: STRING,
+      type: STRING
     },
     assessmentItemId: {
-      type: STRING,
+      type: STRING
     },
     courseUnitRealisationId: {
-      type: STRING,
+      type: STRING
     },
     courseUnitId: {
-      type: STRING,
+      type: STRING
     },
     enrolmentDateTime: {
-      type: DATE,
+      type: DATE
     },
     state: {
-      type: STRING,
+      type: STRING
     },
     documentState: {
-      type: STRING,
+      type: STRING
     },
     studySubGroups: {
-      type: JSONB,
+      type: JSONB
     },
     confirmedStudySubGroupIds: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     tentativeStudySubGroupIds: {
-      type: ARRAY(STRING),
-    },
+      type: ARRAY(STRING)
+    }
   },
   {
     underscored: true,
@@ -59,19 +59,19 @@ Enrolment.init(
     indexes: [
       {
         unique: true,
-        fields: ['id', 'modificationOrdinal'],
+        fields: ['id', 'modificationOrdinal']
       },
       {
-        fields: ['id'],
-      },
+        fields: ['id']
+      }
     ],
     defaultScope: {
       where: {
         documentState: {
-          [Op.not]: 'DELETED',
-        },
-      },
-    },
+          [Op.not]: 'DELETED'
+        }
+      }
+    }
   }
 )
 

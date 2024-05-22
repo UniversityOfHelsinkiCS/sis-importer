@@ -38,11 +38,11 @@ router.get('/courses', async (req, res) => {
           code,
           getAcademicYear(courseUnitRealisation.activityPeriod.startDate),
           getTerm(courseUnitRealisation.activityPeriod.startDate),
-          getCourseType(courseUnitRealisation.courseUnitRealisationTypeUrn),
+          getCourseType(courseUnitRealisation.courseUnitRealisationTypeUrn)
         ].join('.'),
         name: getName(courseUnitRealisation),
         starts: new Date(courseUnitRealisation.activityPeriod.startDate),
-        ends: new Date(courseUnitRealisation.activityPeriod.endDate),
+        ends: new Date(courseUnitRealisation.activityPeriod.endDate)
       }))
     newCourseUnitRealisations = addCourseNumbers(newCourseUnitRealisations).sort((a, b) => (a.id > b.id ? 1 : -1))
     courseUnitRealisations = courseUnitRealisations.concat(newCourseUnitRealisations)
@@ -76,9 +76,9 @@ router.get('/courses/:id', async (req, res) => {
     attributes: ['eduPersonPrincipalName'],
     where: {
       id: {
-        [Op.in]: personIds,
-      },
-    },
+        [Op.in]: personIds
+      }
+    }
   })
 
   const teachers = persons.map(person => person.eduPersonPrincipalName.split('@')[0])
@@ -89,8 +89,8 @@ router.get('/courses/:id', async (req, res) => {
 const getCourseRealisationsByCode = async (code, activityPeriodEndDateAfter) => {
   const courseUnit = await models.CourseUnit.findOne({
     where: {
-      code,
-    },
+      code
+    }
   })
 
   if (!courseUnit) {
@@ -103,11 +103,11 @@ const getCourseRealisationsByCode = async (code, activityPeriodEndDateAfter) => 
     where: {
       primary_course_unit_group_id: groupId,
       assessment_item_type: {
-        [Op.in]: ['urn:code:assessment-item-type:exam', 'urn:code:assessment-item-type:teaching-participation'],
-      },
+        [Op.in]: ['urn:code:assessment-item-type:exam', 'urn:code:assessment-item-type:teaching-participation']
+      }
     },
     attributes: ['id'],
-    raw: true,
+    raw: true
   })
 
   if (!assessmentItems) {
@@ -117,7 +117,7 @@ const getCourseRealisationsByCode = async (code, activityPeriodEndDateAfter) => 
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     where: {
       assessmentItemIds: {
-        [Op.overlap]: assessmentItems.map(({ id }) => id),
+        [Op.overlap]: assessmentItems.map(({ id }) => id)
       },
       ...(activityPeriodEndDateAfter && {
         [Op.and]: [
@@ -125,13 +125,13 @@ const getCourseRealisationsByCode = async (code, activityPeriodEndDateAfter) => 
           {
             activityPeriod: {
               endDate: {
-                [Op.gt]: dateFns.format(new Date(activityPeriodEndDateAfter), 'yyyy-MM-dd'),
-              },
-            },
-          },
-        ],
-      }),
-    },
+                [Op.gt]: dateFns.format(new Date(activityPeriodEndDateAfter), 'yyyy-MM-dd')
+              }
+            }
+          }
+        ]
+      })
+    }
   })
 
   return courseUnitRealisations
@@ -185,7 +185,7 @@ const getCourseType = courseUnitRealisationTypeUrn => {
     'exam-midterm': 'L',
     'independent-work-learning-diary': 'K',
     'teaching-participation-lectures': 'K',
-    'teaching-participation-online': 'K',
+    'teaching-participation-online': 'K'
   }
 
   if (!courseUnitRealisationTypeUrn) {

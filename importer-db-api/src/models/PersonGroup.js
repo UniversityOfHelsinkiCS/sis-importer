@@ -7,29 +7,29 @@ PersonGroup.init(
   {
     id: {
       type: STRING,
-      primaryKey: true,
+      primaryKey: true
     },
     name: {
-      type: JSONB,
+      type: JSONB
     },
     responsibilityInfos: {
-      type: JSONB,
+      type: JSONB
     },
     type: {
-      type: STRING,
+      type: STRING
     },
     createdAt: {
-      type: DATE,
+      type: DATE
     },
     updatedAt: {
-      type: DATE,
-    },
+      type: DATE
+    }
   },
   {
     underscored: true,
     sequelize: sequelize,
     modelName: 'person_group',
-    tableName: 'person_groups',
+    tableName: 'person_groups'
   }
 )
 

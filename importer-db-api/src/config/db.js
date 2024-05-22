@@ -18,5 +18,5 @@ const dbHealth = async () => {
 
 module.exports = {
   sequelize,
-  dbHealth,
+  dbHealth
 }

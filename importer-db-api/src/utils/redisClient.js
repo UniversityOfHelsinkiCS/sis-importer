@@ -14,7 +14,7 @@ const connectRedis = () => {
   try {
     const client = redis.createClient({
       url: process.env.REDIS_URI,
-      retry_strategy: redisRetry,
+      retry_strategy: redisRetry
     })
     if (!client) throw new Error('redis broken or not available?')
 
@@ -43,10 +43,10 @@ const redisPromisify = async (func, ...params) =>
 const redisClient = client
   ? {
       get: async key => await redisPromisify(client.get, key),
-      set: async (key, val) => await redisPromisify(client.set, key, val),
+      set: async (key, val) => await redisPromisify(client.set, key, val)
     }
   : { get: () => null, set: () => null }
 
 module.exports = {
-  redisClient,
+  redisClient
 }

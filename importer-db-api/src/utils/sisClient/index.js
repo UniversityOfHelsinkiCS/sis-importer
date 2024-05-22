@@ -22,25 +22,25 @@ const createGraphqlHttpClient = () => {
   const agent = hasCerts
     ? new https.Agent({
         cert: fs.readFileSync(CERT_PATH, 'utf8'),
-        key: fs.readFileSync(KEY_PATH, 'utf8'),
+        key: fs.readFileSync(KEY_PATH, 'utf8')
       })
     : new https.Agent({
-        rejectUnauthorized: false,
+        rejectUnauthorized: false
       })
 
   return axios.create({
     baseURL: SIS_GRAPHQL_API_URL,
-    httpsAgent: agent,
+    httpsAgent: agent
   })
 }
 
 const graphqlClient = new SisGraphqlClient({
   httpClient: createGraphqlHttpClient(),
-  token: SIS_GRAPHQL_API_TOKEN, // For development purposes when used with proxy
+  token: SIS_GRAPHQL_API_TOKEN // For development purposes when used with proxy
 })
 
 const sisClient = new SisClient({
-  graphqlClient,
+  graphqlClient
 })
 
 module.exports = sisClient

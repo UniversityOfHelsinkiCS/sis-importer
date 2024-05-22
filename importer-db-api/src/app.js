@@ -43,9 +43,9 @@ app.get('/health', async (req, res) =>
     system: {
       uptime: `${os.uptime()}`,
       release: `${os.version()}`,
-      load: `${os.loadavg()}`,
+      load: `${os.loadavg()}`
     },
-    db: { pass: await dbHealth() },
+    db: { pass: await dbHealth() }
   })
 )
 

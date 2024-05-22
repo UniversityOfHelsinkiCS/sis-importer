@@ -29,7 +29,7 @@ test('gets batch attainments by student number and course code', async () => {
     .send([
       { courseCode: 'TKT10001', studentNumber: '010231474' },
       { courseCode: 'TKT10001', studentNumber: '010239573' },
-      { courseCode: 'TKT10001', studentNumber: 'not-a-student' },
+      { courseCode: 'TKT10001', studentNumber: 'not-a-student' }
     ])
   expect(resp.status).toBe(200)
   expect(resp.body.length).toBe(3)
@@ -91,7 +91,7 @@ test('gets batch enrollments by student number and course code', async () => {
     .send([
       { code: 'TKT20005', personId: 'hy-hlo-130906952' },
       { code: 'TKT20005', personId: 'hy-hlo-128785149' },
-      { code: 'TKT20005', personId: 'not-a-student' },
+      { code: 'TKT20005', personId: 'not-a-student' }
     ])
   expect(resp.status).toBe(200)
   expect(resp.body.length).toBe(3)
@@ -121,7 +121,7 @@ test('gets batch enrollments with invalid data', async () => {
     .query(auth)
     .send([
       { code: null, personId: 'hy-hlo-130906952' },
-      { code: 'TKT20005', personId: null },
+      { code: 'TKT20005', personId: null }
     ])
   expect(resp.status).toBe(200)
   expect(resp.body).toEqual([])
@@ -135,8 +135,8 @@ test('gets acceptor persons for course unit realisation', async () => {
   expect(resp.body['hy-CUR-138156846']).toEqual([
     {
       roleUrn: 'urn:code:attainment-acceptor-type:approved-by',
-      personId: 'hy-hlo-1552817',
-    },
+      personId: 'hy-hlo-1552817'
+    }
   ])
   expect(resp.body['not-a-course']).toBe(undefined)
 })

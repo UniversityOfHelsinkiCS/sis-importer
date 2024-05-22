@@ -13,8 +13,8 @@ router.get('/', async (req, res) => {
 
   const courseUnit = await models.CourseUnit.findOne({
     where: {
-      code,
-    },
+      code
+    }
   })
 
   if (!courseUnit) {
@@ -27,11 +27,11 @@ router.get('/', async (req, res) => {
     where: {
       primary_course_unit_group_id: groupId,
       assessment_item_type: {
-        [Op.in]: ['urn:code:assessment-item-type:exam', 'urn:code:assessment-item-type:teaching-participation'],
-      },
+        [Op.in]: ['urn:code:assessment-item-type:exam', 'urn:code:assessment-item-type:teaching-participation']
+      }
     },
     attributes: ['id'],
-    raw: true,
+    raw: true
   })
 
   if (!assessmentItems) {
@@ -41,7 +41,7 @@ router.get('/', async (req, res) => {
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     where: {
       assessmentItemIds: {
-        [Op.overlap]: assessmentItems.map(({ id }) => id),
+        [Op.overlap]: assessmentItems.map(({ id }) => id)
       },
       ...(activityPeriodEndDateAfter && {
         [Op.and]: [
@@ -49,13 +49,13 @@ router.get('/', async (req, res) => {
           {
             activityPeriod: {
               endDate: {
-                [Op.gt]: dateFns.format(new Date(activityPeriodEndDateAfter), 'yyyy-MM-dd'),
-              },
-            },
-          },
-        ],
-      }),
-    },
+                [Op.gt]: dateFns.format(new Date(activityPeriodEndDateAfter), 'yyyy-MM-dd')
+              }
+            }
+          }
+        ]
+      })
+    }
   })
 
   res.send(courseUnitRealisations)
@@ -66,8 +66,8 @@ router.get('/:id', async (req, res) => {
 
   const courseUnitRealisation = await models.CourseUnitRealisation.findOne({
     where: {
-      id,
-    },
+      id
+    }
   })
 
   if (!courseUnitRealisation) {
@@ -87,7 +87,7 @@ router.get('/:id/enrolments', async (req, res) => {
     return enrolments.map(e => {
       return {
         ...e.dataValues,
-        student: personHash[e.personId],
+        student: personHash[e.personId]
       }
     })
   }
@@ -96,8 +96,8 @@ router.get('/:id/enrolments', async (req, res) => {
 
   const enrolments = await models.Enrolment.findAll({
     where: {
-      courseUnitRealisationId: id,
-    },
+      courseUnitRealisationId: id
+    }
   })
 
   const personIds = enrolments.map(e => e.personId)
@@ -105,9 +105,9 @@ router.get('/:id/enrolments', async (req, res) => {
   const persons = await models.Person.findAll({
     where: {
       id: {
-        [Op.in]: personIds,
-      },
-    },
+        [Op.in]: personIds
+      }
+    }
   })
 
   res.send(zip(enrolments, persons))
@@ -118,8 +118,8 @@ router.get('/:id/study_group_sets', async (req, res) => {
 
   const courseUnitRealisation = await models.CourseUnitRealisation.findOne({
     where: {
-      id,
-    },
+      id
+    }
   })
 
   if (!courseUnitRealisation) {
@@ -137,9 +137,9 @@ router.get('/:id/study_group_sets', async (req, res) => {
       ? await models.Person.findAll({
           where: {
             id: {
-              [Op.in]: teacherIds,
-            },
-          },
+              [Op.in]: teacherIds
+            }
+          }
         })
       : []
 
@@ -151,9 +151,9 @@ router.get('/:id/study_group_sets', async (req, res) => {
 
         return {
           ...subGroup,
-          teachers: teacherIds.map(teacherId => persons.find(({ id }) => id === teacherId)),
+          teachers: teacherIds.map(teacherId => persons.find(({ id }) => id === teacherId))
         }
-      }),
+      })
     }
   })
 
@@ -182,15 +182,15 @@ router.get('/:id/responsibility_infos', async (req, res) => {
       ? await models.Person.findAll({
           where: {
             id: {
-              [Op.in]: personIds,
-            },
-          },
+              [Op.in]: personIds
+            }
+          }
         })
       : []
 
   const responsibilityInfosWithPersons = responsibilityInfos.map(info => ({
     ...info,
-    person: persons.find(({ id }) => id === info.personId),
+    person: persons.find(({ id }) => id === info.personId)
   }))
 
   res.send(responsibilityInfosWithPersons)

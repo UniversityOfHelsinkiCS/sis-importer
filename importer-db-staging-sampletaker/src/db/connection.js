@@ -15,12 +15,12 @@ class Connection {
           host: DB_HOST,
           port: DB_PORT,
           user: DB_USERNAME,
-          database: DB_NAME,
+          database: DB_NAME
         },
         pool: {
           min: 0,
-          max: 50,
-        },
+          max: 50
+        }
       })
       await this.knex.raw('select 1+1 as result')
       console.log(`Connected to ${DB_NAME}`)
@@ -40,5 +40,5 @@ const connection = new Connection()
 connection.connect()
 
 module.exports = {
-  connection,
+  connection
 }

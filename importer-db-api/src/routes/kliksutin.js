@@ -16,7 +16,7 @@ const validRealisationTypes = [
   'urn:code:course-unit-realisation-type:independent-work-project',
   'urn:code:course-unit-realisation-type:teaching-participation-blended',
   'urn:code:course-unit-realisation-type:teaching-participation-contact',
-  'urn:code:course-unit-realisation-type:teaching-participation-distance',
+  'urn:code:course-unit-realisation-type:teaching-participation-distance'
 ]
 
 const relevantAttributes = {
@@ -28,15 +28,15 @@ const relevantAttributes = {
     'assessmentItemIds',
     'activityPeriod',
     'courseUnitRealisationTypeUrn',
-    'responsibilityInfos',
+    'responsibilityInfos'
   ],
-  assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],
+  assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId']
 }
 
 const teacherUrns = [
   'urn:code:course-unit-realisation-responsibility-info-type:teacher',
   'urn:code:course-unit-realisation-responsibility-info-type:responsible-teacher',
-  'urn:code:course-unit-realisation-responsibility-info-type:administrative-person',
+  'urn:code:course-unit-realisation-responsibility-info-type:administrative-person'
 ]
 
 const timeTillCourseStart = 6
@@ -48,17 +48,17 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
     attributes: relevantAttributes.assessmentItem,
     where: {
       id: {
-        [Op.in]: assessmentItemIds,
-      },
+        [Op.in]: assessmentItemIds
+      }
     },
     include: [
       {
         model: models.CourseUnit,
         attributes: relevantAttributes.courseUnit,
         as: 'courseUnit',
-        required: true,
-      },
-    ],
+        required: true
+      }
+    ]
   })
 
   const assessmentItems = assessmentItemsWithCrap.filter(aItem =>
@@ -78,7 +78,7 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
 
     return {
       ...realisation,
-      courseUnits,
+      courseUnits
     }
   })
 
@@ -93,9 +93,9 @@ router.get('/course/:courseId', async (req, res) => {
     where: {
       id: courseId,
       courseUnitRealisationTypeUrn: {
-        [Op.in]: validRealisationTypes,
-      },
-    },
+        [Op.in]: validRealisationTypes
+      }
+    }
   })
 
   res.send(courseUnitRealisations)
@@ -112,24 +112,24 @@ router.get('/courses/:personId', async (req, res) => {
     attributes: relevantAttributes.courseUnitRealisation,
     where: {
       responsibilityInfos: {
-        [Op.contains]: [{ personId: teacherId }], // note that '{ personId: teacherId }' would not work. In pg, array containment is more like checking for union
+        [Op.contains]: [{ personId: teacherId }] // note that '{ personId: teacherId }' would not work. In pg, array containment is more like checking for union
       },
       [Op.and]: [
         {
           'activityPeriod.endDate': {
-            [Op.gte]: new Date(),
-          },
+            [Op.gte]: new Date()
+          }
         },
         {
           'activityPeriod.startDate': {
-            [Op.lte]: courseStartTreshold,
-          },
-        },
+            [Op.lte]: courseStartTreshold
+          }
+        }
       ],
       courseUnitRealisationTypeUrn: {
-        [Op.in]: validRealisationTypes,
-      },
-    },
+        [Op.in]: validRealisationTypes
+      }
+    }
   })
 
   const courseUnitRealisationsWithCourseUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
@@ -142,14 +142,14 @@ router.get('/enrollments/:personId', async (req, res) => {
 
   const enrollments = await models.Enrolment.findAll({
     where: {
-      personId: studentId,
+      personId: studentId
     },
     include: [
       { model: models.CourseUnit, as: 'courseUnit' },
-      { model: models.CourseUnitRealisation, as: 'courseUnitRealisation' },
+      { model: models.CourseUnitRealisation, as: 'courseUnitRealisation' }
     ],
     raw: true,
-    nest: true,
+    nest: true
   })
 
   return res.send(enrollments)
@@ -161,9 +161,9 @@ router.get('/teachers/:courseId', async (req, res) => {
   const { responsibilityInfos = [] } =
     (await models.CourseUnitRealisation.findOne({
       where: {
-        id: courseId,
+        id: courseId
       },
-      attributes: ['responsibilityInfos'],
+      attributes: ['responsibilityInfos']
     })) || {}
 
   const teacherIds = responsibilityInfos

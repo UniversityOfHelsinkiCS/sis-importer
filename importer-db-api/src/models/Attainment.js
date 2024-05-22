@@ -7,107 +7,107 @@ Attainment.init(
   {
     id: {
       type: STRING,
-      primaryKey: true,
+      primaryKey: true
     },
     personId: {
-      type: STRING,
+      type: STRING
     },
     verifierPersonId: {
-      type: STRING,
+      type: STRING
     },
     studyRightId: {
-      type: STRING,
+      type: STRING
     },
     attainmentDate: {
-      type: DATE,
+      type: DATE
     },
     registrationDate: {
-      type: DATE,
+      type: DATE
     },
     expiryDate: {
-      type: DATE,
+      type: DATE
     },
     attainmentLanguageUrn: {
-      type: STRING,
+      type: STRING
     },
     acceptorPersons: {
-      type: JSONB,
+      type: JSONB
     },
     organisations: {
-      type: JSONB,
+      type: JSONB
     },
     state: {
-      type: STRING,
+      type: STRING
     },
     misregistration: {
-      type: BOOLEAN,
+      type: BOOLEAN
     },
     primary: {
-      type: BOOLEAN,
+      type: BOOLEAN
     },
     credits: {
-      type: DOUBLE,
+      type: DOUBLE
     },
     studyWeeks: {
-      type: DOUBLE,
+      type: DOUBLE
     },
     gradeScaleId: {
-      type: STRING,
+      type: STRING
     },
     gradeId: {
-      type: INTEGER,
+      type: INTEGER
     },
     gradeAverage: {
-      type: DOUBLE,
+      type: DOUBLE
     },
     additionalInfo: {
-      type: JSONB,
+      type: JSONB
     },
     studyFieldUrn: {
-      type: STRING,
+      type: STRING
     },
     name: {
-      type: JSONB,
+      type: JSONB
     },
     studyLevelUrn: {
-      type: STRING,
+      type: STRING
     },
     courseUnitTypeUrn: {
-      type: STRING,
+      type: STRING
     },
     code: {
-      type: STRING,
+      type: STRING
     },
     type: {
-      type: STRING,
+      type: STRING
     },
     courseUnitId: {
-      type: STRING,
+      type: STRING
     },
     moduleId: {
-      type: STRING,
+      type: STRING
     },
     moduleGroupId: {
-      type: STRING,
+      type: STRING
     },
     nodes: {
-      type: JSONB,
+      type: JSONB
     },
     createdAt: {
-      type: DATE,
+      type: DATE
     },
     updatedAt: {
-      type: DATE,
+      type: DATE
     },
     courseUnitRealisationId: {
-      type: STRING,
+      type: STRING
     },
     assessmentItemAttainmentIds: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     assessmentItemId: {
-      type: STRING,
-    },
+      type: STRING
+    }
   },
   {
     underscored: true,
@@ -116,15 +116,15 @@ Attainment.init(
     tableName: 'attainments',
     indexes: [
       {
-        fields: ['person_id'],
+        fields: ['person_id']
       },
       {
-        fields: ['course_unit_id'],
+        fields: ['course_unit_id']
       },
       {
-        fields: ['module_id'],
-      },
-    ],
+        fields: ['module_id']
+      }
+    ]
   }
 )
 

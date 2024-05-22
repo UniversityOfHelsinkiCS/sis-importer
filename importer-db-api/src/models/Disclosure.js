@@ -7,20 +7,20 @@ Disclosure.init(
   {
     id: {
       type: STRING,
-      primaryKey: true,
+      primaryKey: true
     },
     personId: {
-      type: STRING,
+      type: STRING
     },
     disclosureCategoryId: {
-      type: STRING,
+      type: STRING
     },
     authorized: {
-      type: BOOLEAN,
+      type: BOOLEAN
     },
     documentState: {
-      type: STRING,
-    },
+      type: STRING
+    }
   },
   {
     underscored: true,
@@ -30,12 +30,12 @@ Disclosure.init(
     indexes: [
       {
         unique: true,
-        fields: ['id'],
+        fields: ['id']
       },
       {
-        fields: ['disclosureCategoryId'],
-      },
-    ],
+        fields: ['disclosureCategoryId']
+      }
+    ]
   }
 )
 

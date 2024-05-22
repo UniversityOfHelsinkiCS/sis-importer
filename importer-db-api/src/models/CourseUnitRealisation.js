@@ -11,11 +11,11 @@ const getActivityPeriodComparisonWhere = (column, operator, date) => {
       {
         activityPeriod: {
           [column]: {
-            [operator]: dateFns.format(new Date(date), 'yyyy-MM-dd'),
-          },
-        },
-      },
-    ],
+            [operator]: dateFns.format(new Date(date), 'yyyy-MM-dd')
+          }
+        }
+      }
+    ]
   }
 }
 
@@ -24,91 +24,91 @@ const scopes = {
     return {
       where: {
         assessmentItemIds: {
-          [Op.overlap]: ids,
-        },
-      },
+          [Op.overlap]: ids
+        }
+      }
     }
   },
   activityPeriodEndDateAfter(date) {
     return {
-      where: getActivityPeriodComparisonWhere('endDate', Op.gt, date),
+      where: getActivityPeriodComparisonWhere('endDate', Op.gt, date)
     }
   },
   activityPeriodEndDateBefore(date) {
     return {
-      where: getActivityPeriodComparisonWhere('endDate', Op.lt, date),
+      where: getActivityPeriodComparisonWhere('endDate', Op.lt, date)
     }
   },
   activityPeriodStartDateAfter(date) {
     return {
-      where: getActivityPeriodComparisonWhere('startDate', Op.gt, date),
+      where: getActivityPeriodComparisonWhere('startDate', Op.gt, date)
     }
   },
   activityPeriodStartDateBefore(date) {
     return {
-      where: getActivityPeriodComparisonWhere('startDate', Op.lt, date),
+      where: getActivityPeriodComparisonWhere('startDate', Op.lt, date)
     }
-  },
+  }
 }
 
 CourseUnitRealisation.init(
   {
     id: {
       type: STRING,
-      primaryKey: true,
+      primaryKey: true
     },
     universityOrgIds: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     flowState: {
-      type: STRING,
+      type: STRING
     },
     name: {
-      type: JSONB,
+      type: JSONB
     },
     nameSpecifier: {
-      type: JSONB,
+      type: JSONB
     },
     assessmentItemIds: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     activityPeriod: {
-      type: JSONB,
+      type: JSONB
     },
     teachingLanguageUrn: {
-      type: STRING,
+      type: STRING
     },
     courseUnitRealisationTypeUrn: {
-      type: STRING,
+      type: STRING
     },
     studyGroupSets: {
-      type: JSONB,
+      type: JSONB
     },
     organisations: {
-      type: JSONB,
+      type: JSONB
     },
     enrolmentPeriod: {
-      type: JSONB,
+      type: JSONB
     },
     responsibilityInfos: {
-      type: JSONB,
+      type: JSONB
     },
     customCodeUrns: {
-      type: JSONB,
+      type: JSONB
     },
     createdAt: {
-      type: DATE,
+      type: DATE
     },
     updatedAt: {
-      type: DATE,
-    },
+      type: DATE
+    }
   },
   {
     underscored: true,
     sequelize: sequelize,
     modelName: 'course_unit_realisation',
     tableName: 'course_unit_realisations',
-    scopes,
+    scopes
   }
 )
 

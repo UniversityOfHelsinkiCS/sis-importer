@@ -23,14 +23,14 @@ const getHeaders = () => {
 const agent = hasCerts
   ? new https.Agent({
       cert: fs.readFileSync(CERT_PATH, 'utf8'),
-      key: fs.readFileSync(KEY_PATH, 'utf8'),
+      key: fs.readFileSync(KEY_PATH, 'utf8')
     })
   : new https.Agent()
 
 const sisApi = axios.create({
   baseURL: SIS_API_URL,
   headers: getHeaders(),
-  httpsAgent: agent,
+  httpsAgent: agent
 })
 
 /**
@@ -84,9 +84,9 @@ router.post('/attainments', async (req, res) => {
 
   const persons = await models.Person.findAll({
     where: {
-      studentNumber: { [Op.in]: data.map(({ studentNumber }) => studentNumber) },
+      studentNumber: { [Op.in]: data.map(({ studentNumber }) => studentNumber) }
     },
-    raw: true,
+    raw: true
   })
   const gradeScales = await models.GradeScale.findAll({ raw: true })
   const allCourseUnits = await getAllCourseUnits(
@@ -104,23 +104,23 @@ router.post('/attainments', async (req, res) => {
     const allAttainments = await models.Attainment.findAll({
       where: {
         courseUnitId: {
-          [Op.in]: allCourseUnits[courseCode].map(({ id }) => id),
+          [Op.in]: allCourseUnits[courseCode].map(({ id }) => id)
         },
         personId: person.id,
         misregistration: false,
-        attainmentDate: { [Op.gt]: sub(new Date(), { years: 10 }) },
+        attainmentDate: { [Op.gt]: sub(new Date(), { years: 10 }) }
       },
-      raw: true,
+      raw: true
     })
     const attainmentsWithGrade = allAttainments.map(attainment => ({
       ...attainment,
-      grade: findGrade(gradeScales, attainment.gradeScaleId, attainment.gradeId),
+      grade: findGrade(gradeScales, attainment.gradeScaleId, attainment.gradeId)
     }))
 
     output.push({
       studentNumber,
       courseCode,
-      attainments: attainmentsWithGrade,
+      attainments: attainmentsWithGrade
     })
   }
   return res.send(output)
@@ -140,10 +140,10 @@ router.get('/attainments/:courseCode/:studentNumber', async (req, res) => {
 
   const { id: personId } = await models.Person.findOne({
     where: {
-      studentNumber,
+      studentNumber
     },
     attributes: ['id'],
-    raw: true,
+    raw: true
   })
 
   if (!personId) return res.status(400).send(`No person found with student number ${studentNumber}`)
@@ -153,20 +153,20 @@ router.get('/attainments/:courseCode/:studentNumber', async (req, res) => {
   const allAttainments = await models.Attainment.findAll({
     where: {
       courseUnitId: {
-        [Op.in]: allCourseUnits.map(({ id }) => id),
+        [Op.in]: allCourseUnits.map(({ id }) => id)
       },
       misregistration: false,
       attainmentDate: { [Op.gt]: sub(new Date(), { years: 10 }) },
-      personId,
+      personId
     },
-    raw: true,
+    raw: true
   })
 
   const gradeScales = await models.GradeScale.findAll({ raw: true })
 
   const data = allAttainments.map(attainment => ({
     ...attainment,
-    grade: findGrade(gradeScales, attainment.gradeScaleId, attainment.gradeId),
+    grade: findGrade(gradeScales, attainment.gradeScaleId, attainment.gradeId)
   }))
 
   return res.send(data)
@@ -186,9 +186,9 @@ router.post('/verify', async (req, res) => {
     where: {
       personId: { [Op.in]: data.map(({ personId }) => personId) },
       attainmentDate: { [Op.gt]: sub(new Date(), { years: 10 }) },
-      misregistration: false,
+      misregistration: false
     },
-    raw: true,
+    raw: true
   })
 
   const output = data.map(entry => {
@@ -224,24 +224,24 @@ router.post('/enrolments', async (req, res) => {
   const enrolments = await models.Enrolment.findAll({
     where: {
       [Op.or]: data.map(({ personId, code }) => ({
-        [Op.and]: [{ personId }, { '$courseUnit.code$': code }, { state: 'ENROLLED' }],
-      })),
+        [Op.and]: [{ personId }, { '$courseUnit.code$': code }, { state: 'ENROLLED' }]
+      }))
     },
     include: [
       {
         model: models.AssessmentItem,
         as: 'assessmentItem',
-        attributes: ['credits', 'gradeScaleId', 'autoId'],
+        attributes: ['credits', 'gradeScaleId', 'autoId']
       },
       {
         model: models.CourseUnitRealisation,
         as: 'courseUnitRealisation',
-        attributes: ['activityPeriod', 'name'],
+        attributes: ['activityPeriod', 'name']
       },
-      { model: models.CourseUnit, as: 'courseUnit', attributes: ['credits', 'gradeScaleId', 'code'] },
+      { model: models.CourseUnit, as: 'courseUnit', attributes: ['credits', 'gradeScaleId', 'code'] }
     ],
     raw: true,
-    nest: true,
+    nest: true
   })
   const output = enrolments
     // Sort by assessment item autoId to get the most recent snapshot of enrolment
@@ -252,7 +252,7 @@ router.post('/enrolments', async (req, res) => {
         acc.push({
           personId: e.personId,
           code: e.courseUnit.code,
-          enrolments: [e],
+          enrolments: [e]
         })
       else item.enrolments.push(e)
       return acc
@@ -273,7 +273,7 @@ router.post('/acceptors', async (req, res) => {
   if (!Array.isArray(data)) return res.status(400).send({ error: 'Input should be an array' })
   const realisations = await models.CourseUnitRealisation.findAll({
     where: { id: { [Op.in]: data } },
-    raw: true,
+    raw: true
   })
   if (!realisations.length) return res.status(404).send('Realisation not found')
 
@@ -286,7 +286,7 @@ router.post('/acceptors', async (req, res) => {
       )
       .map(({ personId }) => ({
         roleUrn: 'urn:code:attainment-acceptor-type:approved-by',
-        personId,
+        personId
       }))
     return acc
   }, {})
@@ -298,7 +298,7 @@ router.post('/acceptors/course-unit', async (req, res) => {
   if (!Array.isArray(data)) return res.status(400).send({ error: 'Input should be an array' })
   const courseUnits = await models.CourseUnit.findAll({
     where: { id: data },
-    raw: true,
+    raw: true
   })
   if (!courseUnits.length) return res.status(404).send('No course units found')
 
@@ -307,7 +307,7 @@ router.post('/acceptors/course-unit', async (req, res) => {
       .filter(({ roleUrn }) => roleUrn === 'urn:code:module-responsibility-info-type:responsible-teacher')
       .map(({ personId }) => ({
         roleUrn: 'urn:code:attainment-acceptor-type:approved-by',
-        personId,
+        personId
       }))
     return acc
   }, {})
@@ -326,26 +326,26 @@ router.post('/resolve_user', async (req, res) => {
     attributes: ['assessmentItemIds'],
     where: {
       responsibilityInfos: {
-        [Op.contains]: [{ personId: user.id }],
+        [Op.contains]: [{ personId: user.id }]
       },
-      courseUnitRealisationTypeUrn: { [Op.iLike]: 'urn:code:course-unit-realisation-type:teaching-participation-%' },
+      courseUnitRealisationTypeUrn: { [Op.iLike]: 'urn:code:course-unit-realisation-type:teaching-participation-%' }
     },
-    raw: true,
+    raw: true
   })
 
   const assessmentItemIds = _.uniq(courseUnitRealisations.map(cur => cur.assessmentItemIds).flat())
 
   const assessmentItems = await models.AssessmentItem.findAll({
     where: {
-      id: { [Op.in]: assessmentItemIds },
+      id: { [Op.in]: assessmentItemIds }
     },
     include: [
       {
         model: models.CourseUnit,
-        as: 'courseUnit',
-      },
+        as: 'courseUnit'
+      }
     ],
-    raw: true,
+    raw: true
   })
   const codes = _.uniq(assessmentItems.map(a => a['courseUnit.code']))
 
@@ -360,12 +360,12 @@ router.get('/responsibles/:courseCode', async (req, res) => {
   const groupIds = _.uniq(courseUnits.map(({ groupId }) => groupId))
   const assessmentItems = await models.AssessmentItem.findAll({
     where: {
-      primaryCourseUnitGroupId: { [Op.in]: groupIds },
+      primaryCourseUnitGroupId: { [Op.in]: groupIds }
     },
-    attributes: ['id'],
+    attributes: ['id']
   })
   const courseUnitRealisations = await models.CourseUnitRealisation.scope([
-    { method: ['assessmentItemIdsOverlap', assessmentItems.map(({ id }) => id)] },
+    { method: ['assessmentItemIdsOverlap', assessmentItems.map(({ id }) => id)] }
   ]).findAll({ raw: true, attributes: ['responsibilityInfos'] })
 
   const persons = await models.Person.findAll({
@@ -373,9 +373,9 @@ router.get('/responsibles/:courseCode', async (req, res) => {
       id: {
         [Op.in]: _.uniq(
           courseUnitRealisations.map(({ responsibilityInfos }) => responsibilityInfos.map(r => r.personId)).flat()
-        ),
-      },
-    },
+        )
+      }
+    }
   })
   const personsById = persons.reduce((acc, p) => {
     acc[p.id] = p
@@ -403,10 +403,10 @@ router.post('/study-rights', async (req, res) => {
   const studyRights = await models.StudyRight.findAll({
     where: {
       id: data,
-      documentState: 'ACTIVE',
+      documentState: 'ACTIVE'
     },
     attributes: ['id', 'personId', 'valid', 'snapshotDateTime', 'grantDate'],
-    raw: true,
+    raw: true
   })
   const studyRightsById = _.groupBy(studyRights, 'id')
   const activeSnapshots = Object.keys(studyRightsById)
@@ -428,7 +428,7 @@ router.post('/study-rights-by-person', async (req, res) => {
     attributes: ['id', 'personId', 'valid', 'snapshotDateTime', 'grantDate'],
     include: [{ model: models.Organisation, attributes: ['code'] }, { model: models.TermRegistrations }],
     nest: true,
-    raw: true,
+    raw: true
   })
 
   const studyRightsById = _.groupBy(studyRights, 'id')
@@ -450,9 +450,9 @@ router.get('/study-right/:id', async (req, res) => {
   const studyRights = await models.StudyRight.findAll({
     where: {
       id,
-      documentState: 'ACTIVE',
+      documentState: 'ACTIVE'
     },
-    raw: true,
+    raw: true
   })
 
   const out = studyRights.filter(r => r.snapshotDateTime)
@@ -469,10 +469,10 @@ router.get('/:code/course-units', async (req, res) => {
   return res.send(
     await models.CourseUnit.findAll({
       where: {
-        code,
+        code
       },
       attributes: ['id', 'name', 'validityPeriod'],
-      raw: true,
+      raw: true
     })
   )
 })
@@ -482,10 +482,10 @@ router.post('/course-unit-ids', async (req, res) => {
   if (!Array.isArray(code)) return res.status(400).send({ error: 'Input should be an array' })
   const units = await models.CourseUnit.findAll({
     where: {
-      code,
+      code
     },
     attributes: ['id', 'name', 'validityPeriod', 'code'],
-    raw: true,
+    raw: true
   })
   return res.send(_.groupBy(units, 'code'))
 })
@@ -497,19 +497,19 @@ router.get('/course-unit-enrolments/:code/', async (req, res) => {
   const assessmentItems = await models.AssessmentItem.findAll({
     where: { primaryCourseUnitGroupId: groupIds },
     attributes: ['id', 'gradeScaleId'],
-    raw: true,
+    raw: true
   })
   const courseUnitRealisations = await models.CourseUnitRealisation.scope([
-    { method: ['assessmentItemIdsOverlap', assessmentItems.map(({ id }) => id)] },
+    { method: ['assessmentItemIdsOverlap', assessmentItems.map(({ id }) => id)] }
   ]).findAll({ raw: true, attributes: ['name', 'id', 'activityPeriod', 'assessmentItemIds'] })
   const enrollments = await models.Enrolment.findAll({
     where: {
       courseUnitRealisationId: courseUnitRealisations.map(({ id }) => id),
-      state: 'ENROLLED',
+      state: 'ENROLLED'
     },
     include: [{ model: models.Person, attributes: ['studentNumber', 'firstNames', 'lastName'] }],
     raw: true,
-    nest: true,
+    nest: true
   })
   const grouped = _.groupBy(enrollments, 'courseUnitRealisationId')
   return res.send(
@@ -521,7 +521,7 @@ router.get('/course-unit-enrolments/:code/', async (req, res) => {
         name,
         id,
         activityPeriod,
-        gradeScaleId,
+        gradeScaleId
       }
     })
   )
@@ -550,7 +550,7 @@ const getCourseUnits = async (code, noSubstitutions = false) => {
   const courseUnits = await models.CourseUnit.findAll({
     where: { code },
     attributes: ['groupId', 'substitutions'],
-    raw: true,
+    raw: true
   })
   if (!courseUnits.length) return []
 
@@ -562,16 +562,16 @@ const getCourseUnits = async (code, noSubstitutions = false) => {
         .map(c => c.groupId)
         .concat(courseUnits.map(c => c.substitutions.map(sub => sub[0].courseUnitGroupId)))
         .flat()
-    ),
+    )
   ]
   return (
     (await models.CourseUnit.findAll({
       where: {
         groupId: {
-          [Op.in]: groupIds,
-        },
+          [Op.in]: groupIds
+        }
       },
-      raw: true,
+      raw: true
     })) || []
   )
 }
@@ -584,7 +584,7 @@ const getAllCourseUnits = async (codes, noSubstitutions = false) => {
   const courseUnits = await models.CourseUnit.findAll({
     where: { code: { [Op.in]: codes } },
     attributes: ['groupId', 'substitutions', 'code', 'id'],
-    raw: true,
+    raw: true
   })
   if (!courseUnits.length) return []
   if (noSubstitutions)
@@ -600,7 +600,7 @@ const getAllCourseUnits = async (codes, noSubstitutions = false) => {
         .map(c => c.groupId)
         .concat(courseUnits.map(c => c.substitutions.map(sub => sub[0].courseUnitGroupId)))
         .flat()
-    ),
+    )
   ]
 
   // All course units
@@ -608,10 +608,10 @@ const getAllCourseUnits = async (codes, noSubstitutions = false) => {
     (await models.CourseUnit.findAll({
       where: {
         groupId: {
-          [Op.in]: groupIds,
-        },
+          [Op.in]: groupIds
+        }
       },
-      raw: true,
+      raw: true
     })) || []
 
   // Group ids, including substitutions  by course code

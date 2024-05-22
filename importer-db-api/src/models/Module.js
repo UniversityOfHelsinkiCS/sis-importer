@@ -36,7 +36,7 @@ const moduleResolver = async (rule, n) => {
     await Module.findAll({
       limit: 1,
       where: { group_id: id },
-      order: [['curriculum_period_ids', 'DESC']],
+      order: [['curriculum_period_ids', 'DESC']]
     })
   )[0]
 
@@ -58,7 +58,7 @@ const moduleResolver = async (rule, n) => {
 
   return {
     name: mod.name,
-    type: 'unknown',
+    type: 'unknown'
   }
 }
 
@@ -71,8 +71,8 @@ const courseResolver = async rule => {
   const id = rule.courseUnitGroupId
   const course = await CourseUnit.findOne({
     where: {
-      group_id: id,
-    },
+      group_id: id
+    }
   })
 
   if (!course) {
@@ -84,7 +84,7 @@ const courseResolver = async rule => {
     courseUnitId: course.id,
     code: course.code,
     name: course.name,
-    type: 'course',
+    type: 'course'
   }
 }
 
@@ -112,7 +112,7 @@ const resolver = async (rule, n) => {
 
   return {
     type: rule.type,
-    fact: 'Unhandled rule',
+    fact: 'Unhandled rule'
   }
 }
 
@@ -129,7 +129,7 @@ class Module extends Model {
         id: module.id,
         code: module.code,
         name: module.name,
-        type: module.type,
+        type: module.type
       }
 
       if (module.type === 'course') courses[module.code] = newModule
@@ -148,7 +148,7 @@ class Module extends Model {
     return Object.values(courses).map(course => ({
       id: course.id,
       code: course.code,
-      name: course.name,
+      name: course.name
     }))
   }
 }
@@ -157,77 +157,77 @@ Module.init(
   {
     id: {
       type: STRING,
-      primaryKey: true,
+      primaryKey: true
     },
     universityOrgIds: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     groupId: {
-      type: STRING,
+      type: STRING
     },
     moduleContentApprovalRequired: {
-      type: BOOLEAN,
+      type: BOOLEAN
     },
     code: {
-      type: STRING,
+      type: STRING
     },
     targetCredits: {
-      type: JSONB,
+      type: JSONB
     },
     curriculumPeriodIds: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     approvalState: {
-      type: STRING,
+      type: STRING
     },
     validityPeriod: {
-      type: JSONB,
+      type: JSONB
     },
     contentDescription: {
-      type: JSONB,
+      type: JSONB
     },
     responsibilityInfos: {
-      type: JSONB,
+      type: JSONB
     },
     organisations: {
-      type: JSONB,
+      type: JSONB
     },
     name: {
-      type: JSONB,
+      type: JSONB
     },
     studyLevel: {
-      type: STRING,
+      type: STRING
     },
     possibleAttainmentLanguages: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     studyFields: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     graded: {
-      type: BOOLEAN,
+      type: BOOLEAN
     },
     gradeScaleId: {
-      type: STRING,
+      type: STRING
     },
     studyRightSelectionType: {
-      type: STRING,
+      type: STRING
     },
     minorStudyRightAcceptanceType: {
-      type: STRING,
+      type: STRING
     },
     type: {
-      type: STRING,
+      type: STRING
     },
     rule: {
-      type: JSONB,
+      type: JSONB
     },
     createdAt: {
-      type: DATE,
+      type: DATE
     },
     updatedAt: {
-      type: DATE,
-    },
+      type: DATE
+    }
   },
   {
     underscored: true,
@@ -236,9 +236,9 @@ Module.init(
     tableName: 'modules',
     indexes: [
       {
-        fields: ['group_id'],
-      },
-    ],
+        fields: ['group_id']
+      }
+    ]
   }
 )
 

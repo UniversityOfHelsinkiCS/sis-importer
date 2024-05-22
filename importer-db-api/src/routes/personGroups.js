@@ -18,14 +18,14 @@ const getHeaders = () => {
 const agent = hasCerts
   ? new https.Agent({
       cert: fs.readFileSync(OODIKONE_CERT_PATH, 'utf8'),
-      key: fs.readFileSync(OODIKONE_KEY_PATH, 'utf8'),
+      key: fs.readFileSync(OODIKONE_KEY_PATH, 'utf8')
     })
   : new https.Agent()
 
 const sisApi = axios.create({
   baseURL: SIS_API_URL,
   headers: getHeaders(),
-  httpsAgent: agent,
+  httpsAgent: agent
 })
 
 router.get('/:id/memberships', async (req, res) => {
@@ -39,9 +39,9 @@ router.get('/person/:personId', async (req, res) => {
 
   const groups = await models.PersonGroup.findAll({
     where: {
-      type: 'TUTORING_STUDENT_GROUP',
+      type: 'TUTORING_STUDENT_GROUP'
     },
-    raw: true,
+    raw: true
   })
   const groupsForPerson = groups.filter(group =>
     group.responsibilityInfos.some(

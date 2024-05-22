@@ -11,7 +11,7 @@ class SisGraphqlClient {
 
     return {
       ...normalizedOptions,
-      params: { ...(this.token && { token: this.token }), ...params },
+      params: { ...(this.token && { token: this.token }), ...params }
     }
   }
 
@@ -19,7 +19,7 @@ class SisGraphqlClient {
     const path = ''
     const payload = {
       query,
-      variables,
+      variables
     }
     const options = this.getAuthorizedRequestOptions()
 

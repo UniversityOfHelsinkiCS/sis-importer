@@ -7,7 +7,7 @@ const relevantAttributes = {
     'courseUnitRealisationId',
     'courseUnitId',
     'confirmedStudySubGroupIds',
-    'documentState',
+    'documentState'
   ],
   courseUnit: [
     'id',
@@ -17,7 +17,7 @@ const relevantAttributes = {
     'completionMethods',
     'responsibilityInfos',
     'name',
-    'validityPeriod',
+    'validityPeriod'
   ],
   courseUnitRealisation: [
     'id',
@@ -30,7 +30,7 @@ const relevantAttributes = {
     'studyGroupSets',
     'organisations',
     'responsibilityInfos',
-    'customCodeUrns',
+    'customCodeUrns'
   ],
   assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],
   person: [
@@ -43,9 +43,9 @@ const relevantAttributes = {
     'callName',
     'primaryEmail',
     'secondaryEmail',
-    'preferredLanguageUrn',
+    'preferredLanguageUrn'
   ],
-  organisation: ['id', 'code', 'name', 'parentId'],
+  organisation: ['id', 'code', 'name', 'parentId']
 }
 
 const validRealisationTypes = [
@@ -61,7 +61,7 @@ const validRealisationTypes = [
   'urn:code:course-unit-realisation-type:teaching-participation-blended',
   'urn:code:course-unit-realisation-type:teaching-participation-contact',
   'urn:code:course-unit-realisation-type:teaching-participation-distance',
-  'urn:code:course-unit-realisation-type:training-training',
+  'urn:code:course-unit-realisation-type:training-training'
 ]
 
 const validEducations = [
@@ -71,11 +71,11 @@ const validEducations = [
   'urn:code:education-type:degree-education:masters-degree',
   'urn:code:education-type:degree-education',
   'urn:code:education-type:degree-education:doctor',
-  'urn:code:education-type:degree-education:bachelors-degree',
+  'urn:code:education-type:degree-education:bachelors-degree'
 ]
 
 module.exports = {
   relevantAttributes,
   validRealisationTypes,
-  validEducations,
+  validEducations
 }

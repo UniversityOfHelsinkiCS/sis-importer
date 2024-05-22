@@ -7,26 +7,26 @@ GradeScale.init(
   {
     id: {
       primaryKey: true,
-      type: STRING,
+      type: STRING
     },
     grades: {
-      type: JSONB,
+      type: JSONB
     },
     name: {
-      type: JSONB,
+      type: JSONB
     },
     createdAt: {
-      type: DATE,
+      type: DATE
     },
     updatedAt: {
-      type: DATE,
-    },
+      type: DATE
+    }
   },
   {
     underscored: true,
     sequelize: sequelize,
     modelName: 'grade_scale',
-    tableName: 'grade_scales',
+    tableName: 'grade_scales'
   }
 )
 

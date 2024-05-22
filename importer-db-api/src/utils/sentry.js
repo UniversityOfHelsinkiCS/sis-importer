@@ -7,7 +7,7 @@ const initializeSentry = app => {
   Sentry.init({
     dsn: 'https://eacaccbb66a62f268b3241ddc4da8519@toska.cs.helsinki.fi/9',
     integrations: [new Sentry.Integrations.Http({ tracing: true }), new Tracing.Integrations.Express({ app })],
-    tracesSampleRate: 1.0,
+    tracesSampleRate: 1.0
   })
 }
 

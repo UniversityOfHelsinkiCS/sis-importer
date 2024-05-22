@@ -7,27 +7,27 @@ TermRegistration.init(
   {
     studyRightId: {
       primaryKey: true,
-      type: STRING,
+      type: STRING
     },
     studentId: {
       primaryKey: true,
-      type: STRING,
+      type: STRING
     },
     termRegistrations: {
-      type: JSONB,
+      type: JSONB
     },
     createdAt: {
-      type: DATE,
+      type: DATE
     },
     updatedAt: {
-      type: DATE,
-    },
+      type: DATE
+    }
   },
   {
     underscored: true,
     sequelize: sequelize,
     modelName: 'term_registration',
-    tableName: 'term_registrations',
+    tableName: 'term_registrations'
   }
 )
 

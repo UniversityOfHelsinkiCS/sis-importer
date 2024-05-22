@@ -7,53 +7,53 @@ Education.init(
   {
     id: {
       type: STRING,
-      primaryKey: true,
+      primaryKey: true
     },
     groupId: {
-      type: STRING,
+      type: STRING
     },
     name: {
-      type: JSONB,
+      type: JSONB
     },
     code: {
-      type: STRING,
+      type: STRING
     },
     educationType: {
-      type: STRING,
+      type: STRING
     },
     validityPeriod: {
-      type: JSONB,
+      type: JSONB
     },
     organisations: {
-      type: JSONB,
+      type: JSONB
     },
     universityOrgIds: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     attainmentLanguages: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     structure: {
-      type: JSONB,
+      type: JSONB
     },
     studyFields: {
-      type: ARRAY(STRING),
+      type: ARRAY(STRING)
     },
     responsibilityInfos: {
-      type: JSONB,
+      type: JSONB
     },
     createdAt: {
-      type: DATE,
+      type: DATE
     },
     updatedAt: {
-      type: DATE,
-    },
+      type: DATE
+    }
   },
   {
     underscored: true,
     sequelize: sequelize,
     modelName: 'education',
-    tableName: 'educations',
+    tableName: 'educations'
   }
 )
 

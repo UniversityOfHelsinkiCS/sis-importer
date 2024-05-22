@@ -13,17 +13,17 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
     attributes: relevantAttributes.assessmentItem,
     where: {
       id: {
-        [Op.in]: assessmentItemIds,
-      },
+        [Op.in]: assessmentItemIds
+      }
     },
     include: [
       {
         model: models.CourseUnit,
         attributes: relevantAttributes.courseUnit,
         as: 'courseUnit',
-        required: true,
-      },
-    ],
+        required: true
+      }
+    ]
   })
   const assessmentItems = assessmentItemsWithCrap.filter(aItem => {
     if (!aItem.courseUnit) return false
@@ -64,7 +64,7 @@ updaterRouter.get('/persons', async (req, res) => {
     return res.send({
       waitAndRetry: true,
       message: 'Person study rights view is being refreshed',
-      waitTime: 10_000,
+      waitTime: 10_000
     })
   }
 
@@ -78,10 +78,10 @@ updaterRouter.get('/persons', async (req, res) => {
     {
       replacements: {
         limit,
-        offset,
+        offset
       },
       mapToModel: true,
-      model: models.Person,
+      model: models.Person
     }
   )
 
@@ -99,12 +99,12 @@ updaterRouter.get('/organisations', async (req, res) => {
         // Only latest snapshot
         models.Organisation.sequelize.literal(
           '(id, snapshot_date_time) in (select id, max(snapshot_date_time) from organisations group by id)'
-        ),
-      ],
+        )
+      ]
     },
     limit,
     offset,
-    order: [['id', 'DESC']],
+    order: [['id', 'DESC']]
   })
 
   res.send(organisations)
@@ -120,17 +120,17 @@ updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res
   }
 
   const courseUnitRealisations = await models.CourseUnitRealisation.scope({
-    method: ['activityPeriodEndDateAfter', since],
+    method: ['activityPeriodEndDateAfter', since]
   }).findAll({
     where: {
       courseUnitRealisationTypeUrn: {
-        [Op.in]: validRealisationTypes,
-      },
+        [Op.in]: validRealisationTypes
+      }
     },
     attributes: relevantAttributes.courseUnitRealisation,
     limit,
     offset,
-    order: [['id', 'DESC']],
+    order: [['id', 'DESC']]
   })
 
   const courseUnitRealisationsWithCourseUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
@@ -144,7 +144,7 @@ updaterRouter.get('/course_unit_realisation_with_course_unit/:id', async (req, r
   if (!id) return res.sendStatus(400)
 
   const courseUnitRealisation = await models.CourseUnitRealisation.findByPk(id, {
-    attributes: relevantAttributes.courseUnitRealisation,
+    attributes: relevantAttributes.courseUnitRealisation
   })
 
   if (!courseUnitRealisation) return res.sendStatus(404)
@@ -169,23 +169,23 @@ updaterRouter.get('/deleted-enrolments', async (req, res) => {
   const enrolments = await models.Enrolment.unscoped().findAll({
     where: {
       enrolmentDateTime: {
-        [Op.gte]: since,
+        [Op.gte]: since
       },
       [Op.or]: [
         {
           [Op.not]: {
-            state: 'ENROLLED',
-          },
+            state: 'ENROLLED'
+          }
         },
         {
-          documentState: 'DELETED',
-        },
-      ],
+          documentState: 'DELETED'
+        }
+      ]
     },
     attributes: relevantAttributes.enrolment,
     limit,
     offset,
-    order: [['id', 'DESC']],
+    order: [['id', 'DESC']]
   })
 
   res.send(enrolments)
@@ -206,14 +206,14 @@ updaterRouter.get('/enrolments', async (req, res) => {
   const enrolments = await models.Enrolment.findAll({
     where: {
       enrolmentDateTime: {
-        [Op.gte]: since,
+        [Op.gte]: since
       },
-      state: 'ENROLLED',
+      state: 'ENROLLED'
     },
     attributes: relevantAttributes.enrolment,
     limit,
     offset,
-    order: [['id', 'DESC']],
+    order: [['id', 'DESC']]
   })
 
   res.send(enrolments)
@@ -226,10 +226,10 @@ updaterRouter.get('/enrolments/:courseRealisationId', async (req, res) => {
   const enrolments = await models.Enrolment.findAll({
     where: {
       state: 'ENROLLED',
-      courseUnitRealisationId: id,
+      courseUnitRealisationId: id
     },
     attributes: relevantAttributes.enrolment,
-    order: [['id', 'DESC']],
+    order: [['id', 'DESC']]
   })
 
   if (!enrolments?.length > 0) {
@@ -249,11 +249,11 @@ updaterRouter.get('/enrolments-new', async (req, res) => {
     where: {
       state: 'ENROLLED',
       enrolmentDateTime: {
-        [Op.gte]: since,
-      },
+        [Op.gte]: since
+      }
     },
     attributes: relevantAttributes.enrolment,
-    order: [['id', 'DESC']],
+    order: [['id', 'DESC']]
   })
 
   res.send(enrolments)

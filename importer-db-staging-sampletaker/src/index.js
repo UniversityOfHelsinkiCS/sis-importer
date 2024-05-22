@@ -25,7 +25,7 @@ const getIdsOfStudentsOfProgramme = async ({ educationId, organisationId }) => {
       .where('studyrights.education_id', educationId)
       .andWhere(builder => builder.whereNotNull('persons.student_number', 'persons.first_names', 'persons.last_name'))
       .andWhereRaw("cast(studyrights.valid->>'startDate' as date) >= ?", new Date(startDateForNewProgrammes))
-      .andWhereRaw(`attainments.organisations @> '[{\"organisationId\": \"${organisationId}\"}]'`)
+      .andWhereRaw(`attainments.organisations @> '[{"organisationId": "${organisationId}"}]'`)
       .distinctOn('persons.student_number')
   ).map(({ id }) => id)
 }
@@ -34,27 +34,27 @@ const getIdsOfSuitableStudentsFromTestDb = async () => {
   // Bachelor's Programme in Computer Science
   const KH50_005 = {
     educationId: 'hy-EDU-114256325-2017',
-    organisationId: 'hy-org-116716376',
+    organisationId: 'hy-org-116716376'
   }
 
   // Degree Programme in Medicine
   const MH30_001 = {
     educationId: 'hy-EDU-114256791-2017',
-    organisationId: 'hy-org-116719396',
+    organisationId: 'hy-org-116719396'
   }
 
   // Bachelor's Programme in Education
   const KH60_001 = {
     educationId: 'hy-EDU-114257576-2017',
-    organisationId: 'hy-org-116715340',
+    organisationId: 'hy-org-116715340'
   }
 
   return [
     ...new Set([
       ...(await getIdsOfStudentsOfProgramme(KH50_005)),
       ...(await getIdsOfStudentsOfProgramme(MH30_001)),
-      ...(await getIdsOfStudentsOfProgramme(KH60_001)),
-    ]),
+      ...(await getIdsOfStudentsOfProgramme(KH60_001))
+    ])
   ]
 }
 
@@ -126,7 +126,7 @@ const removeAttainmentRelatedData = async students => {
       'id',
       relevantCourseUnitRealisations.map(({ id }) => id)
     ),
-    removeStuff('enrolments', 'person_id', students),
+    removeStuff('enrolments', 'person_id', students)
   ])
   const personIdsOfRelevantTeachers = (
     await knex
@@ -158,7 +158,7 @@ const removeStudyrightRelatedData = async students => {
     ),
     removeStuff('studyrights', 'person_id', students),
     removeStuff('study_right_primalities', 'student_id', students),
-    removeStuff('term_registrations', 'student_id', students),
+    removeStuff('term_registrations', 'student_id', students)
   ])
 }
 

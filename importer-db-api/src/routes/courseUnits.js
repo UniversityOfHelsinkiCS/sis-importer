@@ -22,9 +22,9 @@ router.get('/', async (req, res) => {
   const courseUnits = await models.CourseUnit.findAll({
     where: {
       code: {
-        [Op.in]: codes,
-      },
-    },
+        [Op.in]: codes
+      }
+    }
   })
 
   res.send(courseUnits)
@@ -36,8 +36,8 @@ router.get('/programme/:programmeCode', async (req, res) => {
 
   const organisation = await models.Organisation.findOne({
     where: {
-      code: programmeCode,
-    },
+      code: programmeCode
+    }
   })
 
   if (!organisation) return res.status(404).send('No such organization, use different code e.g. 500-K005')
@@ -48,7 +48,7 @@ router.get('/programme/:programmeCode', async (req, res) => {
     name: unit.name,
     validityPeriod: unit.validityPeriod,
     groupId: unit.groupId,
-    credits: unit.credits,
+    credits: unit.credits
   }))
 
   const searchString = query.search || ''

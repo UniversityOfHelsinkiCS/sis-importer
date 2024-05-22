@@ -7,26 +7,26 @@ StudyYear.init(
   {
     startYear: {
       primaryKey: true,
-      type: INTEGER,
+      type: INTEGER
     },
     name: {
-      type: STRING,
+      type: STRING
     },
     valid: {
-      type: JSONB,
+      type: JSONB
     },
     org: {
-      type: STRING,
+      type: STRING
     },
     studyTerms: {
-      type: JSONB,
+      type: JSONB
     },
     createdAt: {
-      type: DATE,
+      type: DATE
     },
     updatedAt: {
-      type: DATE,
-    },
+      type: DATE
+    }
   },
   {
     underscored: true,
@@ -35,9 +35,9 @@ StudyYear.init(
     tableName: 'study_years',
     indexes: [
       {
-        fields: ['org'],
-      },
-    ],
+        fields: ['org']
+      }
+    ]
   }
 )
 

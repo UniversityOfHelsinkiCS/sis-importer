@@ -13,7 +13,7 @@ class ApplicationError extends ExtendableError {
     return {
       message: this.message,
       properties: this.properties,
-      status: this.status,
+      status: this.status
     }
   }
 }
@@ -33,5 +33,5 @@ class UserInputError extends ApplicationError {
 module.exports = {
   ApplicationError,
   NotFoundError,
-  UserInputError,
+  UserInputError
 }
