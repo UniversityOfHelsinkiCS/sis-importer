@@ -2,6 +2,7 @@ const express = require('express')
 const { Op } = require('sequelize')
 const { addMonths } = require('date-fns')
 const models = require('../models/index.js')
+const logger = require('../utils/logger.js')
 
 const router = express.Router()
 
@@ -106,7 +107,7 @@ router.get('/courses/:personId', async (req, res) => {
 
   const courseStartTreshold = addMonths(new Date(), timeTillCourseStart)
 
-  console.log(courseStartTreshold)
+  logger.info(courseStartTreshold)
 
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     attributes: relevantAttributes.courseUnitRealisation,

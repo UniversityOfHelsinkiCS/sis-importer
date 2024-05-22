@@ -105,7 +105,7 @@ CourseUnitRealisation.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'course_unit_realisation',
     tableName: 'course_unit_realisations',
     scopes

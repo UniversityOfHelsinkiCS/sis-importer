@@ -111,7 +111,7 @@ Attainment.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'attainment',
     tableName: 'attainments',
     indexes: [

@@ -69,7 +69,7 @@ Person.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'person',
     tableName: 'persons'
   }

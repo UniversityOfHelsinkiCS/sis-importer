@@ -115,7 +115,7 @@ updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res
   if (!limit || !offset) return res.sendStatus(400)
 
   let since = new Date(sinceRaw)
-  if (!sinceRaw || since == 'Invalid Date') {
+  if (!sinceRaw || since === 'Invalid Date') {
     since = defaultSince
   }
 
@@ -162,7 +162,7 @@ updaterRouter.get('/deleted-enrolments', async (req, res) => {
   if (!limit || !offset) return res.sendStatus(400)
 
   let since = new Date(sinceRaw)
-  if (!sinceRaw || since == 'Invalid Date') {
+  if (!sinceRaw || since === 'Invalid Date') {
     since = defaultSince
   }
 
@@ -199,7 +199,7 @@ updaterRouter.get('/enrolments', async (req, res) => {
   if (!limit || !offset) return res.sendStatus(400)
 
   let since = new Date(sinceRaw)
-  if (!sinceRaw || since == 'Invalid Date') {
+  if (!sinceRaw || since === 'Invalid Date') {
     since = defaultSince
   }
 
@@ -242,7 +242,7 @@ updaterRouter.get('/enrolments/:courseRealisationId', async (req, res) => {
 updaterRouter.get('/enrolments-new', async (req, res) => {
   const { since: sinceRaw } = req.query
   const since = new Date(sinceRaw)
-  if (!sinceRaw || since == 'Invalid Date') {
+  if (!sinceRaw || since === 'Invalid Date') {
     return res.status(400).send({ message: 'Missing or invalid query parameter since' })
   }
   const enrolments = await models.Enrolment.findAll({

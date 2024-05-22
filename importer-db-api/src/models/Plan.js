@@ -48,7 +48,7 @@ Plan.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'plan',
     tableName: 'plans'
   }

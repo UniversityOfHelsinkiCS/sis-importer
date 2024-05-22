@@ -25,7 +25,7 @@ TermRegistration.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'term_registration',
     tableName: 'term_registrations'
   }

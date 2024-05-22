@@ -9,12 +9,12 @@ const retry = async (func, params, attempts = 6) => {
       return res
     } catch (err) {
       if (i === attempts) {
-        logger.error({ message: `Calling function failed`, meta: err.stack })
+        logger.error({ message: 'Calling function failed', meta: err.stack })
         throw err
       }
       if (err.response.status === 403) {
         // Forbidden. We won't have access by bashing our head against it
-        logger.error({ message: `Forbidden endpoint`, meta: err.stack })
+        logger.error({ message: 'Forbidden endpoint', meta: err.stack })
 
         throw err
       }

@@ -23,7 +23,11 @@ const reportProgress = (rates, latestOrdinal) => {
 
 const loopEntities = entity => {
   // if (entity.metadata.modificationOrdinal !== 0000) return false
-  if (entity.id == 'hy-CU-135279835-2021-08-01' || entity.code == 'DENT-206' || entity.groupId == 'hy-CU-135279835') {
+  if (
+    entity.id === 'hy-CU-135279835-2021-08-01' ||
+    entity.code === 'DENT-206' ||
+    entity.groupId === 'hy-CU-135279835'
+  ) {
     return true
   }
   return false
@@ -33,7 +37,7 @@ const main = async () => {
   await apiHealthCheck()
   let currentOrdinal = START_ORDINAL
   let hasMore = true
-  let limit = CHUNK_SIZE
+  const limit = CHUNK_SIZE
 
   let entities = []
   let dataIWasLookingFor = []

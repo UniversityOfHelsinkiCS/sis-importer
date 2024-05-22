@@ -4,7 +4,7 @@ const ONE_MB = 1048576 // also default limit in stan
 const SIZE_LIMIT = ONE_MB * 0.9
 
 module.exports = (entities, maxChunkSize) => {
-  let chunkified = []
+  const chunkified = []
   let currentChunk = []
   let chunkSizeNow = 0
 

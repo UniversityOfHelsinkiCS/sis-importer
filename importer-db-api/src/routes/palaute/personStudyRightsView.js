@@ -1,4 +1,5 @@
 const { sequelize } = require('../../config/db')
+const logger = require('../../utils/logger')
 const { validEducations } = require('./config')
 
 const VIEW_EXPIRATION_TIME = 1000 * 60 * 60 * 6 // 6 hours
@@ -17,7 +18,7 @@ const isExpired = () => {
 let state = 'idle'
 
 const createPersonStudyRightsView = async () => {
-  console.log('Creating person study rights view...')
+  logger.info('Creating person study rights view...')
   state = 'creating'
 
   await sequelize.query(
@@ -54,7 +55,7 @@ const createPersonStudyRightsView = async () => {
 
 const refreshPersonStudyRightsView = async () => {
   state = 'refreshing'
-  console.log('Refreshing person study rights view...')
+  logger.info('Refreshing person study rights view...')
   await sequelize.query(`
     REFRESH MATERIALIZED VIEW person_study_rights_view;
   `)

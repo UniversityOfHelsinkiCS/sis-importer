@@ -2,6 +2,7 @@ const router = require('express').Router()
 const models = require('../models')
 const { Op, QueryTypes } = require('sequelize')
 const { sequelize } = require('../config/db')
+const logger = require('../utils/logger')
 
 const getEducationByIdForStudyright = async id => {
   try {
@@ -24,7 +25,7 @@ const getEducationByIdForStudyright = async id => {
 
     return education
   } catch (err) {
-    console.log(err)
+    logger.error(err)
     return { education: 'is missing from the database' }
   }
 }
@@ -94,7 +95,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
     }
     return res.json(mankeledStudyRights)
   } catch (e) {
-    console.log(e)
+    logger.error(e)
     res.status(500).json(e.toString())
   }
 })
@@ -124,11 +125,11 @@ router.get('/assessments', async (req, res) => {
       },
       raw: true
     })
-    console.log(`GOT ${realisations.length} realisations`)
+    logger.info(`GOT ${realisations.length} realisations`)
     const wat = realisations.filter(r => r.assessmentItemIds.length > 1)
     return res.send(wat)
   } catch (e) {
-    console.log(e)
+    logger.error(e)
     res.status(500).json(e.toString())
   }
 })
@@ -165,7 +166,7 @@ router.get('/:studentNumber/attainments', async (req, res) => {
       return res.send(attainmentsWithCourses.filter(a => a.courseUnit && a.courseUnit.code.includes(req.query.code)))
     return res.send(attainmentsWithCourses)
   } catch (e) {
-    console.log(e)
+    logger.error(e)
     res.status(500).json(e.toString())
   }
 })
@@ -201,7 +202,7 @@ router.get('/:studentNumber/enrollments', async (req, res) => {
     )
     return res.send(mankeled)
   } catch (e) {
-    console.log(e)
+    logger.error(e)
     res.status(500).json(e.toString())
   }
 })
@@ -222,7 +223,7 @@ router.get('/assessments/:code', async (req, res) => {
     })
     return res.send({ courseUnit, assessmentItems })
   } catch (e) {
-    console.log(e)
+    logger.error(e)
     res.status(500).json(e.toString())
   }
 })
@@ -240,7 +241,7 @@ router.get('/:studentNumber/missing', async (req, res) => {
     if (!student) return res.status(404).send('Student not found')
 
     if (cache[student.id]) {
-      console.log('Data from cache')
+      logger.info('Data from cache')
       return res.send(cache[student.id])
     }
 
@@ -256,7 +257,7 @@ router.get('/:studentNumber/missing', async (req, res) => {
     cache[student.id] = data
     return res.send(data)
   } catch (e) {
-    console.log(e)
+    logger.error(e)
     res.status(500).json(e.toString())
   }
 })
@@ -278,7 +279,7 @@ router.post('/missing', async (req, res) => {
       .filter(key => allPersonIds.includes(key))
       .map(key => cache[key])
       .flat(1)
-    console.log(`From cache ${output.length} items`)
+    logger.info(`From cache ${output.length} items`)
 
     const notCachedStudents = persons.filter(({ id }) => !(id in cache))
     const listOfStudents = notCachedStudents.map(({ id }) => `'${id}'`).join(', ')
@@ -299,7 +300,7 @@ router.post('/missing', async (req, res) => {
     })
     return res.send(output.concat(data))
   } catch (e) {
-    console.log(e)
+    logger.error(e)
     res.status(500).json(e.toString())
   }
 })
@@ -338,7 +339,7 @@ router.get('/possibleCoursesWithPartAttainments', async (req, res) => {
       ...courseUnit,
       completionMethods: courseUnit.completionMethods.find(m => !!re.exec(m.localId))
     }))
-  console.log('TOTAL', output.length)
+  logger.info('TOTAL', output.length)
   return res.send(output)
 })
 
@@ -395,7 +396,7 @@ router.post('/courseUnitsAndRealisations', async (req, res) => {
   const out = {}
   await Promise.all(
     req.body.map(async code => {
-      console.log('WHAT', code)
+      logger.info('WHAT', code)
       const courseUnits = await models.CourseUnit.findAll({
         where: { code },
         attributes: ['groupId', 'id'],

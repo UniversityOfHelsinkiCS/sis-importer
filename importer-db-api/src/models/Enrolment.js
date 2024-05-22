@@ -53,7 +53,7 @@ Enrolment.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'enrolment',
     tableName: 'enrolments',
     indexes: [

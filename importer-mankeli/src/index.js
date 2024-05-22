@@ -154,7 +154,7 @@ const handleMessage = (channel, msgHandler) => async msg => {
     transaction.commit()
     logger.info(`${data.executionHash} ${data.entities.length} ${channel}`)
   } catch (e) {
-    console.log(e)
+    logger.error(e)
     logger.error({ message: 'Handling message failed', meta: e.stack })
     response = { ...JSON.parse(msg.getData()), status: 'FAIL', amount: 0, channel, stack: e.stack }
     if (transaction) transaction.rollback()
@@ -172,7 +172,7 @@ stan.on('connect', async ({ clientID }) => {
   }
 
   if (connection.error) process.exit(1)
-  console.log(`Connected to NATS as ${clientID}...`)
+  logger.info(`Connected to NATS as ${clientID}...`)
 
   await onCurrentExecutionHashChange(hash => {
     if (!currentExecutionHash && hash) {
@@ -189,6 +189,6 @@ stan.on('connect', async ({ clientID }) => {
 })
 
 stan.on('error', e => {
-  console.log('NATS ERROR', e)
+  logger.error('NATS ERROR', e)
   process.exit(1)
 })

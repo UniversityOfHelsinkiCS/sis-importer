@@ -90,7 +90,7 @@ StudyRight.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'studyright',
     tableName: 'studyrights',
     indexes: [

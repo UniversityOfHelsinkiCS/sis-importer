@@ -86,7 +86,7 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
 
   if (!studyRights.length) return res.json([])
 
-  let result = []
+  const result = []
 
   for (const { id, valid, education, organisation } of studyRights) {
     // Most old studyrights dont have educations
@@ -193,7 +193,6 @@ router.get('/:studentNumber/acual_semester_enrollments', async (req, res) => {
   }).filter(r => !r.studyRightId.includes('hy-avoin-ew-sr'))
 
   const termsPerRight = studyrightTerms.reduce((set, { termRegistrations, studyRightId }) => {
-    console.log(JSON.stringify(termRegistrations), null, 2)
     const mankeled = termRegistrations.map(({ studyTerm, statutoryAbsence, termRegistrationType }) => {
       const semester_code =
         studyTerm.termIndex === 0
@@ -209,7 +208,6 @@ router.get('/:studentNumber/acual_semester_enrollments', async (req, res) => {
         termRegistrationType === 'NONATTENDING'
       ) {
         semester_enrollment_type_code = 2 // absent
-        console.log(termRegistrationType)
       }
 
       return {

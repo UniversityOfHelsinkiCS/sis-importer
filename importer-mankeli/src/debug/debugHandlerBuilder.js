@@ -2,7 +2,7 @@ const { logger } = require('../utils/logger')
 
 let counter = 5
 
-let interestingItems = []
+const interestingItems = []
 
 const debugPrinter = (channel, object) => {
   const string = `[DEBUGGER_${channel}] Item of interest found: \n${JSON.stringify(

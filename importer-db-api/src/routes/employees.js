@@ -2,6 +2,7 @@ const express = require('express')
 
 const models = require('../models')
 const { NotFoundError } = require('../errors')
+const logger = require('../utils/logger')
 
 const router = express.Router()
 
@@ -21,7 +22,7 @@ router.get('/:id', async (req, res) => {
 
     return res.send(employee)
   } catch (e) {
-    console.log(e)
+    logger.error(e)
     res.status(500).json(e.toString())
   }
 })

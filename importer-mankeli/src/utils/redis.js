@@ -2,6 +2,7 @@ const redis = require('redis')
 const redisLock = require('redis-lock')
 const { promisify } = require('util')
 const { CURRENT_EXECUTION_HASH } = require('../config')
+const { logger } = require('./logger')
 
 const redisRetry = ({ attempt, error }) => {
   if (attempt > 100) {
@@ -21,9 +22,9 @@ const client = redis.createClient({
   retry_strategy: redisRetry
 })
 
-client.on('connect', () => console.log('REDIS CONNECTED'))
-client.on('ready', () => console.log('REDIS READY'))
-client.on('error', () => console.log('REDIS ERROR'))
+client.on('connect', () => logger.info('REDIS CONNECTED'))
+client.on('ready', () => logger.info('REDIS READY'))
+client.on('error', () => logger.error('REDIS ERROR'))
 
 const lock = promisify(redisLock(client))
 

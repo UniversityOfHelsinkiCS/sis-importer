@@ -5,8 +5,8 @@ const models = require('../models')
 const fs = require('fs')
 const https = require('https')
 const _ = require('lodash')
-var sub = require('date-fns/sub')
-var isBefore = require('date-fns/isBefore')
+const sub = require('date-fns/sub')
+const isBefore = require('date-fns/isBefore')
 
 const logger = require('../utils/logger')
 

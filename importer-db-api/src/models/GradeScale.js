@@ -24,7 +24,7 @@ GradeScale.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'grade_scale',
     tableName: 'grade_scales'
   }

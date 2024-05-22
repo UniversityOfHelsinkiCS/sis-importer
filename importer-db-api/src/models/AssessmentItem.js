@@ -74,7 +74,7 @@ AssessmentItem.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'assessment_item',
     tableName: 'assessment_items',
     indexes: [

@@ -1,5 +1,5 @@
 const express = require('express')
-const logger = require('morgan')
+const morgan = require('morgan')
 const os = require('os')
 const Sentry = require('@sentry/node')
 require('express-async-errors')
@@ -23,6 +23,7 @@ const jamiRouter = require('./routes/jami')
 const { ApplicationError } = require('./errors')
 const initializeSentry = require('./utils/sentry')
 const { dbHealth } = require('./config/db')
+const logger = require('./utils/logger')
 
 const app = express()
 
@@ -31,7 +32,7 @@ initializeSentry(app)
 app.use(Sentry.Handlers.requestHandler())
 app.use(Sentry.Handlers.tracingHandler())
 
-app.use(logger('short'))
+app.use(morgan('short'))
 app.use(express.json({ limit: '50mb' }))
 
 app.get('/ping', (req, res) => {
@@ -72,7 +73,7 @@ app.get('/sandbox', () => {
 app.use(Sentry.Handlers.errorHandler())
 
 app.use((error, req, res, next) => {
-  console.log(error)
+  logger.error(error)
 
   const { originalUrl, method, query } = req
 

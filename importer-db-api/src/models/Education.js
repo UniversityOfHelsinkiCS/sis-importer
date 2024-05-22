@@ -51,7 +51,7 @@ Education.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'education',
     tableName: 'educations'
   }

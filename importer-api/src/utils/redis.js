@@ -1,4 +1,5 @@
 const redis = require('redis')
+const { logger } = require('./logger')
 
 const redisRetry = ({ attempt, error }) => {
   if (attempt > 100) {
@@ -13,9 +14,9 @@ const client = redis.createClient({
   retry_strategy: redisRetry
 })
 
-client.on('connect', () => console.log('REDIS CONNECTED'))
-client.on('ready', () => console.log('REDIS READY'))
-client.on('error', () => console.log('REDIS ERROR'))
+client.on('connect', () => logger.info('REDIS CONNECTED'))
+client.on('ready', () => logger.info('REDIS READY'))
+client.on('error', () => logger.error('REDIS ERROR'))
 
 const redisPromisify = async (func, ...params) =>
   new Promise((res, rej) => {

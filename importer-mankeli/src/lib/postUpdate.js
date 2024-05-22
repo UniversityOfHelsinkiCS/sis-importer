@@ -3,6 +3,7 @@ const { stan, opts } = require('../utils/stan')
 const { NATS_GROUP, IS_DEV } = require('../config')
 
 const { connection } = require('../db/connection')
+const { logger } = require('../utils/logger')
 
 const sendToStan = (channel, message) =>
   new Promise((res, rej) => {
@@ -26,8 +27,11 @@ const removeOpenUniversityStudyRights = async () => {
 }
 
 const postUpdate = async () => {
-  if (IS_DEV) return console.log('Skipping post update in dev env')
-  console.log('Post Update Start')
+  if (IS_DEV) {
+    logger.info('Skipping post update in dev env')
+    return
+  }
+  logger.info('Post Update Start')
 
   // await removeOpenUniversityStudyRights()
 

@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
     raw: true
   })
 
-  if (!gradeScales.length) return res.status(404).send(`No grade scales found`)
+  if (!gradeScales.length) return res.status(404).send('No grade scales found')
 
   const gradesByGradeScaleId = gradeScales.reduce((acc, { id, grades }) => {
     acc[id] = grades

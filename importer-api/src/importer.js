@@ -8,7 +8,7 @@ const postUpdate = require('./utils/postUpdate')
 const { logger } = require('./utils/logger')
 const { errorCounter } = require('./prom')
 
-let forbiddenServiceIds = []
+const forbiddenServiceIds = []
 let isImporting = false
 
 const updateOrdinalFrom = async (total, redisKey, ordinal) => {

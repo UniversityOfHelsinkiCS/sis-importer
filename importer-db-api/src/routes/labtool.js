@@ -203,7 +203,7 @@ const getName = ({ nameSpecifier, name }) => (nameSpecifier.fi.length > name.fi.
 const addCourseNumbers = courseUnitRealisations => {
   const courseIds = courseUnitRealisations.map(courseUnitRealisation => courseUnitRealisation.id)
 
-  let count = {}
+  const count = {}
   for (const courseId of new Set(courseIds)) {
     const sameIds = courseIds.filter(id => id === courseId)
     count[courseId] = sameIds.length

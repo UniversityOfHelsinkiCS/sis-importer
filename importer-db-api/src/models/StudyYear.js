@@ -30,7 +30,7 @@ StudyYear.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'study_year',
     tableName: 'study_years',
     indexes: [

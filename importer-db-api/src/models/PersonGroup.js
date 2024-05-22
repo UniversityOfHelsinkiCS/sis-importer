@@ -27,7 +27,7 @@ PersonGroup.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'person_group',
     tableName: 'person_groups'
   }

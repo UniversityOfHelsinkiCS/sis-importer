@@ -11,6 +11,20 @@
   },
   "extends": ["eslint:recommended", "plugin:prettier/recommended"],
   "rules": {
-    "no-async-promise-executor": "off"
-  }
+    "eqeqeq": ["error", "smart"],
+    "no-async-promise-executor": "off",
+    "no-console": "error",
+    "no-var": "error",
+    "object-shorthand": "error",
+    "prefer-const": "error",
+    "quotes": ["error", "single", { "avoidEscape": true }]
+  },
+  "overrides": [
+    {
+      "files": ["importer-db-staging-sampletaker/**/*.js", "manual-testing-helper-tool/**/*.js"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }

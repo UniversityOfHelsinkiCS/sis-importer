@@ -24,7 +24,7 @@ Disclosure.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'disclosures',
     tableName: 'disclosures',
     indexes: [

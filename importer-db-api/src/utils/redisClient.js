@@ -1,8 +1,9 @@
 const redis = require('redis')
+const logger = require('./logger')
 
 const redisRetry = ({ attempt, error }) => {
   if (attempt > 10) {
-    console.error('Lost connection to Redis...', error)
+    logger.error('Lost connection to Redis...', error)
     return
   }
 
@@ -18,14 +19,14 @@ const connectRedis = () => {
     })
     if (!client) throw new Error('redis broken or not available?')
 
-    client.on('connect', () => console.log('REDIS CONNECTED'))
-    client.on('ready', () => console.log('REDIS READY'))
-    client.on('error', () => console.log('REDIS ERROR'))
+    client.on('connect', () => logger.info('REDIS CONNECTED'))
+    client.on('ready', () => logger.info('REDIS READY'))
+    client.on('error', () => logger.error('REDIS ERROR'))
 
     return client
   } catch (e) {
-    console.error('Error while connecting to redis: ', e)
-    console.log('REDIS NOT AVAILABLE')
+    logger.error('Error while connecting to redis: ', e)
+    logger.info('REDIS NOT AVAILABLE')
     return null
   }
 }

@@ -93,7 +93,7 @@ curreRouter.get('/enrolments-new', async (req, res) => {
 
   const since = new Date(sinceRaw)
 
-  if (!sinceRaw || since == 'Invalid Date') {
+  if (!sinceRaw || since === 'Invalid Date') {
     return res.status(400).send({ message: 'Missing or invalid query parameter since' })
   }
 

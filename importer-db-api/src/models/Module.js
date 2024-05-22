@@ -3,15 +3,15 @@ const { sequelize } = require('../config/db')
 const CourseUnit = require('./CourseUnit')
 
 const customFlatten = arr => {
-  let result = []
+  const result = []
 
-  for (let elem of arr) {
+  for (const elem of arr) {
     if (!Array.isArray(elem) || elem.length === 0 || (!elem[0].module && elem[0].code)) {
       result.push(elem)
       continue
     }
 
-    for (let subelem of elem) {
+    for (const subelem of elem) {
       result.push(subelem)
     }
   }
@@ -44,14 +44,14 @@ const moduleResolver = async (rule, n) => {
     return { error: 'Could not find module' }
   }
 
-  if (mod.type == 'StudyModule') {
+  if (mod.type === 'StudyModule') {
     const result = await resolver(mod.rule, n)
     if (mod.code.slice(0, 3) === 'KK-') return null
     const moduleCourses = { id: mod.groupId, code: mod.code, name: mod.name, type: 'module', children: result }
     return moduleCourses
   }
 
-  if (mod.type == 'GroupingModule') {
+  if (mod.type === 'GroupingModule') {
     const module = await moduleRuleResolver(mod, n)
     return customFlatten(module)
   }
@@ -89,24 +89,24 @@ const courseResolver = async rule => {
 }
 
 const resolver = async (rule, n) => {
-  if (rule.type == 'CreditsRule') {
+  if (rule.type === 'CreditsRule') {
     return creditResolver(rule, n + 1)
   }
-  if (rule.type == 'CompositeRule') {
+  if (rule.type === 'CompositeRule') {
     return compositeResolver(rule, n)
   }
-  if (rule.type == 'ModuleRule') {
+  if (rule.type === 'ModuleRule') {
     return moduleResolver(rule, n)
   }
-  if (rule.type == 'CourseUnitRule') {
+  if (rule.type === 'CourseUnitRule') {
     return courseResolver(rule)
   }
 
-  if (rule.type == 'AnyCourseUnitRule') {
+  if (rule.type === 'AnyCourseUnitRule') {
     return { id: rule.localId, name: 'Any course' }
   }
 
-  if (rule.type == 'AnyModuleRule') {
+  if (rule.type === 'AnyModuleRule') {
     return { id: rule.localId, name: 'Any module' }
   }
 
@@ -118,7 +118,7 @@ const resolver = async (rule, n) => {
 
 class Module extends Model {
   async getCourses() {
-    let courses = {}
+    const courses = {}
 
     const recursiveWrite = async module => {
       if (Array.isArray(module)) {
@@ -231,7 +231,7 @@ Module.init(
   },
   {
     underscored: true,
-    sequelize: sequelize,
+    sequelize,
     modelName: 'module',
     tableName: 'modules',
     indexes: [
