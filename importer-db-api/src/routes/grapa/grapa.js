@@ -24,7 +24,7 @@ grapaRouter.get('/persons', async (req, res) => {
         offset
       },
       mapToModel: true,
-      model: models.Person,
+      model: models.Person
     }
   )
 
