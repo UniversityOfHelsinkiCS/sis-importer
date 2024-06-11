@@ -31,6 +31,31 @@ grapaRouter.get('/persons', async (req, res) => {
   res.send(personsWithStudyRightOrEmployeeNumber)
 })
 
+grapaRouter.get('/studytracks/:code', async (req, res) => {
+  const programmes = await models.Module.findAll({
+    where: {
+      code: req.params.code,
+    }
+  }).filter(p => !p.validityPeriod.endDate)
+
+  const studytracks = await sequelize.query(
+    `
+      SELECT distinct m.name
+      FROM "modules" m
+      JOIN "studyrights" s ON m."group_id" = s.accepted_selection_path->>'educationPhase2ChildGroupId'
+      WHERE s.accepted_selection_path->>'educationPhase2GroupId' IN (:ids)
+        AND m.validity_period->>'endDate' IS NULL
+    `, {
+      replacements: {
+        ids: programmes.map(p => p.groupId),
+      },
+    }
+  )
+
+  res.send(studytracks[0])
+})
+
+
 router.use('/', grapaRouter)
 
 module.exports = router
