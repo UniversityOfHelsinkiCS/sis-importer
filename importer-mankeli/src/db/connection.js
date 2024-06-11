@@ -17,7 +17,7 @@ class Connection {
       this.sequelize = new Sequelize(DB_CONNECTION_STRING, { logging: false })
       await this.sequelize.authenticate()
       logger.info('Connected to database successfully!')
-      await this.runMigrations()
+      // await this.runMigrations()
       this.established = true
     } catch (e) {
       if (attempt === DB_CONNECTION_RETRY_LIMIT) {

@@ -13,8 +13,8 @@ if (!REJECT_UNAUTHORIZED) {
 stan.on('connect', async ({ clientID }) => {
   logger.info(`Connected to NATS as ${clientID}...`)
   await resetOnetimeServices()
-  run()
-  scheduleCron(IS_DEV ? '*/15 * * * * *' : '0 * * * *', run)
+  // run()
+  // scheduleCron(IS_DEV ? '*/15 * * * * *' : '0 * * * *', run)
 })
 
 stan.on('error', e => {

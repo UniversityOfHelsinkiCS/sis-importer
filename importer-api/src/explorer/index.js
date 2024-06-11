@@ -36,13 +36,13 @@ app.get('/metrics', async (req, res) => {
 app.use((req, res, next) => {
   const { EXPLORER_TOKEN } = process.env
 
-  if (!EXPLORER_TOKEN && !IS_DEV) return res.sendStatus(401)
+  // if (!EXPLORER_TOKEN && !IS_DEV) return res.sendStatus(401)
 
-  if (req.query.token !== EXPLORER_TOKEN && req.headers['token'] !== EXPLORER_TOKEN) {
-    logger.error({ message: `No token ${req.query.token}, ${req.headers['token']}` })
+  // if (req.query.token !== EXPLORER_TOKEN && req.headers['token'] !== EXPLORER_TOKEN) {
+  //   logger.error({ message: `No token ${req.query.token}, ${req.headers['token']}` })
 
-    return res.sendStatus(401)
-  }
+  //   return res.sendStatus(401)
+  // }
   next()
 })
 

@@ -80,6 +80,9 @@ Module.init(
     },
     updatedAt: {
       type: DATE
+    },
+    degreeProgramTypeUrn: {
+      type: STRING
     }
   },
   {

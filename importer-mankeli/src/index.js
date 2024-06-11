@@ -133,6 +133,10 @@ const handleMessage = (channel, msgHandler) => async msg => {
   try {
     if (!transaction) throw new Error('Creating transaction failed')
     const data = JSON.parse(msg.getData())
+    const degreePrograms = data.entities.filter(o => o.type === 'DegreeProgramme')
+    logger.info(`degree programmes length ${degreePrograms.length}`)
+    if(degreePrograms.length > 0) console.table(degreePrograms[0].degreeProgramTypeUrn)
+    
 
     if (!data || data.executionHash !== currentExecutionHash) {
       transaction.rollback()

@@ -2,14 +2,18 @@ const axios = require('axios').default
 const fs = require('fs')
 const https = require('https')
 const { request } = require('./index')
-const { SIS_API_URL, PROXY_TOKEN, KEY_PATH, CERT_PATH, API_KEY } = process.env
+const { SIS_API_URL, SIS_API_USER, SIS_API_PASSWORD, PROXY_TOKEN, KEY_PATH, CERT_PATH, API_KEY } = process.env
 
 const hasCerts = KEY_PATH && CERT_PATH
 
 const getHeaders = () => {
-  if (!hasCerts) return { token: PROXY_TOKEN }
-  else if (hasCerts && API_KEY) return { 'X-Api-Key': API_KEY }
-  return {}
+  // if (!hasCerts) return { token: PROXY_TOKEN }
+  // else if (hasCerts && API_KEY) return { 'X-Api-Key': API_KEY }
+  const auth = `${SIS_API_USER}:${SIS_API_PASSWORD}`
+  const token = Buffer.from(auth).toString('base64')
+  return {
+    'Authorization': 'Basic '+ token
+  }
 }
 
 const agent = hasCerts
