@@ -38,7 +38,7 @@ grapaRouter.get('/studytracks/:code', async (req, res) => {
     }
   }).filter(p => !p.validityPeriod.endDate)
 
-  const studytracks = await sequelize.query(
+  const [ studytracks ] = await sequelize.query(
     `
       SELECT distinct m.name
       FROM "modules" m
@@ -52,7 +52,8 @@ grapaRouter.get('/studytracks/:code', async (req, res) => {
     }
   )
 
-  res.send(studytracks[0])
+  // filter the incomplete entries that do not have a name in all languages
+  res.send(studytracks.filter(st => st.name.fi && st.name.en && st.name.sv))
 })
 
 
