@@ -51,7 +51,7 @@ grapaRouter.get('/studytracks', async (req, res) => {
       WHERE s.accepted_selection_path->>'educationPhase2GroupId' IN (:ids)
         AND m.validity_period->>'endDate' IS NULL
         AND s.document_state = 'ACTIVE'
-      ORDER BY m.code DESC
+      ORDER BY m.name DESC
       LIMIT :limit OFFSET :offset
     `,
     {
