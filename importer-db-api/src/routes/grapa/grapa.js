@@ -45,6 +45,7 @@ grapaRouter.get('/studytracks/:code', async (req, res) => {
       JOIN "studyrights" s ON m."group_id" = s.accepted_selection_path->>'educationPhase2ChildGroupId'
       WHERE s.accepted_selection_path->>'educationPhase2GroupId' IN (:ids)
         AND m.validity_period->>'endDate' IS NULL
+        AND s.document_state = 'ACTIVE'
     `,
     {
       replacements: {
