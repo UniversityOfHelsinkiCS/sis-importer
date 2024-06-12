@@ -32,11 +32,11 @@ grapaRouter.get('/persons', async (req, res) => {
 })
 
 grapaRouter.get('/studytracks/:code', async (req, res) => {
-  const programmes = await models.Module.findAll({
+  const programmes = (await models.Module.findAll({
     where: {
       code: req.params.code
     }
-  }).filter(p => !p.validityPeriod.endDate)
+  })).filter(p => !p.validityPeriod.endDate)
 
   const [studytracks] = await sequelize.query(
     `
