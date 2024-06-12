@@ -31,11 +31,14 @@ grapaRouter.get('/persons', async (req, res) => {
   res.send(personsWithStudyRightOrEmployeeNumber)
 })
 
-grapaRouter.get('/studytracks/:code', async (req, res) => {
+grapaRouter.get('/studytracks', async (req, res) => {
+  const { limit, offset, codes } = req.query
+  if (!limit || !offset || !codes) return res.sendStatus(400)
+
   const programmes = (
     await models.Module.findAll({
       where: {
-        code: req.params.code
+        code: codes
       }
     })
   ).filter(p => !p.validityPeriod.endDate)
@@ -48,10 +51,14 @@ grapaRouter.get('/studytracks/:code', async (req, res) => {
       WHERE s.accepted_selection_path->>'educationPhase2GroupId' IN (:ids)
         AND m.validity_period->>'endDate' IS NULL
         AND s.document_state = 'ACTIVE'
+      ORDER BY m.code DESC
+      LIMIT :limit OFFSET :offset
     `,
     {
       replacements: {
-        ids: programmes.map(p => p.groupId)
+        ids: programmes.map(p => p.groupId),
+        limit,
+        offset
       }
     }
   )
