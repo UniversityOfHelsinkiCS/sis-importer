@@ -186,11 +186,13 @@ router.get('/:studentNumber/semester_enrollments', async (req, res) => {
 /* */
 
 router.get('/:studentNumber/acual_semester_enrollments', async (req, res) => {
-  const studyrightTerms = await models.TermRegistrations.findAll({
-    where: {
-      studentId: req.student.id
-    }
-  }).filter(r => !r.studyRightId.includes('hy-avoin-ew-sr'))
+  const studyrightTerms = (
+    await models.TermRegistrations.findAll({
+      where: {
+        studentId: req.student.id
+      }
+    })
+  ).filter(r => !r.studyRightId.includes('hy-avoin-ew-sr'))
 
   const termsPerRight = studyrightTerms.reduce((set, { termRegistrations, studyRightId }) => {
     const mankeled = termRegistrations.map(({ studyTerm, statutoryAbsence, termRegistrationType }) => {
@@ -260,12 +262,14 @@ router.get('/:studentNumber/has_passed_course/:code', async (req, res) => {
   const { code } = req.params
   if (!code) return res.status(403).send('CourseCode required')
 
-  const courseUnitIds = await models.CourseUnit.findAll({
-    where: {
-      code
-    },
-    attributes: ['id']
-  }).map(e => e.id)
+  const courseUnitIds = (
+    await models.CourseUnit.findAll({
+      where: {
+        code
+      },
+      attributes: ['id']
+    })
+  ).map(e => e.id)
 
   const courseAttainments = await models.Attainment.findAll({
     where: {
