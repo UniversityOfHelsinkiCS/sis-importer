@@ -23,5 +23,5 @@ const parseAssessmentItem = assessmentItem => {
 // ^ yes, assessment items are snapshot data ¯\_(ツ)_/¯
 module.exports = async ({ active, deleted }, transaction) => {
   const parsedAssessmentItems = [...active, ...deleted].map(parseAssessmentItem)
-  await bulkCreate(AssessmentItem, parsedAssessmentItems, transaction, ['id', 'modificationOrdinal', 'autoId'])
+  await bulkCreate(AssessmentItem, parsedAssessmentItems, transaction, ['id', 'modification_ordinal', 'auto_id'])
 }

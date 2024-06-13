@@ -9,19 +9,16 @@ const bulkCreate = async (model, entities, transaction, properties = ['id']) => 
   try {
     await model.bulkCreate(entities, {
       updateOnDuplicate: getColumnsToUpdate(model, properties),
-      transaction,
-      logging: logger.info
+      transaction
     })
   } catch (error) {
-    logger.info(getColumnsToUpdate(model, properties))
     logger.error(error)
     // If one fails on bulkCreate, re-do them individually and report the individual failures.
     for (const entity of entities) {
       try {
         await model.upsert(entity, {
           updateOnDuplicate: getColumnsToUpdate(model, properties),
-          transaction,
-          logging: logger.info
+          transaction
         })
       } catch (e) {
         logger.error(e)
