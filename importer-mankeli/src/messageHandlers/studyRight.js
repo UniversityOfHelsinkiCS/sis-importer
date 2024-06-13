@@ -43,5 +43,5 @@ const parseStudyRight = studyRight => {
 // eslint-disable-next-line
 module.exports = async ({ active, deleted }, transaction) => {
   const parsedStudyRights = [...active, ...deleted].map(parseStudyRight)
-  await bulkCreate(StudyRight, parsedStudyRights, transaction, ['id', 'modification_ordinal', 'auto_id'])
+  await bulkCreate(StudyRight, parsedStudyRights, transaction, ['id', 'modificationOrdinal', 'autoId'])
 }
