@@ -11,8 +11,7 @@ StudyRight.init(
       autoIncrement: true
     },
     id: {
-      type: STRING,
-      unique: true
+      type: STRING
     },
     personId: {
       type: STRING

@@ -12,6 +12,8 @@ const bulkCreate = async (model, entities, transaction, properties = ['id']) => 
       transaction
     })
   } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(error)
     // If one fails on bulkCreate, re-do them individually and report the individual failures.
     for (const entity of entities) {
       try {
@@ -20,6 +22,8 @@ const bulkCreate = async (model, entities, transaction, properties = ['id']) => 
           transaction
         })
       } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log(e)
         logger.error('Single-entity upsert failed: ', JSON.stringify(e, null, 2))
         logger.error('Entity:')
         logger.error(JSON.stringify(entity, null, 2))
