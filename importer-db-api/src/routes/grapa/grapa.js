@@ -2,6 +2,7 @@ const express = require('express')
 const { relevantAttributes } = require('./config')
 const models = require('../../models')
 const { sequelize } = require('../../config/db')
+const { isRefreshingPersonStudyRightsView } = require('../palaute/personStudyRightsView')
 
 const router = express.Router()
 
@@ -10,6 +11,14 @@ const grapaRouter = express.Router()
 grapaRouter.get('/persons', async (req, res) => {
   const { limit, offset } = req.query
   if (!limit || !offset) return res.sendStatus(400)
+
+  if (isRefreshingPersonStudyRightsView()) {
+    return res.send({
+      waitAndRetry: true,
+      message: 'Person study rights view is being refreshed',
+      waitTime: 10_000
+    })
+  }
 
   const personsWithStudyRightOrEmployeeNumber = await sequelize.query(
     `SELECT ${relevantAttributes.persons.map(attr => `P.${attr}`)}
