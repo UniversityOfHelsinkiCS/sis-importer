@@ -40,7 +40,8 @@ class Connection {
           sequelize: this.sequelize,
           tableName: 'migrations'
         },
-        logging: logger.info,
+        // eslint-disable-next-line no-console
+        logging: console.log,
         migrations: {
           params: [this.sequelize.getQueryInterface(), Sequelize],
           path: `${process.cwd()}/src/db/migrations`,

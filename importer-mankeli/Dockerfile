@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/nodejs-10
+FROM registry.access.redhat.com/ubi9/nodejs-20-minimal
 
 ENV TZ="Europe/Helsinki"
 
@@ -12,4 +12,4 @@ COPY . .
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-CMD ["npm", "start"]
+CMD ["node", "./src/index.js"]
