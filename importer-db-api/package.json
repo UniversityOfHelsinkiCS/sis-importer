@@ -25,6 +25,7 @@
     "lru-cache": "^6.0.0",
     "morgan": "^1.10.0",
     "pg": "^8.12.0",
+    "pg-hstore": "^2.3.4",
     "redis": "3.1.1",
     "sequelize": "^6.0.0",
     "winston": "^3.3.3"
