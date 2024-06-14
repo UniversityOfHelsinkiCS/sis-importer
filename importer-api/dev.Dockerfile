@@ -11,4 +11,4 @@ COPY . .
 ARG NODE_ENV=development
 ENV NODE_ENV=${NODE_ENV}
 
-CMD ["npm", "start"]
+CMD ["node_modules/.bin/nodemon", "./src/index.js"]

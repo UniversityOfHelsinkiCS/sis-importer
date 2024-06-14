@@ -11,4 +11,4 @@ COPY . .
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-CMD ["npm", "start"]
+CMD ["node", "./src/index.js"]
