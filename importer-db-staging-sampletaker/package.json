@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "knex": "^0.95.6",
+    "knex": "^2.0.0",
     "nodemon": "^2.0.7",
     "pg": "^8.6.0"
   }
