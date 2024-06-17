@@ -33,7 +33,7 @@ Disclosure.init(
         fields: ['id']
       },
       {
-        fields: ['disclosureCategoryId']
+        fields: ['disclosure_category_id']
       }
     ]
   }

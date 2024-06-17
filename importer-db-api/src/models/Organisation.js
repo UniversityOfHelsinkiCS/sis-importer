@@ -62,12 +62,10 @@ Organisation.init(
       autoIncrement: true
     },
     id: {
-      type: STRING,
-      unique: true
+      type: STRING
     },
     modificationOrdinal: {
-      type: BIGINT,
-      unique: true
+      type: BIGINT
     },
     documentState: {
       type: STRING
@@ -114,7 +112,7 @@ Organisation.init(
     indexes: [
       {
         unique: true,
-        fields: ['id', 'modificationOrdinal']
+        fields: ['id', 'modification_ordinal']
       },
       {
         fields: ['id']
