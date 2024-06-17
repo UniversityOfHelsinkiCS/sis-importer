@@ -52,6 +52,8 @@ grapaRouter.get('/studytracks', async (req, res) => {
     })
   ).filter(p => !p.validityPeriod.endDate)
 
+  if (programmes.length === 0) return res.send([])
+
   const [studytracks] = await sequelize.query(
     `
       SELECT distinct on (m.name) m.name, m.code
