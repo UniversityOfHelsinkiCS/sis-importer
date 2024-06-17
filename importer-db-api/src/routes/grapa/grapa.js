@@ -56,7 +56,7 @@ grapaRouter.get('/studytracks', async (req, res) => {
 
   const [studytracks] = await sequelize.query(
     `
-      SELECT distinct on (m.name) m.name, m.code, s.accepted_selection_path->>'educationPhase2GroupId' as "programGroupId"
+      SELECT distinct on (m.name) m.name, m.id, s.accepted_selection_path->>'educationPhase2GroupId' as "programGroupId"
       FROM "modules" m
       JOIN "studyrights" s ON m."group_id" = s.accepted_selection_path->>'educationPhase2ChildGroupId'
       WHERE s.accepted_selection_path->>'educationPhase2GroupId' IN (:ids)
