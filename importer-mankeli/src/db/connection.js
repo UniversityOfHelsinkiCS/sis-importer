@@ -49,7 +49,10 @@ class Connection {
         }
       })
       const migrations = await migrator.up()
-      logger.info('Migrations up to date', migrations)
+      logger.info(
+        'Migrations up to date',
+        migrations.map(m => m.file)
+      )
     } catch (e) {
       this.error = true
       logger.error('Migration error', e)
