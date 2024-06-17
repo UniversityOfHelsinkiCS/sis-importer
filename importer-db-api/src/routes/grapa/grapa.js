@@ -50,13 +50,13 @@ grapaRouter.get('/studytracks', async (req, res) => {
         code: codes
       }
     })
-  ).filter(p => !p.validityPeriod.endDate)
+  ).filter(p => !p.validityPeriod?.endDate)
 
   if (programmes.length === 0) return res.send([])
 
   const [studytracks] = await sequelize.query(
     `
-      SELECT distinct on (m.name) m.name, m.code
+      SELECT distinct on (m.name) m.name, m.code, s.accepted_selection_path->>'educationPhase2GroupId' as programGroupId
       FROM "modules" m
       JOIN "studyrights" s ON m."group_id" = s.accepted_selection_path->>'educationPhase2ChildGroupId'
       WHERE s.accepted_selection_path->>'educationPhase2GroupId' IN (:ids)
@@ -74,8 +74,13 @@ grapaRouter.get('/studytracks', async (req, res) => {
     }
   )
 
+  const studyTracksWithProgramCodes = studytracks.map(st => ({
+    ...st,
+    programCode: programmes.find(p => p.groupId === st.programGroupId).code
+  }))
+
   // filter the incomplete entries that do not have a name in all languages
-  res.send(studytracks.filter(st => st.name.fi && st.name.en && st.name.sv))
+  res.send(studyTracksWithProgramCodes.filter(st => st.name.fi && st.name.en && st.name.sv))
 })
 
 router.use('/', grapaRouter)
