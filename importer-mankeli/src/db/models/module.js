@@ -81,7 +81,7 @@ Module.init(
     updatedAt: {
       type: DATE
     },
-    degreeProgramTypeUrn: {
+    degreeProgrammeTypeUrn: {
       type: STRING
     }
   },

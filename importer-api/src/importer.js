@@ -72,7 +72,7 @@ const serviceUpdateFun = serviceId => {
 
 const update = async () => {
   for (const serviceId of serviceIds) {
-    if (forbiddenServiceIds.includes(serviceId) || serviceId !== 'MODULE') {
+    if (forbiddenServiceIds.includes(serviceId)) {
       logger.info(`Skipping forbidden serviceId ${serviceId}`)
       continue
     }

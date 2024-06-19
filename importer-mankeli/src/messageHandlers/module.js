@@ -26,8 +26,8 @@ const parseModule = mod => {
     type: mod.type,
     rule: mod.rule,
     degreeTitleUrns: mod.degreeTitleUrns,
-    degreeProgramTypeUrn: mod.type === 'DegreeProgramme' ? mod.degreeProgramTypeUrn : null
-  } 
+    degreeProgrammeTypeUrn: mod.type === 'DegreeProgramme' ? mod.degreeProgramTypeUrn : null
+  }
 }
 
 module.exports = async ({ active, deleted }, transaction) => {
