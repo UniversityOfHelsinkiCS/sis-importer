@@ -18,7 +18,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
 
       - name: 'Run importer-db and importer-db-api'
