@@ -1,20 +1,13 @@
-version: "3.2"
-
 services:
   importer-db:
     container_name: sis-importer-db
-    environment:
-      POSTGRES_USER: dev
-      POSTGRES_PASSWORD: dev
-      POSTGRES_DB: importer-db
-    image: registry.toska.cs.helsinki.fi/sis-importer-db:latest
+    image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
 
   importer-db-api:
     build:
       args:
         NODE_ENV: "test"
       context: importer-db-api
-    command: "npm run jest"
     container_name: sis-importer-db-api
     tty: true
     depends_on:
@@ -27,12 +20,5 @@ services:
       DB_DATABASE: sis-importer-db
       NODE_ENV: test
       PORT: 3001
-      TOKEN: sup3rSecre7TestT0ken
     ports:
       - 3001:3001
-    volumes:
-      - ./importer-db-api/coverage:/usr/src/app/coverage/
-
-networks:
-  default:
-    name: importer_network

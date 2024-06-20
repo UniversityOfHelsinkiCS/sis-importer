@@ -2,11 +2,13 @@ const Sequelize = require('sequelize')
 
 const { IS_DEV } = require('../config')
 
-const { DB_USERNAME, DB_PASSWORD, DB_PORT, DB_HOST, DB_DATABASE } = process.env
+const { DB_USERNAME, DB_PASSWORD, DB_PORT, DB_HOST, DB_DATABASE, NODE_ENV } = process.env
 
 let DB_CONNECTION_STRING = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}?targetServerType=primary`
 
 if (!IS_DEV) DB_CONNECTION_STRING = `${DB_CONNECTION_STRING}&ssl=true`
+
+if (NODE_ENV === 'test') DB_CONNECTION_STRING = `postgres://${DB_USERNAME}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}`
 
 const sequelize = new Sequelize(DB_CONNECTION_STRING, { logging: false })
 
