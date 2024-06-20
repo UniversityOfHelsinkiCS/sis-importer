@@ -9,6 +9,31 @@ on:
       - .github/workflows/importer-mankeli-staging.yaml
 
 jobs:
+  build_and_push_anon_sis_importer_db:
+    name: 'Build anon sis-importer-db and push to toska hub if new migrations have been added'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: check_migrations
+        with:
+          filters: |
+            migrations:
+              - 'importer-mankeli/src/db/migrations/**'
+      - name: 'Login to toska docker registry'
+        uses: docker/login-action@v3
+        with:
+          registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: 'Let importer-mankeli run migrations, then push new version of image to toska hub'
+        if: steps.check_migrations.outputs.migrations == 'true'
+        run: |
+          docker compose --file docker-compose.ci.yml up --detach
+          sleep 10 # wait for importer-mankeli to start and run migrations
+          docker commit sis-importer-db registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
+          docker push registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
+
   test:
     runs-on: ubuntu-latest
 
