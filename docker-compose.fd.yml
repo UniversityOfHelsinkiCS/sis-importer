@@ -7,6 +7,8 @@ services:
       context: importer-api
       dockerfile: dev.Dockerfile
     container_name: sis-importer-api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - importer-mankeli
     env_file:
@@ -21,12 +23,18 @@ services:
       NATS_TOKEN: dev
       REDIS_URI: redis://importer-redis:6379
       SONIC: 1
+      SERVICE_PROVIDER: fd
     ports:
       - 3002:3002 # explorer at http://localhost:3002/
     volumes:
       - ./importer-api:/opt/app-root/src
 
   importer-mankeli:
+    deploy:
+      replicas: 4
+      mode: replicated
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     build:
       args:
         NODE_ENV: "development"
@@ -57,7 +65,7 @@ services:
       POSTGRES_DB: importer-db
     image: postgres:13.1
     ports:
-      - 5432:5432
+      - 15234:5432
     volumes:
       - sis-importer-pgdata:/var/lib/postgresql/data
 
@@ -74,9 +82,9 @@ services:
     environment:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
-      DB_PORT: 12346
-      DB_HOST: localhost
-      DB_DATABASE: sis-importer-db
+      DB_PORT: 5432
+      DB_HOST: importer-db
+      DB_DATABASE: importer-db
       REDIS_URI: redis://importer-redis:6379
     ports:
       - 3005:3000
@@ -84,9 +92,11 @@ services:
       - ./importer-db-api:/opt/app-root/src
 
   importer-redis:
-    command: ["redis-server", "--appendonly", "yes", "--port", "6379"]
+    command: [ "redis-server", "--appendonly", "yes", "--port", "6379" ]
     container_name: sis-redis
     image: redis:5.0.7
+    ports:
+      - 16379:6379
     volumes:
       - sis-importer-redis:/data
 
