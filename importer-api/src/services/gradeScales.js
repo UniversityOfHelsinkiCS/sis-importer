@@ -53,7 +53,7 @@ const customRequest = async () => {
   return toExportResponseFormat(gradeScalesData)
 }
 
-const info_fd = {
+const gradeScalesInfoFD = {
   API: APIS.custom,
   CHANNEL: GRAPHQL_GRADE_SCALES_CHANNEL,
   REDIS_KEY: GRAPHQL_GRADE_SCALES_SCHEDULE_ID,
@@ -64,5 +64,5 @@ const info_fd = {
 module.exports = {
   GRAPHQL_GRADE_SCALES_SCHEDULE_ID,
   info,
-  info_fd
+  gradeScalesInfoFD
 }
