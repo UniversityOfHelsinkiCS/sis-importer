@@ -44,7 +44,7 @@ services:
     environment:
       - ADMINER_DESIGN=pepa-linha
       - ADMINER_DEFAULT_SERVER=importer-db-staging-copy
-    image: adminer:4.7.5
+    image: adminer:4.8.1
     ports:
       - 5051:8080 # http://localhost:5051/?pgsql=importer-test-db&username=postgres&db=importer-db&ns=public
 

@@ -55,7 +55,7 @@ services:
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: dev
       POSTGRES_DB: importer-db
-    image: postgres:13.1
+    image: postgres:13.15
     ports:
       - 5432:5432
     volumes:
@@ -86,14 +86,14 @@ services:
   importer-redis:
     command: ["redis-server", "--appendonly", "yes", "--port", "6379"]
     container_name: sis-redis
-    image: redis:5.0.7
+    image: redis:5.0.14
     volumes:
       - sis-importer-redis:/data
 
   importer-nats:
     command: -cid importer-nats -m 8222 --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 5000 -store file -dir datastore
     container_name: sis-importer-nats
-    image: nats-streaming:0.16.2
+    image: nats-streaming:0.25.6
     ports:
       - 8223:8222 # Monitoring at http://localhost:8223/
     volumes:
@@ -113,7 +113,7 @@ services:
     environment:
       - ADMINER_DESIGN=pepa-linha
       - ADMINER_DEFAULT_SERVER=importer-db
-    image: adminer:4.7.5
+    image: adminer:4.8.1
     ports:
       - 5051:8080 # http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public
 
