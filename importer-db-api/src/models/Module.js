@@ -222,6 +222,12 @@ Module.init(
     rule: {
       type: JSONB
     },
+    degreeTitleUrns: {
+      type: ARRAY(STRING)
+    },
+    degreeProgramTypeUrn: {
+      type: STRING
+    },
     createdAt: {
       type: DATE
     },

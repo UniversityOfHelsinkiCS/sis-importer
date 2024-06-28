@@ -25,7 +25,8 @@ const parseModule = mod => {
     minorStudyRightAcceptanceType: mod.minorStudyRightAcceptanceType,
     type: mod.type,
     rule: mod.rule,
-    degreeTitleUrns: mod.degreeTitleUrns
+    degreeTitleUrns: mod.degreeTitleUrns,
+    degreeProgramTypeUrn: mod.type === 'DegreeProgramme' ? mod.degreeProgramTypeUrn : null
   }
 }
 

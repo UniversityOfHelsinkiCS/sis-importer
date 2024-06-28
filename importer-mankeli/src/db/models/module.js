@@ -75,6 +75,9 @@ Module.init(
     degreeTitleUrns: {
       type: ARRAY(STRING)
     },
+    degreeProgramTypeUrn: {
+      type: STRING
+    },
     createdAt: {
       type: DATE
     },
