@@ -21,7 +21,7 @@ grapaRouter.get('/persons', async (req, res) => {
   }
 
   const personsWithStudyRightOrEmployeeNumber = await sequelize.query(
-    `SELECT ${relevantAttributes.persons.map(attr => `P.${attr}`)}
+    `SELECT ${relevantAttributes.persons.map(attr => `P.${attr}`)}, psr.has_study_right AS "hasStudyRight"
       FROM persons P
       LEFT JOIN person_study_rights_view psr ON psr.person_id = P.id
       WHERE has_study_right IS TRUE OR employee_number IS NOT NULL
