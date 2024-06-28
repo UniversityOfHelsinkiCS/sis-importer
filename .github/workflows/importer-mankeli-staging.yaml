@@ -30,7 +30,7 @@ jobs:
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
           docker compose --file docker-compose.ci.yml up --detach
-          sleep 10 # wait for importer-mankeli to start and run migrations
+          sleep 30 # wait for importer-mankeli to start and run migrations
           docker commit sis-importer-db registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
           docker push registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
 
