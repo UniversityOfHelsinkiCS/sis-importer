@@ -1,6 +1,5 @@
 const { APIS } = require('../config')
 const { GRAPHQL_GRADE_SCALES_CHANNEL } = require('../utils/stan')
-const { koriRequest } = require('../utils/koriApi')
 const GRAPHQL_GRADE_SCALES_SCHEDULE_ID = 'GRAPHQL_GRADE_SCALES'
 
 const info = {
@@ -42,27 +41,7 @@ const info = {
   }`
 }
 
-const toExportResponseFormat = data => ({
-  greatestOrdinal: 1,
-  hasMore: false,
-  entities: data
-})
-
-const customRequest = async () => {
-  const gradeScalesData = await koriRequest('/grade-scales')
-  return toExportResponseFormat(gradeScalesData)
-}
-
-const gradeScalesInfoFD = {
-  API: APIS.custom,
-  CHANNEL: GRAPHQL_GRADE_SCALES_CHANNEL,
-  REDIS_KEY: GRAPHQL_GRADE_SCALES_SCHEDULE_ID,
-  ONETIME: true,
-  customRequest
-}
-
 module.exports = {
   GRAPHQL_GRADE_SCALES_SCHEDULE_ID,
-  info,
-  gradeScalesInfoFD
+  info
 }

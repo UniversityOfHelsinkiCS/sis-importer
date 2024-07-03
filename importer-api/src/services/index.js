@@ -15,7 +15,7 @@ const { COUNTRY_SCHEDULE_ID, info: countryInfo } = require('./country')
 const { EDUCATION_TYPE_SCHEDULE_ID, info: educationTypeInfo } = require('./educationType')
 const { STUDY_RIGHT_PRIMALITY_SCHEDULE_ID, info: studyRightPrimalityInfo } = require('./studyRightPrimality')
 const { ENROLMENT_SCHEDULE_ID, info: enrolmentInfo } = require('./enrolments')
-const { GRAPHQL_GRADE_SCALES_SCHEDULE_ID, info: gradeScalesInfo, gradeScalesInfoFD } = require('./gradeScales')
+const { GRAPHQL_GRADE_SCALES_SCHEDULE_ID, info: gradeScalesInfo } = require('./gradeScales')
 const { DEGREE_TITLE_SCHEDULE_ID, info: degreeTitleInfo } = require('./degreeTitle')
 const { EDUCATION_CLASSIFICATION_SCHEDULE_ID, info: educationClassificationInfo } = require('./educationClassification')
 const { PLAN_SCHEDULE_ID, info: planInfo } = require('./plan')
@@ -26,7 +26,6 @@ const {
 } = require('./studyRightExpirationRule')
 const { ADMISSION_TYPE_SCHEDULE_ID, info: admissionTypeInfo } = require('./admissionType')
 const { DISCLOSURE_SCHEDULE_ID, info: disclosureInfo } = require('./disclosure')
-const { SERVICE_PROVIDER } = process.env
 
 const services = {
   [ATTAINMENT_SCHEDULE_ID]: attainmentInfo,
@@ -46,7 +45,7 @@ const services = {
   [EDUCATION_TYPE_SCHEDULE_ID]: educationTypeInfo,
   [STUDY_RIGHT_PRIMALITY_SCHEDULE_ID]: studyRightPrimalityInfo,
   [ENROLMENT_SCHEDULE_ID]: enrolmentInfo,
-  [GRAPHQL_GRADE_SCALES_SCHEDULE_ID]: SERVICE_PROVIDER === 'fd' ? gradeScalesInfoFD : gradeScalesInfo,
+  [GRAPHQL_GRADE_SCALES_SCHEDULE_ID]: gradeScalesInfo,
   [DEGREE_TITLE_SCHEDULE_ID]: degreeTitleInfo,
   [EDUCATION_CLASSIFICATION_SCHEDULE_ID]: educationClassificationInfo,
   [STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID]: studyRightExpirationRuleInfo,
