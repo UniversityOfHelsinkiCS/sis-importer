@@ -46,8 +46,8 @@ services:
             NATS_URI: nats://importer-nats:4222
             NATS_TOKEN: dev
             REDIS_URI: redis://importer-redis:6379
-            volumes:
-                - ./importer-mankeli:/opt/app-root/src
+        volumes:
+            - ./importer-mankeli:/opt/app-root/src
 
     importer-db:
         container_name: sis-importer-db
