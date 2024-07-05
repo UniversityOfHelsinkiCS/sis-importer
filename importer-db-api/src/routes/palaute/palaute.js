@@ -98,7 +98,7 @@ updaterRouter.get('/organisations', async (req, res) => {
       [Op.and]: [
         // Only latest snapshot
         models.Organisation.sequelize.literal(
-          '(id, snapshot_date_time) in (select id, max(snapshot_date_time) from organisations group by id)'
+          '(code, snapshot_date_time) in (select code, max(snapshot_date_time) from organisations group by code)'
         )
       ]
     },
