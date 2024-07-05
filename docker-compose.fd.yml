@@ -93,7 +93,7 @@ services:
 
     importer-redis:
         command: [ "redis-server", "--appendonly", "yes", "--port", "6379" ]
-        container_name: sis-redis
+        container_name: sis-importer-redis
         image: redis:5.0.7
         ports:
             - 16379:6379
@@ -118,14 +118,6 @@ services:
         ports:
             - 8282:8282 # http://localhost:8282/
 
-    importer-adminer:
-        container_name: importer-adminer
-        environment:
-            - ADMINER_DESIGN=pepa-linha
-            - ADMINER_DEFAULT_SERVER=importer-db
-        image: adminer:4.7.5
-        ports:
-            - 5051:8080 # http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public
 
 volumes:
     sis-importer-redis:

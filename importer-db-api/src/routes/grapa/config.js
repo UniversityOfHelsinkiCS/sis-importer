@@ -6,7 +6,8 @@ const relevantAttributes = {
     'first_names',
     'last_name',
     'primary_email',
-    'employee_number'
+    'employee_number',
+    'student_number'
   ]
 }
 
