@@ -20,7 +20,7 @@ const knex = require('knex')({
     password: DB_PASSWORD,
     database: DB_DATABASE,
     port: DB_PORT,
-    ssl: !IS_DEV
+    ssl: !IS_DEV ? { rejectUnauthorized: false } : false,
   },
   pool: {
     min: 0,
