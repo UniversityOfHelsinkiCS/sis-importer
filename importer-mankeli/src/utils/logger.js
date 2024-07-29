@@ -45,7 +45,7 @@ if (!IS_DEV) {
 
   transports.push(new winston.transports.Console({ format: prodFormat }))
 
-  if (!process.env.STAGING) {
+  if (!process.env.STAGING && !process.env.SERVICE_PROVIDER === 'fd') {
     transports.push(
       new WinstonGelfTransporter({
         handleExceptions: true,

@@ -54,6 +54,7 @@ services:
             NATS_URI: nats://importer-nats:4222
             NATS_TOKEN: dev
             REDIS_URI: redis://importer-redis:6379
+            SERVICE_PROVIDER: fd
         volumes:
             - ./importer-mankeli:/opt/app-root/src
 
@@ -86,6 +87,7 @@ services:
             DB_HOST: importer-db
             DB_DATABASE: importer-db
             REDIS_URI: redis://importer-redis:6379
+            SERVICE_PROVIDER: fd
         ports:
             - 3005:3000
         volumes:
