@@ -16,6 +16,7 @@ const APIS = {
 }
 const UPDATE_RETRY_LIMIT = 6
 const PANIC_TIMEOUT = IS_DEV || SONIC ? 60 * 1000 : 15 * 1000 // * 5
+const SERVICE_PROVIDER = process.env.SERVICE_PROVIDER || ''
 
 module.exports = {
   PORT,
@@ -27,5 +28,6 @@ module.exports = {
   IS_DEV,
   APIS,
   UPDATE_RETRY_LIMIT,
-  PANIC_TIMEOUT
+  PANIC_TIMEOUT,
+  SERVICE_PROVIDER
 }
