@@ -3,7 +3,7 @@ const os = require('os')
 const winston = require('winston')
 const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 
-const { IS_DEV } = require('../config')
+const { IS_DEV, SERVICE_PROVIDER } = require('../config')
 const { combine, timestamp, printf, splat } = winston.format
 
 const transports = []
@@ -45,7 +45,7 @@ if (!IS_DEV) {
 
   transports.push(new winston.transports.Console({ format: prodFormat }))
 
-  if (!process.env.STAGING) {
+  if (!process.env.STAGING && !SERVICE_PROVIDER === 'fd') {
     transports.push(
       new WinstonGelfTransporter({
         handleExceptions: true,

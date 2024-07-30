@@ -2,7 +2,7 @@ const axios = require('axios').default
 const fs = require('fs')
 const https = require('https')
 
-const SERVICE_PROVIDER = require('../config')
+const { SERVICE_PROVIDER } = require('../config')
 const { retry } = require('./index')
 const { SIS_API_URL, PROXY_TOKEN, KEY_PATH, CERT_PATH, API_KEY } = process.env
 
