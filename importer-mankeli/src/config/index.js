@@ -8,7 +8,7 @@ const IS_DEV = process.env.NODE_ENV === 'development'
 
 let DB_CONNECTION_STRING = `postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}?targetServerType=primary`
 
-if (!IS_DEV) DB_CONNECTION_STRING = `${DB_CONNECTION_STRING}&ssl=true`
+if (!IS_DEV && process.env.SERVICE_PROVIDER !== 'fd') DB_CONNECTION_STRING = `${DB_CONNECTION_STRING}&ssl=true`
 
 module.exports.DB_CONNECTION_STRING = DB_CONNECTION_STRING
 
