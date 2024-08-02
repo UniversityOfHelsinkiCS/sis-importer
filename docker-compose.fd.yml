@@ -88,6 +88,8 @@ services:
             DB_DATABASE: importer-db
             REDIS_URI: redis://importer-redis:6379
             SERVICE_PROVIDER: fd
+            IMPORTER_DB_API_USER: dev_user
+            IMPORTER_DB_API_PASSWORD: dev_password
         ports:
             - 3005:3000
         volumes:

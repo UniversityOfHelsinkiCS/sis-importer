@@ -22,9 +22,11 @@ const personGroupsRouter = require('./routes/personGroups')
 const teacherRightsRouter = require('./routes/teacherRights')
 const jamiRouter = require('./routes/jami')
 const { ApplicationError } = require('./errors')
+const basicAuth = require('./utils/basicAuthMiddleware')
 const initializeSentry = require('./utils/sentry')
 const { dbHealth } = require('./config/db')
 const logger = require('./utils/logger')
+const { serviceProvider } = require('./config')
 
 const app = express()
 
@@ -35,6 +37,8 @@ app.use(Sentry.Handlers.tracingHandler())
 
 app.use(morgan('short'))
 app.use(express.json({ limit: '50mb' }))
+
+if (serviceProvider === 'fd') app.use(basicAuth)
 
 app.get('/ping', (req, res) => {
   res.send('pong')
