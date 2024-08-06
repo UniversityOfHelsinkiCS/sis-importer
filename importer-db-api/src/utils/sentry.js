@@ -3,7 +3,8 @@ const Tracing = require('@sentry/tracing') // eslint-disable-line
 const { serviceProvider, configSentryDSN, nodeEnv } = require('../config')
 
 const initializeSentry = app => {
-  if (nodeEnv !== 'production' || (serviceProvider === 'fd' && !configSentryDSN))
+  const noSentryDsnInFdEnvironment = (serviceProvider === 'fd' && !configSentryDSN)
+  if (nodeEnv !== 'production' || noSentryDsnInFdEnvironment)
     return
 
   const sentryDSN = configSentryDSN || 'https://eacaccbb66a62f268b3241ddc4da8519@toska.cs.helsinki.fi/9'
