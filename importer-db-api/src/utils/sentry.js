@@ -4,6 +4,7 @@ const { serviceProvider, configSentryDSN, nodeEnv } = require('../config')
 
 const initializeSentry = app => {
   const noSentryDsnInFdEnvironment = (serviceProvider === 'fd' && !configSentryDSN)
+  
   if (nodeEnv !== 'production' || noSentryDsnInFdEnvironment)
     return
 
