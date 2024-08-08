@@ -47,5 +47,5 @@ services:
         "--port",
         "6379"
       ]
-    image: redis:6-alpine
+    image: redis:7-alpine
     container_name: sis-importer-redis
