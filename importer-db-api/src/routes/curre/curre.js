@@ -44,9 +44,18 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
         return courseUnit
       })
 
+    const organisations = assessmentItems
+      .filter(assessmentItem => realisation.assessmentItemIds.includes(assessmentItem.id))
+      .flatMap(assessmentItem => {
+        const organisations = assessmentItem.get({ plain: true }).organisations
+        return organisations
+      })
+
+
     return {
       ...realisation,
-      courseUnits
+      courseUnits,
+      organisations
     }
   })
 
