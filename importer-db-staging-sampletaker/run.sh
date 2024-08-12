@@ -54,7 +54,7 @@ restore_psql_from_backup () {
 }
 
 setup_db () {
-  docker-compose up -d "$container"
+  docker compose up -d "$container"
   drop_psql "$container" "$db"
   ping_psql "$container" "$db"
   restore_psql_from_backup importer-db-staging.sqz "$container" "$db"
@@ -64,15 +64,15 @@ setup_db () {
 
 create_sample () {
   # Ensure that newest version of sampletaker is used
-  docker-compose build importer-db-staging-sampletaker
+  docker compose build importer-db-staging-sampletaker
   
   # Run sampletaker: first dry-run, then confirm
-  docker-compose run --rm importer-db-staging-sampletaker
+  docker compose run --rm importer-db-staging-sampletaker
   read -rp "Create sample by nuking extra stuff from db(y/n)?" CREATE
   if [ "$CREATE" != "y" ]; then
     exit 0
   fi
-  docker-compose run --rm -e DESTROY=TRUE importer-db-staging-sampletaker
+  docker compose run --rm -e DESTROY=TRUE importer-db-staging-sampletaker
   
   # Vacuum the sample database
   docker exec "$container" psql -U postgres "$db" -c 'VACUUM FULL;'
@@ -86,7 +86,7 @@ cleanup () {
   rm importer-db-staging.sqz
   
   # Run down services
-  docker-compose down --rmi all --volumes --remove-orphans
+  docker compose down --rmi all --volumes --remove-orphans
 }
 
 # run script in phases, comment out phase if need to debug

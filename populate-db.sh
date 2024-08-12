@@ -20,8 +20,8 @@ echo "Fetching backup data"
 scp -r -o ProxyCommand="ssh -W %h:%p $username@melkki.cs.helsinki.fi" $username@toska.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/importer.sql.gz $BACKUP
 
 echo "Setting up db"
-docker-compose down
-docker-compose up -d $SERVICE
+docker compose down
+docker compose up -d $SERVICE
 
 echo "Dropping $DB"
 retry docker exec -u postgres $CONTAINER pg_isready --dbname=$DB
