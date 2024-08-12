@@ -29,9 +29,25 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
     ]
   })
 
+  const allOrganisationIds = assessmentItemsWithCrap.flatMap(assessmentItem =>
+    assessmentItem.organisations.map(org => org.organisationId)
+  )
+
+  const allOrganisations = await models.Organisation.findAll({
+    attributes: ['name', 'id', 'code'],
+    where: {
+      id: allOrganisationIds
+    }
+  })
+
   const assessmentItems = assessmentItemsWithCrap.filter(aItem =>
     aItem?.courseUnit.completionMethods.find(method => method.assessmentItemIds.includes(aItem.id))
   )
+
+  const findOrgByAssessmentItem = assessmentItem =>
+    assessmentItem.organisations.map(org =>
+      allOrganisations.find(organisation => organisation.id === org.organisationId)
+    )
 
   const realisationsWithCourseUnits = courseUnitRealisations.map(aRealisation => {
     const realisation = aRealisation.get({ plain: true })
@@ -40,22 +56,14 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
       .filter(assessmentItem => realisation.assessmentItemIds.includes(assessmentItem.id))
       .map(assessmentItem => {
         const courseUnit = assessmentItem.get({ plain: true }).courseUnit
+        const organisations = findOrgByAssessmentItem(assessmentItem)
         delete courseUnit.completionMethods
-        return courseUnit
+        return { ...courseUnit, organisations }
       })
-
-    const organisations = assessmentItems
-      .filter(assessmentItem => realisation.assessmentItemIds.includes(assessmentItem.id))
-      .flatMap(assessmentItem => {
-        const organisations = assessmentItem.get({ plain: true }).organisations
-        return organisations
-      })
-
 
     return {
       ...realisation,
-      courseUnits,
-      organisations
+      courseUnits
     }
   })
 
