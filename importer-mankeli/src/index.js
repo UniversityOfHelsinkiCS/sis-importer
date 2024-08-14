@@ -26,7 +26,8 @@ const {
   URN_ADMISSION_TYPE_CHANNEL,
   OSUVA_PLAN_CHANNEL,
   ORI_PERSON_GROUP_CHANNEL,
-  ORI_DISCLOSURE_CHANNEL
+  ORI_DISCLOSURE_CHANNEL,
+  KORI_PUBLIC_CURRICULUM_PERIOD_CHANNEL
 } = require('./utils/stan')
 
 const personHandler = require('./messageHandlers/person')
@@ -54,6 +55,7 @@ const admissionTypeHandler = require('./messageHandlers/admissionType')
 const planHandler = require('./messageHandlers/plan')
 const personGroupHandler = require('./messageHandlers/personGroup')
 const disclosureHandler = require('./messageHandlers/disclosure')
+const curriculumPeriodHandler = require('./messageHandlers/curriculumPeriod')
 
 const { sleep } = require('./utils')
 const { createTransaction } = require('./utils/db')
@@ -93,7 +95,8 @@ const channels = {
   [URN_ADMISSION_TYPE_CHANNEL]: admissionTypeHandler,
   [OSUVA_PLAN_CHANNEL]: planHandler,
   [ORI_PERSON_GROUP_CHANNEL]: personGroupHandler,
-  [ORI_DISCLOSURE_CHANNEL]: disclosureHandler
+  [ORI_DISCLOSURE_CHANNEL]: disclosureHandler,
+  [KORI_PUBLIC_CURRICULUM_PERIOD_CHANNEL]: curriculumPeriodHandler
 }
 
 const attachDebugHandler = (CHANNEL, handler) => {

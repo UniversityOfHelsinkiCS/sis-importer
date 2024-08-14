@@ -26,6 +26,7 @@ const {
 } = require('./studyRightExpirationRule')
 const { ADMISSION_TYPE_SCHEDULE_ID, info: admissionTypeInfo } = require('./admissionType')
 const { DISCLOSURE_SCHEDULE_ID, info: disclosureInfo } = require('./disclosure')
+const { CURRICULUM_PERIOD_SCHEDULE_ID, info: curriculumPeriodInfo } = require('./curriculumPeriod')
 
 const services = {
   [ATTAINMENT_SCHEDULE_ID]: attainmentInfo,
@@ -52,7 +53,8 @@ const services = {
   [ADMISSION_TYPE_SCHEDULE_ID]: admissionTypeInfo,
   [PLAN_SCHEDULE_ID]: planInfo,
   [PERSON_GROUP_SCHEDULE_ID]: personGroupInfo,
-  [DISCLOSURE_SCHEDULE_ID]: disclosureInfo
+  [DISCLOSURE_SCHEDULE_ID]: disclosureInfo,
+  [CURRICULUM_PERIOD_SCHEDULE_ID]: curriculumPeriodInfo
 }
 
 // Imported in this order
@@ -81,7 +83,8 @@ const serviceIds = [
   ADMISSION_TYPE_SCHEDULE_ID,
   PLAN_SCHEDULE_ID,
   PERSON_GROUP_SCHEDULE_ID,
-  DISCLOSURE_SCHEDULE_ID
+  DISCLOSURE_SCHEDULE_ID,
+  CURRICULUM_PERIOD_SCHEDULE_ID
 ]
 
 module.exports = {

@@ -18,6 +18,7 @@ const APIS = {
 const UPDATE_RETRY_LIMIT = 6
 const PANIC_TIMEOUT = IS_DEV || SONIC ? 60 * 1000 : 15 * 1000 // * 5
 const SERVICE_PROVIDER = process.env.SERVICE_PROVIDER || ''
+const ROOT_ORG_ID = process.env.ROOT_ORG_ID || 'hy-university-root-id'
 
 module.exports = {
   PORT,
@@ -30,5 +31,6 @@ module.exports = {
   APIS,
   UPDATE_RETRY_LIMIT,
   PANIC_TIMEOUT,
-  SERVICE_PROVIDER
+  SERVICE_PROVIDER,
+  ROOT_ORG_ID
 }

@@ -24,6 +24,7 @@ const PersonGroup = require('./personGroup')
 const StudyEvent = require('./studyEvent')
 const Location = require('./location')
 const Disclosure = require('./disclosure')
+const CurriculumPeriod = require('./curriculumPeriod')
 
 Person.hasMany(StudyRight)
 Education.hasMany(StudyRight)
@@ -57,5 +58,6 @@ module.exports = {
   PersonGroup,
   StudyEvent,
   Location,
-  Disclosure
+  Disclosure,
+  CurriculumPeriod
 }
