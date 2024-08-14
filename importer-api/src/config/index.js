@@ -8,6 +8,7 @@ const MAX_CHUNK_SIZE = IS_DEV && !SONIC ? 5 : 100
 const APIS = {
   ori: 'ORI',
   kori: 'KORI',
+  koriPublic: 'KORI_PUBLIC',
   ilmo: 'ILMO',
   osuva: 'OSUVA',
   urn: 'URN',

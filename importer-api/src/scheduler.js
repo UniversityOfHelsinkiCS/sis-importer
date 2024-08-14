@@ -2,6 +2,7 @@ const { eachLimit } = require('async')
 const { stan, opts, SCHEDULER_STATUS_CHANNEL } = require('./utils/stan')
 const { oriRequest } = require('./utils/oriApi')
 const { koriRequest } = require('./utils/koriApi')
+const { koriPublicRequest } = require('./utils/koriApiPublic')
 const { urnRequest } = require('./utils/urnApi')
 const { ilmoRequest } = require('./utils/ilmoApi')
 const { osuvaRequest } = require('./utils/osuvaApi')
@@ -25,6 +26,7 @@ const API_MAPPING = {
 const fetchBy = async (api, url, ordinal, customRequest, limit = 1000, query) => {
   if (api === APIS.graphql) return graphqlRequest(query)
   if (api === APIS.custom) return customRequest(url)
+  if (api === APIS.koriPublic) return koriPublicRequest(url)
   const targetUrl = url.endsWith('/export') ? `${url}?since=${ordinal}&limit=${limit}` : url
   return API_MAPPING[api](targetUrl)
 }
