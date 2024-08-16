@@ -2,6 +2,8 @@ const axios = require('axios').default
 
 const { request } = require('./index')
 
+const { SIS_API_URL } = process.env
+
 const toEntities = data => ({
   entities: data,
   // Provide an ordinal so redis gets populated for the service and onetime
@@ -11,7 +13,7 @@ const toEntities = data => ({
 })
 
 const koriPublicInstance = axios.create({
-  baseURL: 'https://sisu.helsinki.fi/kori/api'
+  baseURL: `${SIS_API_URL}/kori/api`
 })
 
 const koriPublicRequest = async path => {
