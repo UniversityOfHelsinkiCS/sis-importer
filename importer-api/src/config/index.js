@@ -19,7 +19,8 @@ const UPDATE_RETRY_LIMIT = 6
 const PANIC_TIMEOUT = IS_DEV || SONIC ? 60 * 1000 : 15 * 1000 // * 5
 const SERVICE_PROVIDER = process.env.SERVICE_PROVIDER || ''
 const ROOT_ORG_ID = process.env.ROOT_ORG_ID || 'hy-university-root-id'
-const KORI_API_URL = process.env.SIS_API_URL || 'https://sis-helsinki.funidata.fi/kori/api'
+const SIS_API_URL = process.env.SIS_API_URL || 'https://sis-helsinki.funidata.fi'
+const KORI_API_URL = `${SIS_API_URL}/kori/api`
 
 module.exports = {
   PORT,
