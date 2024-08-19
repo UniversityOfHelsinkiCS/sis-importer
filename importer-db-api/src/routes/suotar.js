@@ -284,9 +284,10 @@ router.post('/acceptors', async (req, res) => {
           roleUrn === 'urn:code:course-unit-realisation-responsibility-info-type:teacher' ||
           roleUrn === 'urn:code:course-unit-realisation-responsibility-info-type:responsible-teacher'
       )
-      .map(({ personId }) => ({
+      .map(({ personId, text }) => ({
         roleUrn: 'urn:code:attainment-acceptor-type:approved-by',
-        personId
+        personId,
+        text
       }))
     return acc
   }, {})
@@ -305,9 +306,10 @@ router.post('/acceptors/course-unit', async (req, res) => {
   const acceptors = courseUnits.reduce((acc, { id, responsibilityInfos }) => {
     acc[id] = responsibilityInfos
       .filter(({ roleUrn }) => roleUrn === 'urn:code:module-responsibility-info-type:responsible-teacher')
-      .map(({ personId }) => ({
+      .map(({ personId, text }) => ({
         roleUrn: 'urn:code:attainment-acceptor-type:approved-by',
-        personId
+        personId,
+        text
       }))
     return acc
   }, {})
