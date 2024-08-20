@@ -135,7 +135,8 @@ test('gets acceptor persons for course unit realisation', async () => {
   expect(resp.body['hy-CUR-138156846']).toEqual([
     {
       roleUrn: 'urn:code:attainment-acceptor-type:approved-by',
-      personId: 'hy-hlo-1552817'
+      personId: 'hy-hlo-1552817',
+      text: null
     }
   ])
   expect(resp.body['not-a-course']).toBe(undefined)
