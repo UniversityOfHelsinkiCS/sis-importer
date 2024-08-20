@@ -1,5 +1,6 @@
 const axios = require('axios').default
 
+const { KORI_PUBLIC_API_URL } = require('../config')
 const { request } = require('./index')
 
 const toEntities = data => ({
@@ -11,7 +12,7 @@ const toEntities = data => ({
 })
 
 const koriPublicInstance = axios.create({
-  baseURL: 'https://sisu.helsinki.fi/kori/api'
+  baseURL: KORI_PUBLIC_API_URL
 })
 
 const koriPublicRequest = async path => {
