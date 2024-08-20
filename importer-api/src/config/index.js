@@ -19,6 +19,8 @@ const UPDATE_RETRY_LIMIT = 6
 const PANIC_TIMEOUT = IS_DEV || SONIC ? 60 * 1000 : 15 * 1000 // * 5
 const SERVICE_PROVIDER = process.env.SERVICE_PROVIDER || ''
 const ROOT_ORG_ID = process.env.ROOT_ORG_ID || 'hy-university-root-id'
+const KORI_API_BASE_URL = `${process.env.SIS_API_URL}/kori/api`
+const KORI_PUBLIC_API_URL = SERVICE_PROVIDER === 'fd' ? KORI_API_BASE_URL : 'https://sisu.helsinki.fi/kori/api'
 
 module.exports = {
   PORT,
@@ -32,5 +34,7 @@ module.exports = {
   UPDATE_RETRY_LIMIT,
   PANIC_TIMEOUT,
   SERVICE_PROVIDER,
-  ROOT_ORG_ID
+  ROOT_ORG_ID,
+  KORI_PUBLIC_API_URL,
+  KORI_API_BASE_URL
 }

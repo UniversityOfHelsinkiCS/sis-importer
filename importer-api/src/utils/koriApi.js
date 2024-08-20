@@ -1,9 +1,10 @@
 const axios = require('axios').default
+const { KORI_API_BASE_URL } = require('../config')
 const fs = require('fs')
 const https = require('https')
 const { request } = require('./index')
 const { getAuthHeaders } = require('./auth')
-const { SIS_API_URL, KEY_PATH, CERT_PATH } = process.env
+const { KEY_PATH, CERT_PATH } = process.env
 
 const hasCerts = KEY_PATH && CERT_PATH
 
@@ -19,7 +20,7 @@ const agent = hasCerts
   : new https.Agent()
 
 const koriInstance = axios.create({
-  baseURL: `${SIS_API_URL}/kori/api`,
+  baseURL: KORI_API_BASE_URL,
   headers: getHeaders(),
   httpsAgent: agent
 })
