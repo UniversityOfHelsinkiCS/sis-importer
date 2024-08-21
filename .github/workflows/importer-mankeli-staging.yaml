@@ -20,6 +20,7 @@ jobs:
           filters: |
             migrations:
               - 'importer-mankeli/src/db/migrations/**'
+              - '.github/workflows/importer-mankeli-staging.yaml'
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v3
         with:
@@ -29,13 +30,16 @@ jobs:
       - name: 'Let importer-mankeli run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach sis-importer-mankeli
+          docker compose --file docker-compose.ci.yml up --detach importer-mankeli
           sleep 30 # wait for importer-mankeli to start and run migrations
           docker commit sis-importer-db registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
           docker push registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
 
   test:
     runs-on: ubuntu-latest
+
+    needs:
+      - build_and_push_anon_sis_importer_db
 
     steps:
       - uses: actions/checkout@v4
