@@ -5,7 +5,6 @@ const AssessmentItem = require('./AssessmentItem')
 const Organisation = require('./Organisation')
 const StudyRight = require('./StudyRight')
 const Attainment = require('./Attainment')
-const StudyYear = require('./StudyYear')
 const Person = require('./Person')
 const TermRegistrations = require('./TermRegistrations')
 const Education = require('./Education')
@@ -51,7 +50,6 @@ const models = {
   AssessmentItem,
   StudyRight,
   Attainment,
-  StudyYear,
   Person,
   TermRegistrations,
   Education,

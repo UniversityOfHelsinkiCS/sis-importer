@@ -29,7 +29,7 @@ jobs:
       - name: 'Let importer-mankeli run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
-          docker compose --file docker-compose.ci.yml up --detach
+          docker compose --file docker-compose.ci.yml up --detach sis-importer-mankeli
           sleep 30 # wait for importer-mankeli to start and run migrations
           docker commit sis-importer-db registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
           docker push registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db

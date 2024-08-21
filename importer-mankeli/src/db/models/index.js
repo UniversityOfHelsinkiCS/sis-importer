@@ -9,7 +9,6 @@ const Module = require('./module')
 const Organisation = require('./organisation')
 const TermRegistration = require('./termRegistration')
 const StudyLevel = require('./studyLevel')
-const StudyYear = require('./studyYear')
 const GradeScale = require('./gradeScale')
 const Country = require('./country')
 const EducationType = require('./educationType')
@@ -44,7 +43,6 @@ module.exports = {
   Organisation,
   TermRegistration,
   StudyLevel,
-  StudyYear,
   GradeScale,
   Country,
   EducationType,
