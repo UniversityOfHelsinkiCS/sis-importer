@@ -11,6 +11,9 @@ const relevantAttributes = {
   ]
 }
 
+const masterThesisCourseCode = 'urn:code:course-unit-type:masters-thesis'
+
 module.exports = {
-  relevantAttributes
+  relevantAttributes,
+  masterThesisCourseCode
 }

@@ -1,5 +1,5 @@
 const express = require('express')
-const { relevantAttributes } = require('./config')
+const { relevantAttributes, masterThesisCourseCode } = require('./config')
 const models = require('../../models')
 const { sequelize } = require('../../config/db')
 const { isRefreshingPersonStudyRightsView } = require('../palaute/personStudyRightsView')
@@ -7,6 +7,31 @@ const { isRefreshingPersonStudyRightsView } = require('../palaute/personStudyRig
 const router = express.Router()
 
 const grapaRouter = express.Router()
+
+grapaRouter.get('/masters-attainments', async (req, res) => {
+  const { personIds } = req.body
+
+  if (!personIds) return res.sendStatus(400)
+
+  const studentAttainments = await models.Attainment.findAll({
+    where: {
+      personId: personIds,
+      state: 'ATTAINED'
+    },
+    include: [
+      {
+        attributes: ['id', 'code'],
+        model: models.CourseUnit,
+        as: 'courseUnit',
+        where: {
+          courseUnitType: masterThesisCourseCode
+        }
+      }
+    ]
+  })
+
+  res.send(studentAttainments)
+})
 
 grapaRouter.get('/persons', async (req, res) => {
   const { limit, offset } = req.query
