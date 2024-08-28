@@ -9,11 +9,12 @@ const router = express.Router()
 const grapaRouter = express.Router()
 
 grapaRouter.get('/masters-attainments', async (req, res) => {
-  const { personIds } = req.body
+  const { limit, offset, personIds } = req.query
 
-  if (!personIds) return res.sendStatus(400)
+  if (!limit || !offset || !personIds) return res.sendStatus(400)
 
   const studentAttainments = await models.Attainment.findAll({
+    attributes: ['id', 'personId', 'courseUnitId', 'state', 'attainmentDate', 'registrationDate'],
     where: {
       personId: personIds,
       state: 'ATTAINED'
