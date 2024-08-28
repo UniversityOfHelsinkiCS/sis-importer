@@ -28,7 +28,9 @@ grapaRouter.get('/masters-attainments', async (req, res) => {
           courseUnitType: masterThesisCourseCode
         }
       }
-    ]
+    ],
+    limit,
+    offset
   })
 
   res.send(studentAttainments)
