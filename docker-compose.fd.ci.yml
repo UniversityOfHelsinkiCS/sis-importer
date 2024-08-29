@@ -1,0 +1,22 @@
+services:
+
+  importer-api:
+    build:
+      context: ${SIS_IMPORTER_REPO:-../sis-importer-contrib}/importer-api
+      args:
+        NODE_ENV: production
+    image: ${DOCKER_SIS_IMPORTER_NAMESPACE:-637423527834.dkr.ecr.eu-north-1.amazonaws.com/sis-importer}/importer-api:${DOCKER_IMAGE_TAG:-dev}
+
+  importer-mankeli:
+    build:
+      context: ${SIS_IMPORTER_REPO:-../sis-importer-contrib}/importer-mankeli
+      args:
+        NODE_ENV: production
+    image: ${DOCKER_SIS_IMPORTER_NAMESPACE:-637423527834.dkr.ecr.eu-north-1.amazonaws.com/sis-importer}/importer-mankeli:${DOCKER_IMAGE_TAG:-dev}
+
+  importer-db-api:
+    build:
+      context: ${SIS_IMPORTER_REPO:-../sis-importer-contrib}/importer-db-api
+      args:
+        NODE_ENV: production
+    image: ${DOCKER_SIS_IMPORTER_NAMESPACE:-637423527834.dkr.ecr.eu-north-1.amazonaws.com/sis-importer}/importer-db-api:${DOCKER_IMAGE_TAG:-dev}
