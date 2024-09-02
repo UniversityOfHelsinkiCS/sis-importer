@@ -2,7 +2,7 @@ services:
 
   importer-api:
     build:
-      context: ${SIS_IMPORTER_REPO:-.}/importer-api'
+      context: ${SIS_IMPORTER_REPO:-.}/importer-api
       args:
         NODE_ENV: production
     image: ${DOCKER_SIS_IMPORTER_NAMESPACE:-637423527834.dkr.ecr.eu-north-1.amazonaws.com/sis-importer}/importer-api:${DOCKER_IMAGE_TAG:-dev}
