@@ -1,11 +1,9 @@
 {
-  "name": "importer-test-db-mankeli",
+  "name": "importer-db-staging-sampletaker",
   "version": "1.0.0",
-  "description": "Package to mangel better test-db from impoter-db-test-db",
+  "description": "Package to mangel better test-db from importer-db-test-db",
   "main": "./src/index.js",
   "scripts": {
-    "start": "node ./src/index.js",
-    "start:dev": "nodemon ./src/index.js",
     "test": "npm run lint",
     "lint": "eslint .",
     "lintfix": "prettier --write **/*.{js,json} && eslint --fix ."
@@ -13,8 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "knex": "^2.0.0",
-    "nodemon": "^3.1.3",
-    "pg": "^8.6.0"
+    "knex": "^3.1.0",
+    "pg": "^8.12.0"
   }
 }
