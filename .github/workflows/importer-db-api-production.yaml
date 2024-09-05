@@ -5,6 +5,7 @@ on:
     types: [published]
 
 jobs:
+  # TODO: uncomment once test data is fixed in sis-importer-db DB 
   # test:
   #   runs-on: ubuntu-latest
 
