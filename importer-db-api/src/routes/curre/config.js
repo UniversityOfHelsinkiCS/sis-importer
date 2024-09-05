@@ -1,17 +1,3 @@
-const validRealisationTypes = [
-  'urn:code:course-unit-realisation-type:teaching-participation-lab',
-  'urn:code:course-unit-realisation-type:teaching-participation-online',
-  'urn:code:course-unit-realisation-type:teaching-participation-field-course',
-  'urn:code:course-unit-realisation-type:teaching-participation-project',
-  'urn:code:course-unit-realisation-type:teaching-participation-lectures',
-  'urn:code:course-unit-realisation-type:teaching-participation-small-group',
-  'urn:code:course-unit-realisation-type:teaching-participation-seminar',
-  'urn:code:course-unit-realisation-type:independent-work-project',
-  'urn:code:course-unit-realisation-type:teaching-participation-blended',
-  'urn:code:course-unit-realisation-type:teaching-participation-contact',
-  'urn:code:course-unit-realisation-type:teaching-participation-distance'
-]
-
 const relevantAttributes = {
   courseUnit: ['id', 'code', 'responsibilityInfos', 'completionMethods', 'name', 'validityPeriod'],
   courseUnitRealisation: [
@@ -47,7 +33,6 @@ const teacherUrns = [
 const timeTillCourseStart = 6
 
 module.exports = {
-  validRealisationTypes,
   relevantAttributes,
   teacherUrns,
   timeTillCourseStart

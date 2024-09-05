@@ -3,7 +3,7 @@ const express = require('express')
 const models = require('../../models')
 
 const { addMonths } = require('date-fns')
-const { timeTillCourseStart, relevantAttributes, validRealisationTypes } = require('./config')
+const { timeTillCourseStart, relevantAttributes } = require('./config')
 
 const router = express.Router()
 
@@ -92,10 +92,7 @@ router.get('/courses', async (req, res) => {
             [Op.lte]: courseStartTreshold
           }
         }
-      ],
-      courseUnitRealisationTypeUrn: {
-        [Op.in]: validRealisationTypes
-      }
+      ]
     }
   })
 
