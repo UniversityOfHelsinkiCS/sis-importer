@@ -1,6 +1,6 @@
 # SIS-IMPORTER
 
-[Backlog](https://github.com/orgs/UniversityOfHelsinkiCS/projects/13)
+[Backlog](https://github.com/orgs/UniversityOfHelsinkiCS/projects/19)
 
 ## What is importer?
 
@@ -49,7 +49,7 @@ For step by step overview of how the importer works, see the following READMEs
 - OSUVA (study plans) https://sis-helsinki.funidata.fi/osuva/docs/index.html
 - ARTO (assessments) https://sis-helsinki.funidata.fi/arto/docs/index.html
 
-### Local development
+## Local development
 
 1. See initial setup in https://version.helsinki.fi/toska/dokumentaatio/-/blob/master/guides/how_to_sis-importer_locally.md - contains too much secret data to have here
 2. `npm start` will start the application scaled to 3 mankelis.
@@ -107,6 +107,30 @@ $ docker exec -it <redis-container> redis-cli
 By setting the LATEST_XXXX_ORDINAL to 0 (e.g. set LATEST_ENROLMENT_ORDINAL "0") you can refresh data. Or similarly skip data by setting the value _high enough_. Depends on the data what is a good number.
 
 You can use reset-ordinals.sh as the example. It resets all of the ordinals to 0.
+
+### Running tests
+
+Currently only importer-db-api has some tests. If you want to run them locally, you can run these commands:
+
+1. Start the services
+
+    ```bash
+    docker compose -f docker-compose.ci.yml -f docker-compose.test.yml up -d
+    ```
+
+2. Run the tests
+
+    ```bash
+    docker exec -it sis-importer-db-api npm test
+    ```
+
+    If you want to run the tests in watch mode, you can add `-- --watchAll` to the end of the command. This will automatically rerun the tests when you make changes to the code and save them.
+
+3. Stop the services
+
+    ```bash
+    docker compose -f docker-compose.ci.yml -f docker-compose.test.yml down
+    ```
 
 ### SONIC mode
 

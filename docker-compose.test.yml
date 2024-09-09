@@ -1,0 +1,6 @@
+services:
+  importer-db-api:
+    build:
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ./importer-db-api:/opt/app-root/src
