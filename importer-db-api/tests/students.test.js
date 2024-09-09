@@ -13,7 +13,7 @@ test.skip('unauthorized users can not use endpoints', async () => {
 })
 
 test('get student study rights', async () => {
-  const resp = await supertest(app).get('/students/010231474/studyrights').query(auth)
+  const resp = await supertest(app).get('/students/433237/studyrights').query(auth)
   expect(resp.status).toBe(200)
   expect(resp.body).toHaveLength(1)
   expect(resp.body[0].elements).not.toBe(undefined)

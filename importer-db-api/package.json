@@ -6,10 +6,7 @@
   "scripts": {
     "start": "node ./src/index.js",
     "start:dev": "nodemon ./src/index.js",
-    "ci": "../run.sh ci build importer-db-api && ../run.sh ci run importer-db-api npm run ci:test",
-    "jest": "jest --no-cache --forceExit",
-    "ci:test": "npm-run-all lint jest",
-    "test": "../run.sh ci up --build --abort-on-container-exit --exit-code-from importer-db-api"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -44,8 +41,10 @@
       "text"
     ],
     "collectCoverageFrom": [
-      "**/*.{js,jsx}",
-      "!**/node_modules/**"
+      "**/*.js",
+      "!**/node_modules/**",
+      "!**/coverage/**",
+      "!**/tests/**"
     ]
   }
 }

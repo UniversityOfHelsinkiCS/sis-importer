@@ -2,6 +2,11 @@ services:
   importer-db:
     container_name: sis-importer-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d sis-importer-db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   importer-db-api:
     build:
@@ -11,41 +16,14 @@ services:
     container_name: sis-importer-db-api
     tty: true
     depends_on:
-      - importer-db
+      importer-db:
+        condition: service_healthy
     environment:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       DB_PORT: 5432
       DB_HOST: importer-db
       DB_DATABASE: sis-importer-db
-      NODE_ENV: test
       PORT: 3001
     ports:
       - 3001:3001
-
-  importer-mankeli:
-    build:
-      context: importer-mankeli
-    container_name: sis-importer-mankeli
-    depends_on:
-      - importer-db
-      - importer-redis
-    environment:
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      DB_PORT: 5432
-      DB_HOST: importer-db
-      DB_DATABASE: sis-importer-db
-      REDIS_URI: redis://importer-redis:6379
-
-  importer-redis:
-    command:
-      [
-        "redis-server",
-        "--appendonly",
-        "yes",
-        "--port",
-        "6379"
-      ]
-    image: redis:6-alpine
-    container_name: sis-importer-redis

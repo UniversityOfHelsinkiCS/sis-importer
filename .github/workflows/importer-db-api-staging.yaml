@@ -23,9 +23,8 @@ jobs:
 
       - name: 'Run importer-db and importer-db-api'
         run: docker compose --file docker-compose.ci.yml up --detach --quiet-pull
-      # TODO: uncomment once test data is fixed in sis-importer-db DB 
-      # - name: 'Run unit tests'
-      #   run: docker compose --file docker-compose.ci.yml exec importer-db-api npm run jest
+      - name: 'Run unit tests'
+        run: docker compose --file docker-compose.ci.yml exec importer-db-api npm run test
       - name: Install dependencies
         run: npm ci && npm ci --prefix importer-db-api
       - name: Lint files
