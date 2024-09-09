@@ -21,7 +21,15 @@ const relevantAttributes = {
     'confirmedStudySubGroupIds',
     'documentState'
   ],
-  persons: ['id', 'eduPersonPrincipalName', 'preferredLanguageUrn']
+  persons: [
+    'id',
+    'eduPersonPrincipalName',
+    'preferredLanguageUrn',
+    'studentNumber',
+    'firstNames',
+    'lastName',
+    'primaryEmail'
+  ]
 }
 
 const teacherUrns = [
