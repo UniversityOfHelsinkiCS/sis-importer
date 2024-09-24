@@ -5,11 +5,31 @@ const https = require('https')
 
 const models = require('../models')
 
-const { SIS_API_URL, PROXY_TOKEN, OODIKONE_KEY_PATH, OODIKONE_CERT_PATH, OODIKONE_API_KEY } = process.env
+const {
+  SIS_API_URL,
+  PROXY_TOKEN,
+  OODIKONE_KEY_PATH,
+  OODIKONE_CERT_PATH,
+  OODIKONE_API_KEY,
+  SIS_API_USER,
+  SIS_API_PASSWORD
+} = process.env
 
 const hasCerts = OODIKONE_KEY_PATH && OODIKONE_CERT_PATH
 
+const getSisBasicAuthHeader = () => {
+  const auth = `${SIS_API_USER}:${SIS_API_PASSWORD}`
+  const token = Buffer.from(auth).toString('base64')
+  return {
+    Authorization: 'Basic ' + token
+  }
+}
+
 const getHeaders = () => {
+  const basicAuthProvided = SIS_API_USER && SIS_API_PASSWORD
+  if (basicAuthProvided) {
+    return getSisBasicAuthHeader()
+  }
   if (!hasCerts) return { token: PROXY_TOKEN || '' }
   else if (hasCerts && OODIKONE_API_KEY) return { 'X-Api-Key': OODIKONE_API_KEY }
   return {}
