@@ -60,6 +60,9 @@ Person.init(
     personalDataSafetyNonDisclosure: {
       type: BOOLEAN
     },
+    hasPersonalIdentityCode: {
+      type: BOOLEAN
+    },
     createdAt: {
       type: DATE
     },
