@@ -7,6 +7,7 @@ on:
     paths:
       - importer-mankeli/**
       - .github/workflows/importer-mankeli-staging.yaml
+      - docker-compose.ci.yml
 
 jobs:
   build_and_push_anon_sis_importer_db:

@@ -27,3 +27,23 @@ services:
       PORT: 3001
     ports:
       - 3001:3001
+
+  importer-mankeli:
+    build:
+      context: importer-mankeli
+    container_name: sis-importer-mankeli
+    depends_on:
+      - importer-db
+      - importer-redis
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+      DB_HOST: importer-db
+      DB_DATABASE: sis-importer-db
+      REDIS_URI: redis://importer-redis:6379
+
+  importer-redis:
+    command: [ "redis-server", "--appendonly", "yes", "--port", "6379" ]
+    image: redis:6-alpine
+    container_name: sis-importer-redis
