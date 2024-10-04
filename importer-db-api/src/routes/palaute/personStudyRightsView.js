@@ -36,8 +36,8 @@ const createPersonStudyRightsView = async () => {
           ORDER BY snapshot_date_time DESC
           NULLS LAST
           LIMIT 1
-        ) S, educations E 
-        WHERE S.education_id = E.id 
+        ) S, educations E
+        WHERE S.education_id = E.id
         AND E.education_type IN (:validEducations)
         AND TO_DATE(valid->>'endDate', 'YYYY-MM-DD') >= NOW()
         AND TO_DATE(valid->>'startDate', 'YYYY-MM-DD') <= NOW()
