@@ -33,6 +33,7 @@ const createPersonStudyRightsView = async () => {
         FROM (
           SELECT * from studyrights
           WHERE person_id = P.id
+          AND (snapshot_date_time <= NOW() OR snapshot_date_time IS NULL)
           ORDER BY snapshot_date_time DESC
           NULLS LAST
           LIMIT 1
@@ -41,6 +42,7 @@ const createPersonStudyRightsView = async () => {
         AND E.education_type IN (:validEducations)
         AND TO_DATE(valid->>'endDate', 'YYYY-MM-DD') >= NOW()
         AND TO_DATE(valid->>'startDate', 'YYYY-MM-DD') <= NOW()
+        LIMIT 1
     ) > 0 has_study_right
     FROM persons P;
     
