@@ -14,7 +14,7 @@
     "async": "^2.6.4",
     "axios": "^0.28.0",
     "express": "^4.17.1",
-    "knex": "^2.0.0",
+    "knex": "^3.0.0",
     "lodash": "^4.17.21",
     "node-cron": "^3.0.1",
     "node-nats-streaming": "^0.2.6",
