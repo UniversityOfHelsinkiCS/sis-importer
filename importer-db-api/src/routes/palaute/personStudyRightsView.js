@@ -34,7 +34,7 @@ const createPersonStudyRightsView = async () => {
           SELECT * from studyrights
           WHERE person_id = P.id
           AND (snapshot_date_time <= NOW() OR snapshot_date_time IS NULL)
-          ORDER BY snapshot_date_time DESC
+          ORDER BY snapshot_date_time DESC NULLS LAST, modification_ordinal DESC
           NULLS LAST
           LIMIT 1
         ) S, educations E
