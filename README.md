@@ -15,6 +15,10 @@ For step by step overview of how the importer works, see the following READMEs
 - [Fetcher's README](./importer-api/README.md)
 - [Mankeli's README](./importer-mankeli/README.md)
 
+## How to connect to the local DB
+
+Connect to db: `docker exec -it sis-importer-db psql -U dev -h importer-db -d importer-db`
+
 ## Caveats
 
 - Document state: `documentState` field present in all data defines should the data be used or not. Mainly importer ignores any other data than `ACTIVE` (`DRAFT` and `DELETED` in most cases should be ignored).
@@ -148,5 +152,3 @@ http://localhost:8282/
 
 All three services (api, mankeli and db-api) go through individual staging and production github actions workflows, defined in .github/workflows.
 Docker images are tagged as `production` and `staging` and are pulled automatically into the production and staging environments.
-
-Connect to db: `docker exec -it sis-importer-db psql -U dev -h importer-db -d importer-db`
