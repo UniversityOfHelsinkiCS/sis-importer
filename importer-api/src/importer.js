@@ -6,7 +6,6 @@ const { SONIC, IS_DEV, CURRENT_EXECUTION_HASH, UPDATE_RETRY_LIMIT } = require('.
 const { sleep } = require('./utils')
 const postUpdate = require('./utils/postUpdate')
 const { logger } = require('./utils/logger')
-const { errorCounter } = require('./prom')
 
 const forbiddenServiceIds = []
 let isImporting = false
@@ -58,7 +57,6 @@ const serviceUpdateFun = serviceId => {
     } catch (err) {
       logger.error({ message: err.message, meta: err.stack })
       logger.error({ message: 'Importing failed', meta: err.stack })
-      errorCounter.inc({ service: serviceId })
 
       if (resourceWasForbidden(serviceId, err)) return
       if (attempt > UPDATE_RETRY_LIMIT) return

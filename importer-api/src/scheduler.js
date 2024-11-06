@@ -13,8 +13,6 @@ const { FETCH_AMOUNT, MAX_CHUNK_SIZE, APIS, PANIC_TIMEOUT } = require('./config'
 const { logger } = require('./utils/logger')
 const chunkify = require('./utils/chunkify')
 
-const { successCounter } = require('./prom')
-
 const API_MAPPING = {
   [APIS.ori]: oriRequest,
   [APIS.kori]: koriRequest,
@@ -91,7 +89,6 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinis
           total: amountScheduled,
           serviceId
         })
-        successCounter.inc({ service: serviceId }, amount)
       }
       if (result === Number(amountScheduled)) {
         handleFinish()
