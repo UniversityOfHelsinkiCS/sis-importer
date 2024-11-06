@@ -13,7 +13,7 @@
   "dependencies": {
     "@sentry/node": "^6.3.6",
     "@sentry/tracing": "^6.3.6",
-    "axios": "^0.28.0",
+    "axios": "^1.0.0",
     "date-fns": "^4.0.0",
     "es6-error": "^4.1.1",
     "express": "^4.17.1",

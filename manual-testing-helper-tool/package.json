@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.28.0",
+    "axios": "^1.0.0",
     "dotenv": "^16.0.0",
     "nodemon": "^3.1.3"
   }
