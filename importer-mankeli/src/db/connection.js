@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const Umzug = require('umzug')
+const { Umzug, SequelizeStorage } = require('umzug')
 const { DB_CONNECTION_STRING, DB_CONNECTION_RETRY_LIMIT, MIGRATIONS_LOCK } = require('../config')
 const { lock } = require('../utils/redis')
 const { logger } = require('../utils/logger')
@@ -35,18 +35,21 @@ class Connection {
     const unlock = await lock(MIGRATIONS_LOCK, 1000 * 60 * 10)
     try {
       const migrator = new Umzug({
-        storage: 'sequelize',
-        storageOptions: {
-          sequelize: this.sequelize,
-          tableName: 'migrations'
-        },
-        // eslint-disable-next-line no-console
-        logging: console.log,
+        storage: new SequelizeStorage({ sequelize: this.sequelize, tableName: 'migrations' }),
+        logger: console,
         migrations: {
-          params: [this.sequelize.getQueryInterface(), Sequelize],
-          path: `${process.cwd()}/src/db/migrations`,
-          pattern: /\.js$/
-        }
+          resolve: ({ name, path, context }) => {
+            // Adjust the migration from the new signature to the v2 signature, making easier to upgrade to v3
+            const migration = require(path)
+            return {
+              name,
+              up: async () => migration.up(context),
+              down: async () => migration.down(context)
+            }
+          },
+          glob: `${process.cwd()}/src/db/migrations/*.js`
+        },
+        context: this.sequelize.getQueryInterface()
       })
       const migrations = await migrator.up()
       logger.info(
