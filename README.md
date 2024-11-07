@@ -18,6 +18,7 @@ For step by step overview of how the importer works, see the following READMEs
 ## How to connect to the local DB
 
 Connect to db: `docker exec -it sis-importer-db psql -U dev -h importer-db -d importer-db`
+Password is `dev`
 
 ## Caveats
 
