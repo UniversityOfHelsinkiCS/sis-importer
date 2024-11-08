@@ -3,6 +3,7 @@ const { HOSTNAME, NATS_URI, NATS_TOKEN } = process.env
 
 const stan = natsStreaming.connect('importer-nats', HOSTNAME, {
   url: NATS_URI,
+  port: 4222,
   token: NATS_TOKEN,
   maxReconnectAttempts: -1,
   waitOnFirstConnect: true,
