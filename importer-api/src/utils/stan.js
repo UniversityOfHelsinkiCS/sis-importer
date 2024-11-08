@@ -1,8 +1,8 @@
 const natsStreaming = require('node-nats-streaming')
-const { HOSTNAME, NATS_TOKEN } = process.env
+const { HOSTNAME, NATS_URI, NATS_TOKEN } = process.env
 
 const stan = natsStreaming.connect('importer-nats', HOSTNAME, {
-  url: 'nats://nats-importer:4222',
+  url: NATS_URI,
   token: NATS_TOKEN,
   maxReconnectAttempts: -1,
   waitOnFirstConnect: true,
