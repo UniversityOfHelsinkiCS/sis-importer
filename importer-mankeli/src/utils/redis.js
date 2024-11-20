@@ -1,6 +1,5 @@
 const redis = require('redis')
 const redisLock = require('redis-lock')
-const { promisify } = require('util')
 const { CURRENT_EXECUTION_HASH } = require('../config')
 const { logger } = require('./logger')
 
@@ -12,42 +11,49 @@ const redisRetry = ({ attempt, error }) => {
   return Math.min(attempt * 100, 5000)
 }
 
-const listener = redis.createClient({
-  url: process.env.REDIS_URI,
-  retry_strategy: redisRetry
-})
-
 const client = redis.createClient({
   url: process.env.REDIS_URI,
-  retry_strategy: redisRetry
+  reconnectStrategy: redisRetry
 })
 
 client.on('connect', () => logger.info('REDIS CONNECTED'))
 client.on('ready', () => logger.info('REDIS READY'))
 client.on('error', () => logger.error('REDIS ERROR'))
-
-const lock = promisify(redisLock(client))
-
-const redisPromisify = async (func, ...params) =>
-  new Promise((res, rej) => {
-    func.call(client, ...params, (err, data) => {
-      if (err) rej(err)
-      else res(data)
-    })
+client
+  .connect()
+  .then(() => {
+    logger.info('Client connected to Redis')
+  })
+  .catch(error => {
+    logger.error('Client failed to connect to Redis', error)
   })
 
-const get = async key => await redisPromisify(client.get, key)
+const lock = redisLock(client)
 
-const set = async (key, val) => await redisPromisify(client.set, key, val)
+const get = async key => await client.get(key)
 
-const expire = async (key, val) => await redisPromisify(client.expire, key, val)
+const set = async (key, val) => await client.set(key, val)
 
-listener.subscribe(CURRENT_EXECUTION_HASH)
+const expire = async (key, val) => await client.expire(key, val)
+
+const listener = client.duplicate()
+listener.on('error', () => logger.error('REDIS ERROR'))
+listener
+  .connect()
+  .then(() => {
+    logger.info('Listener connected to Redis')
+  })
+  .catch(error => {
+    logger.error('Listener failed to connect to Redis', error)
+  })
+
 const onCurrentExecutionHashChange = async handleChange => {
   const initialExecutionHash = await get(CURRENT_EXECUTION_HASH)
   if (initialExecutionHash) handleChange(initialExecutionHash)
-  listener.on('message', async (_, hash) => {
-    handleChange(hash)
+
+  await listener.unsubscribe(CURRENT_EXECUTION_HASH)
+  await listener.subscribe(CURRENT_EXECUTION_HASH, async newHash => {
+    handleChange(newHash)
   })
 }
 

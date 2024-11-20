@@ -11,36 +11,37 @@ const redisRetry = ({ attempt, error }) => {
 
 const client = redis.createClient({
   url: process.env.REDIS_URI,
-  retry_strategy: redisRetry
+  reconnectStrategy: redisRetry
 })
 
 client.on('connect', () => logger.info('REDIS CONNECTED'))
 client.on('ready', () => logger.info('REDIS READY'))
 client.on('error', () => logger.error('REDIS ERROR'))
 
-const redisPromisify = async (func, ...params) =>
-  new Promise((res, rej) => {
-    func.call(client, ...params, (err, data) => {
-      if (err) rej(err)
-      else res(data)
-    })
+client
+  .connect()
+  .then(() => {
+    logger.info('Connected to Redis')
+  })
+  .catch(error => {
+    logger.error('Failed to connect to Redis', error)
   })
 
-const sadd = async (key, val) => await redisPromisify(client.sadd, key, val)
+const sadd = async (key, val) => await client.sAdd(key, val)
 
-const smembers = async key => await redisPromisify(client.smembers, key)
+const smembers = async key => await client.sMembers(key)
 
-const get = async key => await redisPromisify(client.get, key)
+const get = async key => await client.get(key)
 
-const set = async (key, val) => await redisPromisify(client.set, key, val)
+const set = async (key, val) => await client.set(key, val)
 
-const expire = async (key, val) => await redisPromisify(client.expire, key, val)
+const expire = async (key, val) => await client.expire(key, val)
 
-const del = async key => await redisPromisify(client.del, key)
+const del = async key => await client.del(key)
 
-const incrby = async (key, val) => await redisPromisify(client.incrby, key, val)
+const incrby = async (key, val) => await client.incrBy(key, val)
 
-const publish = async (channel, message) => await redisPromisify(client.publish, channel, message)
+const publish = async (channel, message) => await client.publish(channel, message)
 
 module.exports = {
   sadd,
