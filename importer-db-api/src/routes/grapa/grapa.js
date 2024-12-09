@@ -3,29 +3,45 @@ const { relevantAttributes, masterThesisCourseCode } = require('./config')
 const models = require('../../models')
 const { sequelize } = require('../../config/db')
 const { isRefreshingPersonStudyRightsView } = require('../palaute/personStudyRightsView')
+const { Op } = require('sequelize')
 
 const router = express.Router()
 
 const grapaRouter = express.Router()
 
-grapaRouter.get('/masters-attainments', async (req, res) => {
+grapaRouter.get('/masters-attainments/:orgCode', async (req, res) => {
   const { limit, offset, personIds } = req.query
 
   if (!limit || !offset || !personIds) return res.sendStatus(400)
 
+  const organisation = await models.Organisation.findOne({
+    where: {
+      code: req.params.orgCode
+    }
+  })
+
+  if (!organisation) return res.sendStatus(404)
+
   const studentAttainments = await models.Attainment.findAll({
     attributes: ['id', 'personId', 'courseUnitId', 'state', 'attainmentDate', 'registrationDate'],
     where: {
-      personId: personIds,
-      state: 'ATTAINED'
+      state: 'ATTAINED',
+      personId: personIds
     },
     include: [
       {
-        attributes: ['id', 'code'],
+        attributes: ['id', 'code', 'organisations'],
         model: models.CourseUnit,
         as: 'courseUnit',
         where: {
-          courseUnitType: masterThesisCourseCode
+          courseUnitType: masterThesisCourseCode,
+          organisations: {
+            [Op.contains]: [
+              {
+                organisationId: organisation.id
+              }
+            ]
+          }
         }
       }
     ],
