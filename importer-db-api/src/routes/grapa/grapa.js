@@ -100,7 +100,7 @@ grapaRouter.get('/studytracks', async (req, res) => {
 
   const [studytracks] = await sequelize.query(
     `
-      SELECT distinct on (m.name) m.name, m.id, s.accepted_selection_path->>'educationPhase2GroupId' as "programGroupId"
+      SELECT distinct on (m.name) m.name, m.id, m.curriculum_period_ids as "curriculumPeriodIds", s.accepted_selection_path->>'educationPhase2GroupId' as "programGroupId"
       FROM "modules" m
       JOIN "studyrights" s ON m."group_id" = s.accepted_selection_path->>'educationPhase2ChildGroupId'
       WHERE s.accepted_selection_path->>'educationPhase2GroupId' IN (:ids)
@@ -118,13 +118,27 @@ grapaRouter.get('/studytracks', async (req, res) => {
     }
   )
 
-  const studyTracksWithProgramCodes = studytracks.map(st => ({
-    ...st,
-    programCode: programmes.find(p => p.groupId === st.programGroupId).code
-  }))
+  const promises = studytracks.map(async st => {
+    const curriculumPeriodInfo = await models.CurriculumPeriod.findAll({
+      attributes: ['id', 'name', 'activePeriod'],
+      where: {
+        id: st.curriculumPeriodIds
+      }
+    })
+
+    const program = programmes.find(p => p.groupId === st.programGroupId)
+
+    return {
+      ...st,
+      curriculumPeriods: curriculumPeriodInfo,
+      programCode: program.code
+    }
+  })
+
+  const acualStudyTracks = await Promise.all(promises).then(studyTracks => studyTracks)
 
   // filter the incomplete entries that do not have a name in all languages
-  res.send(studyTracksWithProgramCodes.filter(st => st.name.fi && st.name.en && st.name.sv))
+  res.send(acualStudyTracks.filter(st => st.name.fi && st.name.en && st.name.sv))
 })
 
 router.use('/', grapaRouter)
