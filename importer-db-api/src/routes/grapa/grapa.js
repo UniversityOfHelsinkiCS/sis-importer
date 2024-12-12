@@ -100,13 +100,13 @@ grapaRouter.get('/studytracks', async (req, res) => {
 
   const [studytracks] = await sequelize.query(
     `
-      SELECT distinct on (m.name) m.name, m.id, m.validity_period, s.accepted_selection_path->>'educationPhase2GroupId' as "programGroupId"
+      SELECT distinct on (lower(m.name->>'fi')) m.name, m.id, s.accepted_selection_path->>'educationPhase2GroupId' as "programGroupId"
       FROM "modules" m
       JOIN "studyrights" s ON m."group_id" = s.accepted_selection_path->>'educationPhase2ChildGroupId'
       WHERE s.accepted_selection_path->>'educationPhase2GroupId' IN (:ids)
         AND m.validity_period->>'endDate' IS NULL
         AND s.document_state = 'ACTIVE'
-      ORDER BY m.name, m.validity_period DESC
+      ORDER BY lower(m.name->>'fi'), m.validity_period DESC
       LIMIT :limit OFFSET :offset
     `,
     {
