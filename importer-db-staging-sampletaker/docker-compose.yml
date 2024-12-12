@@ -17,7 +17,7 @@ services:
     environment:
       POSTGRES_DB: sis-importer-db
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:15.8
+    image: postgres:17.2
     volumes:
       - sis-importer-db-data:/var/lib/postgresql/data
 
