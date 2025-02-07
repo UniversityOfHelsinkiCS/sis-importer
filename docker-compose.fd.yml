@@ -99,7 +99,7 @@ services:
     importer-redis:
         command: [ "redis-server", "--appendonly", "yes", "--port", "6379" ]
         container_name: sis-importer-redis
-        image: redis:5.0.7
+        image: redis:7.4.2
         ports:
             - 16379:6379
         volumes:
