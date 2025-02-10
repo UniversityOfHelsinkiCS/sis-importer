@@ -58,15 +58,15 @@ test('gets batch attainments by student number and course code with substituting
   const resp = await supertest(app)
     .post('/suotar/attainments')
     .query(auth)
-    .send([{ courseCode: '582102', studentNumber: '544261' }])
+    .send([{ courseCode: '582204', studentNumber: '0012955237' }])
   expect(resp.status).toBe(200)
   expect(resp.body.length).toBe(1)
 
   expect(resp.body[0].attainments.length).toBe(1)
-  expect(resp.body[0].attainments[0].personId).toBe('hy-hlo-102720914')
-  expect(resp.body[0].attainments[0].courseUnitId).toBe('hy-CU-53598640-2014-08-01')
-  expect(resp.body[0].attainments[0].credits).toBe(5)
-  expect(resp.body[0].attainments[0].gradeId).toBe(5)
+  expect(resp.body[0].attainments[0].personId).toBe('hy-hlo-78657540')
+  expect(resp.body[0].attainments[0].courseUnitId).toBe('otm-009cfc3d-e43a-4eec-822e-e430b698d9dd') // Course code TKT20013
+  expect(resp.body[0].attainments[0].credits).toBe(6)
+  expect(resp.body[0].attainments[0].gradeId).toBe(4)
 })
 
 test('gets batch attainments by student number and course code without substitutions', async () => {

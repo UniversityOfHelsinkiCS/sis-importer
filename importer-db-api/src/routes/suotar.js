@@ -108,7 +108,7 @@ router.post('/attainments', async (req, res) => {
         },
         personId: person.id,
         misregistration: false,
-        attainmentDate: { [Op.gt]: sub(new Date(), { years: 10 }) }
+        attainmentDate: { [Op.gt]: sub(new Date(), { years: 10 }) } // Why 10 years?
       },
       raw: true
     })
