@@ -1,5 +1,5 @@
 const Sentry = require('@sentry/node')
-const Tracing = require('@sentry/tracing') // eslint-disable-line
+const Tracing = require('@sentry/tracing')
 const { serviceProvider, configSentryDSN, nodeEnv } = require('../config')
 
 const initializeSentry = app => {

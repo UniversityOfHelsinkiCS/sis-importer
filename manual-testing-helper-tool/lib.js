@@ -20,7 +20,6 @@ const axiosInstance = axios.create({
 const apiHealthCheck = async () => {
   const healthCheckPath = 'kori/api/course-units/v1/export?since=0&limit=1'
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     try {
       await axiosInstance.get(healthCheckPath)

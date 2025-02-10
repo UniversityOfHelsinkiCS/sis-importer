@@ -40,7 +40,6 @@ const parseStudyRight = studyRight => {
 // different instances of the same studyright id (snapshots) and we want to
 // save all of them. Thus we can't use id as the primary key. We also don't
 // want to delete any studyrights even if their state is deleted.
-// eslint-disable-next-line
 module.exports = async ({ active, deleted }, transaction) => {
   const parsedStudyRights = [...active, ...deleted].map(parseStudyRight)
   await bulkCreate(StudyRight, parsedStudyRights, transaction, ['id', 'modificationOrdinal', 'autoId'])
