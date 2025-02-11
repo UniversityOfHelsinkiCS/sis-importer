@@ -11,8 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sentry/node": "^6.3.6",
-    "@sentry/tracing": "^6.3.6",
+    "@sentry/node": "^9.0.0",
+    "@sentry/tracing": "^7.0.0",
     "axios": "^1.0.0",
     "date-fns": "^4.0.0",
     "es6-error": "^4.1.1",
