@@ -1,3 +1,4 @@
+require('./utils/sentry')
 const express = require('express')
 const morgan = require('morgan')
 const os = require('os')
@@ -23,17 +24,11 @@ const teacherRightsRouter = require('./routes/teacherRights')
 const jamiRouter = require('./routes/jami')
 const { ApplicationError } = require('./errors')
 const basicAuth = require('./utils/basicAuthMiddleware')
-const initializeSentry = require('./utils/sentry')
 const { dbHealth } = require('./config/db')
 const logger = require('./utils/logger')
 const { serviceProvider } = require('./config')
 
 const app = express()
-
-initializeSentry(app)
-
-app.use(Sentry.Handlers.requestHandler())
-app.use(Sentry.Handlers.tracingHandler())
 
 app.use(morgan('short'))
 app.use(express.json({ limit: '50mb' }))
@@ -76,7 +71,7 @@ app.get('/sandbox', () => {
   throw new Error('Importer is melting down! :fine:')
 })
 
-app.use(Sentry.Handlers.errorHandler())
+Sentry.setupExpressErrorHandler(app)
 
 app.use((error, req, res, next) => {
   logger.error(error)
