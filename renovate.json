@@ -6,16 +6,18 @@
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch",
       "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0/",
       "matchPackageNames": ["*"]
     },
     {
       "matchDatasources": ["docker"],
-      "matchPackageNames": ["node"],
-      "versionCompatibility": "^(?<version>[^-]+)(?<compatibility>-.*)?$",
-      "versioning": "node"
+      "enabled": false
     }
   ],
+  "rebaseWhen": "never",
   "vulnerabilityAlerts": {
     "labels": ["security"]
-  }
+  },
+  "addLabels": ["dependencies"],
+  "rangeStrategy": "bump"
 }
