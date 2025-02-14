@@ -1,14 +1,8 @@
 const Sentry = require('@sentry/node')
 
-const initializeSentry = () => {
-  if (process.env.NODE_ENV !== 'production' || (process.env.SERVICE_PROVIDER === 'fd' && !process.env.SENTRY_DSN))
-    return
-
-  const sentryDSN = process.env.SENTRY_DSN || 'https://eacaccbb66a62f268b3241ddc4da8519@toska.cs.helsinki.fi/9'
-
+if (process.env.NODE_ENV === 'production' && (process.env.SERVICE_PROVIDER !== 'fd' || process.env.SENTRY_DSN)) {
   Sentry.init({
-    dsn: sentryDSN
+    dsn: process.env.SENTRY_DSN || 'https://9b31b43c3f270430d3bb4d7ec9ad8094@toska.cs.helsinki.fi/24',
+    tracesSampleRate: 1.0
   })
 }
-
-module.exports = initializeSentry

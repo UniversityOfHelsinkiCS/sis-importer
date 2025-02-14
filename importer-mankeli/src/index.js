@@ -1,3 +1,4 @@
+require('./utils/sentry')
 const {
   stan,
   opts,
@@ -29,6 +30,7 @@ const {
   ORI_DISCLOSURE_CHANNEL,
   KORI_PUBLIC_CURRICULUM_PERIOD_CHANNEL
 } = require('./utils/stan')
+const Sentry = require('@sentry/node')
 
 const personHandler = require('./messageHandlers/person')
 const attainmentHandler = require('./messageHandlers/attainment')
@@ -98,6 +100,23 @@ const channels = {
   [ORI_DISCLOSURE_CHANNEL]: disclosureHandler,
   [KORI_PUBLIC_CURRICULUM_PERIOD_CHANNEL]: curriculumPeriodHandler
 }
+
+// Remove this when you have verified that Sentry is working
+const transaction = Sentry.startTransaction({
+  op: 'test',
+  name: 'My First Test Transaction'
+})
+
+setTimeout(() => {
+  try {
+    // eslint-disable-next-line no-undef
+    foo()
+  } catch (e) {
+    Sentry.captureException(e)
+  } finally {
+    transaction.finish()
+  }
+}, 99)
 
 const attachDebugHandler = (CHANNEL, handler) => {
   const debugHandler = debugHandlers.find(({ channel }) => channel === CHANNEL)
