@@ -39,9 +39,12 @@ router.get('/sisuroles/:id', async (req, res) => {
     if (e.response) {
       const { response } = e
       logger.info(`Error fetching Sisu roles for person ${id}: ${response.status} ${response.data}`)
-      return res.status(response.status).json(response.data)
+      // return res.status(response.status).json(response.data)
+      return res.status([])
     }
-    throw new Error(`Error fetching Sisu roles for person ${id}: ${e.toString()}`)
+    // throw new Error(`Error fetching Sisu roles for person ${id}: ${e.toString()}`)
+    logger.info(`Error fetching Sisu roles for person ${id}: ${e.toString()}`)
+    return res.status([])
   }
 })
 
