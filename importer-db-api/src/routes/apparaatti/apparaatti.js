@@ -7,7 +7,7 @@ const { timeTillCourseStart, relevantAttributes } = require('./config')
 
 const router = express.Router()
 
-const curreRouter = express.Router()
+const apparaattiRouter = express.Router()
 
 const addCourseUnitsToRealisations = async courseUnitRealisations => {
   const assessmentItemIds = courseUnitRealisations.flatMap(c => c.assessmentItemIds)
@@ -101,7 +101,7 @@ router.get('/courses', async (req, res) => {
   res.send(courseUnitRealisationsWithCourseUnits)
 })
 
-curreRouter.get('/enrolments-new', async (req, res) => {
+apparaattiRouter.get('/enrolments-new', async (req, res) => {
   const { since: sinceRaw, limit, offset } = req.query
   if (!limit || !offset) return res.sendStatus(400)
 
@@ -127,7 +127,7 @@ curreRouter.get('/enrolments-new', async (req, res) => {
   res.send(enrolments)
 })
 
-curreRouter.get('/persons', async (req, res) => {
+apparaattiRouter.get('/persons', async (req, res) => {
   const { limit, offset } = req.query
   if (!limit || !offset) return res.sendStatus(400)
 
@@ -141,6 +141,6 @@ curreRouter.get('/persons', async (req, res) => {
   res.send(persons)
 })
 
-router.use('/', curreRouter)
+router.use('/', apparaattiRouter)
 
 module.exports = router
