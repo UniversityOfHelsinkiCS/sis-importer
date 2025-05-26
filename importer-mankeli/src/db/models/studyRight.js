@@ -94,6 +94,9 @@ StudyRight.init(
     admissionTypeUrn: {
       type: STRING
     },
+    codeUrns: {
+      type: ARRAY(STRING)
+    },
     createdAt: {
       type: DATE
     },

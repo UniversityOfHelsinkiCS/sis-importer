@@ -32,7 +32,8 @@ const parseStudyRight = studyRight => {
       ? studyRight.studyRightExpirationRulesUrn
       : [studyRight.studyRightExpirationRulesUrn],
     modificationOrdinal: studyRight.metadata.modificationOrdinal,
-    admissionTypeUrn: studyRight.admissionTypeUrn
+    admissionTypeUrn: studyRight.admissionTypeUrn,
+    codeUrns: studyRight.codeUrns
   }
 }
 
