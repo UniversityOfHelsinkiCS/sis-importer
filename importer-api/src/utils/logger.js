@@ -49,7 +49,7 @@ if (!IS_DEV) {
   transports.push(
     new LokiTransport({
       host: 'http://loki-svc.toska-lokki.svc.cluster.local:3100',
-      labels: { app: 'sis-importer', environment: process.env.NODE_ENV || 'production' },
+      labels: { app: 'sis-importer', environment: process.env.NODE_ENV || 'production' }
     })
   )
 
