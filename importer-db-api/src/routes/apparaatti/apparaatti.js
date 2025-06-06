@@ -167,7 +167,7 @@ const getEducationByIdForStudyright = async id => {
 }
 
 //this is partially taken from archeology.js
-router.get('/:studentNumber/studyrights', async (req, res) => {
+apparaattiRouter.get('/:studentNumber/studyrights', async (req, res) => {
   try {
     const student = await models.Person.findOne({
       where: {
