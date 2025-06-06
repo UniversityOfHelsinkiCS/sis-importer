@@ -142,6 +142,33 @@ apparaattiRouter.get('/persons', async (req, res) => {
 })
 
 
+const getEducationByIdForStudyright = async id => {
+  try {
+    const education = await models.Education.findOne({
+      where: { id },
+      raw: true
+    })
+
+    delete education.organisations
+    delete education.responsibilityInfos
+    delete education.universityOrgIds
+    delete education.attainmentLanguages
+    delete education.studyFields
+    if (education.structure && education.structure.phase1)
+      education.structure.phase1 = { name: education.structure.phase1.name }
+    if (education.structure && education.structure.phase2)
+      education.structure.phase2 = { name: education.structure.phase2.name }
+    if (education.structure && education.structure.learningOpportunities)
+      delete education.structure.learningOpportunities
+
+    return education
+  } catch (err) {
+    logger.error(err)
+    return { education: 'is missing from the database' }
+  }
+}
+
+
 //this is partially taken from archeology.js
 router.get('/:studentNumber/studyrights', async (req, res) => {
   try {
@@ -210,7 +237,6 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
     }
     
     catch (e) {
-      logger.error(e)
       res.status(500).json(e.toString())
     }
 })
