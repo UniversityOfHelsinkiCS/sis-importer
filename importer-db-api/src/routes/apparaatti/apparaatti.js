@@ -141,6 +141,35 @@ apparaattiRouter.get('/persons', async (req, res) => {
   res.send(persons)
 })
 
+
+//this is partially taken from argchelogy.js
+router.get('/:studentNumber/studyrights', async (req, res) => {
+  try {
+    const student = await models.Person.findOne({
+      where: {
+        studentNumber: req.params.studentNumber
+      }
+    })
+
+    const { openUni: includeOpenUni } = req.query
+    const { deleted: includeDeleted } = req.query
+
+    if (!student) return res.status(404).send('Student not found')
+
+    const studyRights = await models.StudyRight.findAll({
+      where: { personId: student.id },
+      order: [['modificationOrdinal', 'DESC']],
+      raw: true
+    })
+    if (!studyRights.length) return res.json([])
+      return res.json(studyRights)
+    }
+    catch (e) {
+      logger.error(e)
+      res.status(500).json(e.toString())
+    }
+})
+
 router.use('/', apparaattiRouter)
 
 module.exports = router
