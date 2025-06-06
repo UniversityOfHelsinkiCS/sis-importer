@@ -162,8 +162,53 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
       raw: true
     })
     if (!studyRights.length) return res.json([])
-      return res.json(studyRights)
+
+    const mankeledStudyRights = []
+    for (const studyRight of studyRights) {
+      const { educationPhase1GroupId, educationPhase2GroupId } = studyRight.acceptedSelectionPath || {}
+
+      const education = await getEducationByIdForStudyright(studyRight.educationId)
+
+      if (!includeDeleted && studyRight.documentState === 'DELETED') continue
+      if (!includeOpenUni && education?.educationType?.includes('open-university-studies')) continue
+
+      const additionalData = { education }
+
+      if (educationPhase1GroupId) {
+        const educationPhase1 = await models.Module.findOne({
+          where: { groupId: educationPhase1GroupId },
+          raw: true
+        })
+        if (educationPhase1) {
+          delete educationPhase1.responsibilityInfos
+          delete educationPhase1.organisations
+          delete educationPhase1.universityOrgIds
+          delete educationPhase1.curriculumPeriodIds
+          delete educationPhase1.studyFields
+          delete educationPhase1.rule
+        }
+        additionalData.educationPhase1 = educationPhase1
+      }
+      if (educationPhase2GroupId) {
+        const educationPhase2 = await models.Module.findOne({
+          where: { groupId: educationPhase2GroupId },
+          raw: true
+        })
+        if (educationPhase2) {
+          delete educationPhase2.responsibilityInfos
+          delete educationPhase2.organisations
+          delete educationPhase2.universityOrgIds
+          delete educationPhase2.curriculumPeriodIds
+          delete educationPhase2.studyFields
+          delete educationPhase2.rule
+        }
+        additionalData.educationPhase2 = educationPhase2
+      }
+      mankeledStudyRights.push({ ...studyRight, ...additionalData })
     }
+      return res.json(mankeledStudyRights)
+    }
+    
     catch (e) {
       logger.error(e)
       res.status(500).json(e.toString())
