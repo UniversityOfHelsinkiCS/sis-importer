@@ -142,7 +142,7 @@ apparaattiRouter.get('/persons', async (req, res) => {
 })
 
 
-//this is partially taken from argchelogy.js
+//this is partially taken from archeology.js
 router.get('/:studentNumber/studyrights', async (req, res) => {
   try {
     const student = await models.Person.findOne({
