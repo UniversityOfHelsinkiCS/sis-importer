@@ -141,7 +141,6 @@ apparaattiRouter.get('/persons', async (req, res) => {
   res.send(persons)
 })
 
-
 const getEducationByIdForStudyright = async id => {
   try {
     const education = await models.Education.findOne({
@@ -163,11 +162,9 @@ const getEducationByIdForStudyright = async id => {
 
     return education
   } catch (err) {
-    logger.error(err)
     return { education: 'is missing from the database' }
   }
 }
-
 
 //this is partially taken from archeology.js
 router.get('/:studentNumber/studyrights', async (req, res) => {
@@ -233,12 +230,10 @@ router.get('/:studentNumber/studyrights', async (req, res) => {
       }
       mankeledStudyRights.push({ ...studyRight, ...additionalData })
     }
-      return res.json(mankeledStudyRights)
-    }
-    
-    catch (e) {
-      res.status(500).json(e.toString())
-    }
+    return res.json(mankeledStudyRights)
+  } catch (e) {
+    res.status(500).json(e.toString())
+  }
 })
 
 router.use('/', apparaattiRouter)
