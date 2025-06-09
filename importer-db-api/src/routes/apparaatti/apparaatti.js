@@ -166,6 +166,92 @@ const getEducationByIdForStudyright = async id => {
   }
 }
 
+// drops certain fields based on includeOpenUni and includeDeleted
+const mankeloiStudyRights = async (studyRights, includeOpenUni, includeDeleted) => {
+  const mankeledStudyRights = []
+
+  for (const studyRight of studyRights) {
+    const { educationPhase1GroupId, educationPhase2GroupId } = studyRight.acceptedSelectionPath || {}
+    const education = await getEducationByIdForStudyright(studyRight.educationId)
+
+    if (!includeDeleted && studyRight.documentState === 'DELETED') continue
+    if (!includeOpenUni && education?.educationType?.includes('open-university-studies')) continue
+
+    const additionalData = { education }
+
+    if (educationPhase1GroupId) {
+      const educationPhase1 = await models.Module.findOne({
+        where: { groupId: educationPhase1GroupId },
+        raw: true
+      })
+      if (educationPhase1) {
+        delete educationPhase1.responsibilityInfos
+        delete educationPhase1.organisations
+        delete educationPhase1.universityOrgIds
+        delete educationPhase1.curriculumPeriodIds
+        delete educationPhase1.studyFields
+        delete educationPhase1.rule
+      }
+      additionalData.educationPhase1 = educationPhase1
+    }
+
+    if (educationPhase2GroupId) {
+      const educationPhase2 = await models.Module.findOne({
+        where: { groupId: educationPhase2GroupId },
+        raw: true
+      })
+      if (educationPhase2) {
+        delete educationPhase2.responsibilityInfos
+        delete educationPhase2.organisations
+        delete educationPhase2.universityOrgIds
+        delete educationPhase2.curriculumPeriodIds
+        delete educationPhase2.studyFields
+        delete educationPhase2.rule
+      }
+      additionalData.educationPhase2 = educationPhase2
+    }
+
+    mankeledStudyRights.push({ ...studyRight, ...additionalData })
+  }
+
+  return mankeledStudyRights
+}
+
+apparaattiRouter.get('/studyrights', async (req, res) => {
+  try {
+    const { studentNumbers } = req.body
+    if (!studentNumbers || !Array.isArray(studentNumbers) || studentNumbers.length === 0) {
+      return res.status(400).send('Invalid student numbers list')
+    }
+
+    const students = await models.Person.findAll({
+      where: { studentNumber: studentNumbers }
+    })
+
+    if (!students.length) return res.status(404).send('No students found')
+
+    const { openUni: includeOpenUni, deleted: includeDeleted } = req.query
+
+    const studyRightsPromises = students.map(async student => {
+      const studyRights = await models.StudyRight.findAll({
+        where: { personId: student.id },
+        order: [['modificationOrdinal', 'DESC']],
+        raw: true
+      })
+
+      if (!studyRights.length) return []
+
+      const mankeledStudyRights = await mankeloiStudyRights(studyRights, includeOpenUni, includeDeleted)
+      return mankeledStudyRights
+    })
+
+    const allStudyRights = await Promise.all(studyRightsPromises)
+    return res.json(allStudyRights.flat())
+  } catch (e) {
+    res.status(500).json(e.toString())
+  }
+})
+
 //this is partially taken from archeology.js
 apparaattiRouter.get('/:studentNumber/studyrights', async (req, res) => {
   try {
