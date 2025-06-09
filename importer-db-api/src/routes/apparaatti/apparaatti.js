@@ -3,7 +3,7 @@ const express = require('express')
 const models = require('../../models')
 
 const { addMonths } = require('date-fns')
-const { timeTillCourseStart, relevantAttributes } = require('./config')
+const { relevantAttributes } = require('./config')
 
 const router = express.Router()
 
@@ -74,7 +74,7 @@ router.get('/courses', async (req, res) => {
   const { limit, offset } = req.query
   if (!limit || !offset) return res.sendStatus(400)
 
-  const courseStartTreshold = addMonths(new Date(), timeTillCourseStart)
+  const courseStartTreshold = addMonths(new Date(), 48)
 
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     attributes: relevantAttributes.courseUnitRealisation,
