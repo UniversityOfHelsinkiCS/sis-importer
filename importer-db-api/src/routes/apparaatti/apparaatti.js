@@ -217,7 +217,7 @@ const mankeloiStudyRights = async (studyRights, includeOpenUni, includeDeleted) 
   return mankeledStudyRights
 }
 
-apparaattiRouter.get('/studyrights', async (req, res) => {
+apparaattiRouter.post('/studyrights', async (req, res) => {
   try {
     const { studentNumbers } = req.body
     if (!studentNumbers || !Array.isArray(studentNumbers) || studentNumbers.length === 0) {
