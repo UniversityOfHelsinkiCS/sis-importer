@@ -219,34 +219,20 @@ const mankeloiStudyRights = async (studyRights, includeOpenUni, includeDeleted) 
 
 apparaattiRouter.post('/studyrights', async (req, res) => {
   try {
-    const { studentNumbers } = req.body
-    if (!studentNumbers || !Array.isArray(studentNumbers) || studentNumbers.length === 0) {
-      return res.status(400).send('Invalid student numbers list')
-    }
-
-    const students = await models.Person.findAll({
-      where: { studentNumber: studentNumbers }
-    })
-
-    if (!students.length) return res.status(404).send('No students found')
-
+    const { limit, offset } = req.query
+    if (!limit || !offset) return res.sendStatus(400)
     const { openUni: includeOpenUni, deleted: includeDeleted } = req.query
 
-    const studyRightsPromises = students.map(async student => {
-      const studyRights = await models.StudyRight.findAll({
-        where: { personId: student.id },
-        order: [['modificationOrdinal', 'DESC']],
-        raw: true
-      })
-
-      if (!studyRights.length) return []
-
-      const mankeledStudyRights = await mankeloiStudyRights(studyRights, includeOpenUni, includeDeleted)
-      return mankeledStudyRights
+    const studyRights = await models.StudyRight.findAll({
+      limit,
+      offset,
+      order: [['modificationOrdinal', 'DESC']],
+      raw: true
     })
+    if (!studyRights.length) return []
 
-    const allStudyRights = await Promise.all(studyRightsPromises)
-    return res.json(allStudyRights.flat())
+    const mankeledStudyRights = await mankeloiStudyRights(studyRights, includeOpenUni, includeDeleted)
+    return res.json(mankeledStudyRights)
   } catch (e) {
     res.status(500).json(e.toString())
   }
