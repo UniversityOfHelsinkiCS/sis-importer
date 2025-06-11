@@ -217,7 +217,7 @@ const mankeloiStudyRights = async (studyRights, includeOpenUni, includeDeleted) 
   return mankeledStudyRights
 }
 
-apparaattiRouter.post('/studyrights', async (req, res) => {
+apparaattiRouter.get('/studyrights', async (req, res) => {
   try {
     const { limit, offset } = req.query
     if (!limit || !offset) return res.sendStatus(400)
