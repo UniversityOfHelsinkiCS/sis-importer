@@ -226,7 +226,6 @@ apparaattiRouter.get('/studyrights', async (req, res) => {
     const studyRights = await models.StudyRight.findAll({
       limit,
       offset,
-      order: [['modificationOrdinal', 'DESC']],
       raw: true
     })
     if (!studyRights.length) return []
