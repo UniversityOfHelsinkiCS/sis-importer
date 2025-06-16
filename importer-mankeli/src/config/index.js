@@ -2,7 +2,8 @@ module.exports.CURRENT_EXECUTION_HASH = 'CURRENT_EXECUTION_HASH'
 
 module.exports.MIGRATIONS_LOCK = 'MIGRATIONS_LOCK'
 
-const { DB_USERNAME, DB_PASSWORD, DB_PORT, DB_HOST, DB_DATABASE, DB_CONNECTION_SSL_MODE } = process.env
+const { DB_USERNAME, DB_PASSWORD, DB_PORT, DB_HOST, DB_DATABASE, DB_CONNECTION_SSL_MODE, REDIS_HOST, REDIS_PORT } =
+  process.env
 
 const IS_DEV = process.env.NODE_ENV === 'development'
 
@@ -19,3 +20,7 @@ module.exports.DB_CONNECTION_RETRY_LIMIT = process.env.NODE_ENV === 'development
 module.exports.REJECT_UNAUTHORIZED = process.env.KEY_PATH && process.env.CERT_PATH
 
 module.exports.NATS_GROUP = 'importer-api.workers'
+
+module.exports.REDIS_HOST = REDIS_HOST
+
+module.exports.REDIS_PORT = REDIS_PORT

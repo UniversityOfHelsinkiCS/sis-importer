@@ -13,6 +13,7 @@
   "dependencies": {
     "@sentry/node": "^9.1.0",
     "axios": "^1.0.0",
+    "bullmq": "^5.54.0",
     "lodash": "^4.17.21",
     "node-nats-streaming": "^0.2.6",
     "pg": "^8.12.0",
