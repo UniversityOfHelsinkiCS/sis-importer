@@ -1,7 +1,7 @@
 const { set: redisSet, publish: redisPublish } = require('./utils/redis')
 const { randomBytes } = require('crypto')
 const { serviceIds } = require('./services')
-const { schedule } = require('./scheduler')
+const { schedule, scheduleBMQ } = require('./scheduler')
 const { SONIC, IS_DEV, CURRENT_EXECUTION_HASH, UPDATE_RETRY_LIMIT } = require('./config')
 const { sleep } = require('./utils')
 const postUpdate = require('./utils/postUpdate')
@@ -36,7 +36,12 @@ const updateResource = async serviceId => {
   if (IS_DEV && !SONIC) await sleep(1000)
 
   const generatedHash = await updateHash()
-  const data = await schedule(serviceId, generatedHash)
+  let data
+  if (process.env.BMQ) {
+    data = await scheduleBMQ(serviceId, generatedHash)
+  } else {
+    data = await schedule(serviceId, generatedHash)
+  }
   if (!data) return false
 
   const { greatestOrdinal, hasMore, total, ordinalKey } = data

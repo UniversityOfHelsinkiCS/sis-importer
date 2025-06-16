@@ -9,12 +9,21 @@ const connection = {
 
 const queue = new Queue('importer-queue', {
   connection,
+  limiter: {
+    max: 10,
+    duration: 1000
+  },
   defaultJobOptions: {
     removeOnComplete: {
       count: 1000
     },
     removeOnFail: {
       count: 5000
+    },
+    attempts: 3,
+    backoff: {
+      type: 'exponential',
+      delay: 1000
     }
   }
 })

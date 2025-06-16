@@ -89,8 +89,7 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinis
         result = await redisIncrementBy(`${ordinalKey}_UPDATED`, amount)
       } else if (status === 'FAIL') {
         if (entities.length > 1) {
-          // await createJobsFromEntities(channel, entities, executionHash, Math.ceil(entities.length / 2))
-          await createBMQJobsFromEntities(channel, entities)
+          await createJobsFromEntities(channel, entities, executionHash, Math.ceil(entities.length / 2))
         } else {
           logger.error({ message: 'Importing entity failed', meta: stack })
           result = await redisIncrementBy(`${ordinalKey}_UPDATED`, entities.length)
@@ -129,6 +128,7 @@ const schedule = async (id, executionHash) => {
     if (ONETIME && latestOrdinal > 0) return resolve(null)
 
     try {
+      console.log(`fetching ${id} ${latestOrdinal}`)
       const { hasMore, entities, greatestOrdinal } = await fetchBy(
         API,
         API_URL,
@@ -137,12 +137,15 @@ const schedule = async (id, executionHash) => {
         FETCH_AMOUNT,
         { QUERY, GRAPHQL_KEY }
       )
+      console.log(`fetched ${id} ${latestOrdinal}`)
       if (!entities || !entities.length) return resolve(null)
 
+      console.log('updating status')
       await updateServiceStatus(REDIS_KEY, {
         scheduled: entities.length,
         updated: 0
       })
+      console.log('status updated')
 
       const handleFinish = () =>
         resolve(
@@ -164,14 +167,45 @@ const schedule = async (id, executionHash) => {
         clearTimeout(panicTimeout)
       })
 
-      // await createJobsFromEntities(CHANNEL, entities, executionHash)
-      await createBMQJobsFromEntities(CHANNEL, entities)
+      console.log('creating jobs')
+      await createJobsFromEntities(CHANNEL, entities, executionHash)
+      console.log('jobs created')
     } catch (e) {
       console.log(e)
       if (statusChannel) statusChannel.unsubscribe()
       reject(e)
     }
   })
+}
+
+const scheduleBMQ = async serviceId => {
+  const { API, API_URL, REDIS_KEY, CHANNEL, customRequest, QUERY, GRAPHQL_KEY, ONETIME } = services[serviceId]
+
+  const latestOrdinal = (await redisGet(REDIS_KEY)) || 0
+
+  if (ONETIME && latestOrdinal > 0) return
+
+  const { hasMore, entities, greatestOrdinal } = await fetchBy(
+    API,
+    API_URL,
+    latestOrdinal,
+    customRequest,
+    FETCH_AMOUNT,
+    { QUERY, GRAPHQL_KEY }
+  )
+  if (!entities || !entities.length) return
+
+  await createBMQJobsFromEntities(CHANNEL, entities)
+
+  const amountScheduled = entities.length
+
+  logger.info({
+    message: `Queued ${serviceId} ${amountScheduled}`,
+    count: amountScheduled,
+    serviceId
+  })
+
+  return API === APIS.custom ? null : { greatestOrdinal, hasMore, total: entities.length, ordinalKey: REDIS_KEY }
 }
 
 const resetOnetimeServices = async () => {
@@ -181,5 +215,6 @@ const resetOnetimeServices = async () => {
 
 module.exports = {
   schedule,
+  scheduleBMQ,
   resetOnetimeServices
 }

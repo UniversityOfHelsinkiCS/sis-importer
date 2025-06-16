@@ -112,7 +112,7 @@ const attachDebugHandler = (CHANNEL, handler) => {
   return fullHandler
 }
 
-const currentExecutionHash = null
+let currentExecutionHash = null
 
 const splitEntitiesToActiveAndDeleted = (entities, channel) => {
   const active = []
@@ -194,7 +194,6 @@ createWorker(async message => {
   await transaction.commit()
 }).run()
 
-/*
 stan.on('connect', async ({ clientID }) => {
   while (!connection.established && !connection.error) {
     await sleep(100)
@@ -216,7 +215,6 @@ stan.on('connect', async ({ clientID }) => {
   })
   initializePostUpdateChannel()
 })
- */
 
 stan.on('error', e => {
   logger.error('NATS ERROR', e)

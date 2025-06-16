@@ -1,5 +1,5 @@
 services:
-  importer-api:
+  importer-api-bu:
     build:
       args:
         NODE_ENV: 'development'
@@ -21,14 +21,13 @@ services:
       REDIS_URI: redis://importer-redis:6379
       REDIS_HOST: importer-redis
       REDIS_PORT: 6379
-      # BMQ: 1
       SONIC: 0
     ports:
       - 3002:3002 # explorer at http://localhost:3002/
     volumes:
       - ./importer-api:/opt/app-root/src
 
-  importer-mankeli:
+  importer-mankeli-bu:
     build:
       args:
         NODE_ENV: 'development'
@@ -49,11 +48,10 @@ services:
       REDIS_URI: redis://importer-redis:6379
       REDIS_HOST: importer-redis
       REDIS_PORT: 6379
-      # BMQ: 1
     volumes:
       - ./importer-mankeli:/opt/app-root/src
 
-  importer-db:
+  importer-db-bu:
     container_name: sis-importer-db
     environment:
       POSTGRES_USER: dev
@@ -65,7 +63,7 @@ services:
     volumes:
       - sis-importer-pgdata:/var/lib/postgresql/data
 
-  importer-db-api:
+  importer-db-api-bu:
     build:
       args:
         NODE_ENV: 'development'
@@ -88,14 +86,14 @@ services:
     volumes:
       - ./importer-db-api:/opt/app-root/src
 
-  importer-redis:
+  importer-redis-bu:
     command: ['redis-server', '--appendonly', 'yes', '--port', '6379']
     container_name: sis-redis
     image: redis:7.2.7-alpine
     volumes:
       - sis-importer-redis:/data
 
-  importer-nats:
+  importer-nats-bu:
     command: -cid importer-nats -m 8222 --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 5000 -store file -dir datastore
     container_name: sis-importer-nats
     image: nats-streaming:0.25.6
@@ -104,7 +102,7 @@ services:
     volumes:
       - sis-importer-datastore:/datastore
 
-  importer-nats-streaming-console:
+  importer-nats-streaming-console-bu:
     container_name: sis-nats-streaming-console
     environment:
       - STAN_URL=nats://importer-nats:4222
@@ -113,7 +111,7 @@ services:
     ports:
       - 8282:8282 # http://localhost:8282/
 
-  importer-adminer:
+  importer-adminer-bu:
     container_name: importer-adminer
     environment:
       - ADMINER_DESIGN=pepa-linha
@@ -123,10 +121,10 @@ services:
       - 5051:8080 # http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public
 
 volumes:
-  sis-importer-redis:
-  sis-importer-datastore:
-  sis-importer-pgdata:
+  sis-importer-redis-bu:
+  sis-importer-datastore-bu:
+  sis-importer-pgdata-bu:
 
 networks:
   default:
-    name: importer_network
+    name: importer_network-bu
