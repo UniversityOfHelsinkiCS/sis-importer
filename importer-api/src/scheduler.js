@@ -12,6 +12,8 @@ const { services, serviceIds } = require('./services')
 const { FETCH_AMOUNT, MAX_CHUNK_SIZE, APIS, PANIC_TIMEOUT } = require('./config')
 const { logger } = require('./utils/logger')
 const chunkify = require('./utils/chunkify')
+const { chunk } = require('lodash')
+const { queue } = require('./utils/queue')
 
 const API_MAPPING = {
   [APIS.ori]: oriRequest,
@@ -50,6 +52,19 @@ const createJobsFromEntities = async (channel, entities, executionHash, chunks =
     await createJobs(channel, e, executionHash)
   })
 
+const createBMQJobs = async (channel, entities) => {
+  logger.info(`Creating BMQ jobs for ${channel}`)
+  await queue.addBulk(
+    entities.map(entityChunk => ({
+      name: channel,
+      data: entityChunk
+    }))
+  )
+  logger.info(`Created BMQ jobs for ${channel}`)
+}
+
+const createBMQJobsFromEntities = async (channel, entities) => createBMQJobs(channel, chunk(entities, 10))
+
 const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinish, serviceId) => {
   const statusChannel = stan.subscribe(SCHEDULER_STATUS_CHANNEL, opts)
   statusChannel.on('message', async msg => {
@@ -74,7 +89,8 @@ const initializeStatusChannel = (channel, ordinalKey, executionHash, handleFinis
         result = await redisIncrementBy(`${ordinalKey}_UPDATED`, amount)
       } else if (status === 'FAIL') {
         if (entities.length > 1) {
-          await createJobsFromEntities(channel, entities, executionHash, Math.ceil(entities.length / 2))
+          // await createJobsFromEntities(channel, entities, executionHash, Math.ceil(entities.length / 2))
+          await createBMQJobsFromEntities(channel, entities)
         } else {
           logger.error({ message: 'Importing entity failed', meta: stack })
           result = await redisIncrementBy(`${ordinalKey}_UPDATED`, entities.length)
@@ -148,8 +164,10 @@ const schedule = async (id, executionHash) => {
         clearTimeout(panicTimeout)
       })
 
-      await createJobsFromEntities(CHANNEL, entities, executionHash)
+      // await createJobsFromEntities(CHANNEL, entities, executionHash)
+      await createBMQJobsFromEntities(CHANNEL, entities)
     } catch (e) {
+      console.log(e)
       if (statusChannel) statusChannel.unsubscribe()
       reject(e)
     }

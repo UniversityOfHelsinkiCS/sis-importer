@@ -2,7 +2,7 @@ services:
   importer-api:
     build:
       args:
-        NODE_ENV: "development"
+        NODE_ENV: 'development'
       context: importer-api
       dockerfile: dev.Dockerfile
     container_name: sis-importer-api
@@ -30,7 +30,7 @@ services:
   importer-mankeli:
     build:
       args:
-        NODE_ENV: "development"
+        NODE_ENV: 'development'
       context: importer-mankeli
       dockerfile: dev.Dockerfile
     depends_on:
@@ -46,6 +46,8 @@ services:
       NATS_URI: nats://importer-nats:4222
       NATS_TOKEN: dev
       REDIS_URI: redis://importer-redis:6379
+      REDIS_HOST: importer-redis
+      REDIS_PORT: 6379
     volumes:
       - ./importer-mankeli:/opt/app-root/src
 
@@ -64,7 +66,7 @@ services:
   importer-db-api:
     build:
       args:
-        NODE_ENV: "development"
+        NODE_ENV: 'development'
       context: importer-db-api
       dockerfile: dev.Dockerfile
     container_name: sis-importer-db-api
@@ -85,7 +87,7 @@ services:
       - ./importer-db-api:/opt/app-root/src
 
   importer-redis:
-    command: ["redis-server", "--appendonly", "yes", "--port", "6379"]
+    command: ['redis-server', '--appendonly', 'yes', '--port', '6379']
     container_name: sis-redis
     image: redis:7.2.7-alpine
     volumes:

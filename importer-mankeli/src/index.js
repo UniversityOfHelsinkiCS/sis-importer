@@ -66,6 +66,7 @@ const { connection } = require('./db/connection')
 const { REJECT_UNAUTHORIZED, NATS_GROUP } = require('./config')
 const initializePostUpdateChannel = require('./lib/postUpdate')
 const { debugHandlers } = require('./debug')
+const createWorker = require('./utils/worker')
 
 if (!REJECT_UNAUTHORIZED) {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
@@ -111,7 +112,7 @@ const attachDebugHandler = (CHANNEL, handler) => {
   return fullHandler
 }
 
-let currentExecutionHash = null
+const currentExecutionHash = null
 
 const splitEntitiesToActiveAndDeleted = (entities, channel) => {
   const active = []
@@ -170,6 +171,30 @@ const handleMessage = (channel, msgHandler) => async msg => {
   })
 }
 
+createWorker(async message => {
+  const transaction = await createTransaction()
+
+  const channel = message.name
+  const entities = message.data
+
+  logger.info(`Handling ${entities.length} entities for channel ${channel}`)
+
+  const { active, deleted } = splitEntitiesToActiveAndDeleted(entities, channel)
+
+  const messageData = {
+    active,
+    deleted,
+    entities
+  }
+
+  const handler = channels[channel]
+
+  await handler(messageData)
+
+  await transaction.commit()
+}).run()
+
+/*
 stan.on('connect', async ({ clientID }) => {
   while (!connection.established && !connection.error) {
     await sleep(100)
@@ -191,6 +216,7 @@ stan.on('connect', async ({ clientID }) => {
   })
   initializePostUpdateChannel()
 })
+ */
 
 stan.on('error', e => {
   logger.error('NATS ERROR', e)
