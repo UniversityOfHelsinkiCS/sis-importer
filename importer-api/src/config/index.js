@@ -1,4 +1,6 @@
 const PORT = process.env.PORT || 3002
+const REDIS_PORT = process.env.REDIS_PORT || 6379
+const REDIS_HOST = process.env.REDIS_HOST || 'importet-redis'
 const REJECT_UNAUTHORIZED = process.env.KEY_PATH && process.env.CERT_PATH
 const SONIC = process.env.SONIC === '1'
 const CURRENT_EXECUTION_HASH = 'CURRENT_EXECUTION_HASH'
@@ -24,6 +26,8 @@ const KORI_PUBLIC_API_URL = SERVICE_PROVIDER === 'fd' ? KORI_API_BASE_URL : 'htt
 
 module.exports = {
   PORT,
+  REDIS_HOST,
+  REDIS_PORT,
   REJECT_UNAUTHORIZED,
   SONIC,
   CURRENT_EXECUTION_HASH,

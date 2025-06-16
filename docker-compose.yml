@@ -19,7 +19,9 @@ services:
       NATS_URI: nats://importer-nats:4222
       NATS_TOKEN: dev
       REDIS_URI: redis://importer-redis:6379
-      SONIC: 1
+      REDIS_HOST: importer-redis
+      REDIS_PORT: 6379
+      SONIC: 0
     ports:
       - 3002:3002 # explorer at http://localhost:3002/
     volumes:
