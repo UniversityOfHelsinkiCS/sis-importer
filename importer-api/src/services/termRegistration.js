@@ -1,5 +1,5 @@
 const { APIS } = require('../config')
-const { ORI_TERM_REGISTRATION_CHANNEL } = require('../utils/stan')
+const { ORI_TERM_REGISTRATION_CHANNEL } = require('../utils/channels')
 const TERM_REGISTRATION_SCHEDULE_ID = 'TERM_REGISTRATION'
 
 const info = {

@@ -1,10 +1,8 @@
-const { set: redisSet, publish: redisPublish } = require('./utils/redis')
-const { randomBytes } = require('crypto')
+const { set: redisSet } = require('./utils/redis')
 const { serviceIds } = require('./services')
-const { schedule, scheduleBMQ } = require('./scheduler')
-const { SONIC, IS_DEV, CURRENT_EXECUTION_HASH, UPDATE_RETRY_LIMIT } = require('./config')
+const { scheduleBMQ } = require('./scheduler')
+const { SONIC, IS_DEV, UPDATE_RETRY_LIMIT } = require('./config')
 const { sleep } = require('./utils')
-const postUpdate = require('./utils/postUpdate')
 const { logger } = require('./utils/logger')
 
 const forbiddenServiceIds = []
@@ -12,13 +10,6 @@ let isImporting = false
 
 const updateOrdinalFrom = async (total, redisKey, ordinal) => {
   if (total) await redisSet(redisKey, ordinal)
-}
-
-const updateHash = async () => {
-  const generatedHash = randomBytes(12).toString('hex')
-  await redisSet(CURRENT_EXECUTION_HASH, generatedHash)
-  await redisPublish(CURRENT_EXECUTION_HASH, generatedHash)
-  return generatedHash
 }
 
 const resourceWasForbidden = (serviceId, err) => {
@@ -35,13 +26,8 @@ const resourceWasForbidden = (serviceId, err) => {
 const updateResource = async serviceId => {
   if (IS_DEV && !SONIC) await sleep(1000)
 
-  const generatedHash = await updateHash()
-  let data
-  if (process.env.BMQ) {
-    data = await scheduleBMQ(serviceId, generatedHash)
-  } else {
-    data = await schedule(serviceId, generatedHash)
-  }
+  const data = await scheduleBMQ(serviceId)
+
   if (!data) return false
 
   const { greatestOrdinal, hasMore, total, ordinalKey } = data
@@ -91,7 +77,6 @@ const run = async () => {
 
   isImporting = true
   await update()
-  await postUpdate()
   isImporting = false
 }
 

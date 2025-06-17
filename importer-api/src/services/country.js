@@ -1,5 +1,5 @@
 const { APIS, KORI_PUBLIC_API_URL } = require('../config')
-const { URN_COUNTRY_CHANNEL } = require('../utils/stan')
+const { URN_COUNTRY_CHANNEL } = require('../utils/channels')
 const COUNTRY_SCHEDULE_ID = 'COUNTRY'
 
 const info = {

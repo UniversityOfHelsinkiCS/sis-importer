@@ -1,22 +1,3 @@
-const natsStreaming = require('node-nats-streaming')
-const { NATS_GROUP } = require('../config')
-const { HOSTNAME, NATS_URI, NATS_TOKEN } = process.env
-
-const stan = natsStreaming.connect('importer-nats', HOSTNAME, {
-  url: NATS_URI,
-  token: NATS_TOKEN,
-  maxReconnectAttempts: -1,
-  waitOnFirstConnect: true,
-  connectTimeout: 60 * 1000 * 5
-})
-
-const opts = stan.subscriptionOptions()
-opts.setDeliverAllAvailable()
-opts.setDurableName(NATS_GROUP)
-opts.setManualAckMode(true)
-opts.setAckWait(60 * 1000)
-opts.setMaxInFlight(1)
-
 const SCHEDULER_STATUS_CHANNEL = 'SCHEDULER_STATUS_CHANNEL'
 const ORI_PERSON_CHANNEL = 'ORI_PERSON_CHANNEL'
 const ORI_ATTAINMENT_CHANNEL = 'ORI_ATTAINMENT_CHANNEL'
@@ -46,8 +27,6 @@ const ORI_DISCLOSURE_CHANNEL = 'ORI_DISCLOSURE_CHANNEL'
 const KORI_PUBLIC_CURRICULUM_PERIOD_CHANNEL = 'KORI_PUBLIC_CURRICULUM_PERIOD_CHANNEL'
 
 module.exports = {
-  stan,
-  opts,
   SCHEDULER_STATUS_CHANNEL,
   ORI_PERSON_CHANNEL,
   ORI_ATTAINMENT_CHANNEL,

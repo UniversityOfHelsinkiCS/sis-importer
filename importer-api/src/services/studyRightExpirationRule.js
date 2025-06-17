@@ -1,5 +1,5 @@
 const { APIS, KORI_PUBLIC_API_URL } = require('../config')
-const { URN_STUDY_RIGHT_EXPIRATION_RULE_CHANNEL } = require('../utils/stan')
+const { URN_STUDY_RIGHT_EXPIRATION_RULE_CHANNEL } = require('../utils/channels')
 const STUDY_RIGHT_EXPIRATION_RULE_SCHEDULE_ID = 'STUDY_RIGHT_EXPIRATION_RULE'
 
 const info = {

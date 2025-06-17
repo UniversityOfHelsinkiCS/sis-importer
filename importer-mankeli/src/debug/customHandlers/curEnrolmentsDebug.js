@@ -1,4 +1,4 @@
-const { ILMO_ENROLMENT_CHANNEL } = require('../../utils/stan')
+const { ILMO_ENROLMENT_CHANNEL } = require('../../utils/channels')
 
 const matcher = enrolment =>
   enrolment.courseUnitRealisationId === 'hy-opt-cur-2324-f0c0d370-0087-4bb9-93aa-387e76bd11f2'

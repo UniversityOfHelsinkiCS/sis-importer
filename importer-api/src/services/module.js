@@ -1,5 +1,5 @@
 const { APIS } = require('../config')
-const { KORI_MODULE_CHANNEL } = require('../utils/stan')
+const { KORI_MODULE_CHANNEL } = require('../utils/channels')
 const MODULE_SCHEDULE_ID = 'MODULE'
 
 const info = {

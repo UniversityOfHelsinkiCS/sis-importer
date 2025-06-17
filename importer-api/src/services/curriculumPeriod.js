@@ -1,5 +1,5 @@
 const { APIS, ROOT_ORG_ID } = require('../config')
-const { KORI_PUBLIC_CURRICULUM_PERIOD_CHANNEL } = require('../utils/stan')
+const { KORI_PUBLIC_CURRICULUM_PERIOD_CHANNEL } = require('../utils/channels')
 
 const CURRICULUM_PERIOD_SCHEDULE_ID = 'CURRICULUM_PERIOD'
 

@@ -1,8 +1,6 @@
 require('./utils/sentry')
 const {
-  stan,
-  opts,
-  SCHEDULER_STATUS_CHANNEL,
+  //SCHEDULER_STATUS_CHANNEL,
   ORI_PERSON_CHANNEL,
   ORI_ATTAINMENT_CHANNEL,
   ORI_STUDY_RIGHT_CHANNEL,
@@ -29,7 +27,7 @@ const {
   ORI_PERSON_GROUP_CHANNEL,
   ORI_DISCLOSURE_CHANNEL,
   KORI_PUBLIC_CURRICULUM_PERIOD_CHANNEL
-} = require('./utils/stan')
+} = require('./utils/channels')
 
 const personHandler = require('./messageHandlers/person')
 const attainmentHandler = require('./messageHandlers/attainment')
@@ -58,14 +56,14 @@ const personGroupHandler = require('./messageHandlers/personGroup')
 const disclosureHandler = require('./messageHandlers/disclosure')
 const curriculumPeriodHandler = require('./messageHandlers/curriculumPeriod')
 
-const { sleep } = require('./utils')
+// const { sleep } = require('./utils')
 const { createTransaction } = require('./utils/db')
 const { logger } = require('./utils/logger')
-const { onCurrentExecutionHashChange } = require('./utils/redis')
-const { connection } = require('./db/connection')
-const { REJECT_UNAUTHORIZED, NATS_GROUP } = require('./config')
-const initializePostUpdateChannel = require('./lib/postUpdate')
-const { debugHandlers } = require('./debug')
+// const { onCurrentExecutionHashChange } = require('./utils/redis')
+// const { connection } = require('./db/connection')
+const { REJECT_UNAUTHORIZED } = require('./config')
+// const initializePostUpdateChannel = require('./lib/postUpdate')
+// const { debugHandlers } = require('./debug')
 const createWorker = require('./utils/worker')
 
 if (!REJECT_UNAUTHORIZED) {
@@ -101,18 +99,18 @@ const channels = {
   [KORI_PUBLIC_CURRICULUM_PERIOD_CHANNEL]: curriculumPeriodHandler
 }
 
-const attachDebugHandler = (CHANNEL, handler) => {
-  const debugHandler = debugHandlers.find(({ channel }) => channel === CHANNEL)
-  const fullHandler = debugHandler
-    ? msg => {
-        debugHandler.handler(msg)
-        return handler(msg)
-      }
-    : handler
-  return fullHandler
-}
+// const attachDebugHandler = (CHANNEL, handler) => {
+//   const debugHandler = debugHandlers.find(({ channel }) => channel === CHANNEL)
+//   const fullHandler = debugHandler
+//     ? msg => {
+//       debugHandler.handler(msg)
+//       return handler(msg)
+//     }
+//     : handler
+//   return fullHandler
+// }
 
-let currentExecutionHash = null
+// let currentExecutionHash = null
 
 const splitEntitiesToActiveAndDeleted = (entities, channel) => {
   const active = []
@@ -123,7 +121,7 @@ const splitEntitiesToActiveAndDeleted = (entities, channel) => {
     if (entity.documentState === 'DELETED') return deleted.push(entity)
     // documentState must be DRAFT
 
-    if (channel === KORI_EDUCATION_CHANNEL) return active.push(entity)
+    if (channel === 'KORI_EDUCATION_CHANNEL') return active.push(entity)
     return deleted.push(entity)
   })
   return {
@@ -132,44 +130,44 @@ const splitEntitiesToActiveAndDeleted = (entities, channel) => {
   }
 }
 
-const handleMessage = (channel, msgHandler) => async msg => {
-  let response = null
-  const transaction = await createTransaction()
-  try {
-    if (!transaction) throw new Error('Creating transaction failed')
-    const data = JSON.parse(msg.getData())
+// const handleMessage = (channel, msgHandler) => async msg => {
+//   let response = null
+//   const transaction = await createTransaction()
+//   try {
+//     if (!transaction) throw new Error('Creating transaction failed')
+//     const data = JSON.parse(msg.getData())
 
-    if (!data || data.executionHash !== currentExecutionHash) {
-      transaction.rollback()
-      msg.ack()
-      return
-    }
+//     if (!data || data.executionHash !== currentExecutionHash) {
+//       transaction.rollback()
+//       msg.ack()
+//       return
+//     }
 
-    const { active, deleted } = splitEntitiesToActiveAndDeleted(data.entities, channel)
-    data.active = active
-    data.deleted = deleted
+//     const { active, deleted } = splitEntitiesToActiveAndDeleted(data.entities, channel)
+//     data.active = active
+//     data.deleted = deleted
 
-    response = {
-      ...(await msgHandler(data, transaction)),
-      status: 'OK',
-      amount: data.entities.length,
-      channel,
-      executionHash: data.executionHash
-    }
-    transaction.commit()
-    logger.info(`${data.executionHash} ${data.entities.length} ${channel}`)
-  } catch (e) {
-    logger.error(e)
-    logger.error({ message: 'Handling message failed', meta: e.stack })
-    response = { ...JSON.parse(msg.getData()), status: 'FAIL', amount: 0, channel, stack: e.stack }
-    if (transaction) transaction.rollback()
-  }
+//     response = {
+//       ...(await msgHandler(data, transaction)),
+//       status: 'OK',
+//       amount: data.entities.length,
+//       channel,
+//       executionHash: data.executionHash
+//     }
+//     transaction.commit()
+//     logger.info(`${data.executionHash} ${data.entities.length} ${channel}`)
+//   } catch (e) {
+//     logger.error(e)
+//     logger.error({ message: 'Handling message failed', meta: e.stack })
+//     response = { ...JSON.parse(msg.getData()), status: 'FAIL', amount: 0, channel, stack: e.stack }
+//     if (transaction) transaction.rollback()
+//   }
 
-  stan.publish(SCHEDULER_STATUS_CHANNEL, JSON.stringify(response), err => {
-    if (err) logger.error({ message: 'Failed publishing', meta: err.stack })
-    else msg.ack()
-  })
-}
+//   stan.publish(SCHEDULER_STATUS_CHANNEL, JSON.stringify(response), err => {
+//     if (err) logger.error({ message: 'Failed publishing', meta: err.stack })
+//     else msg.ack()
+//   })
+// }
 
 createWorker(async message => {
   const transaction = await createTransaction()
@@ -194,29 +192,29 @@ createWorker(async message => {
   await transaction.commit()
 }).run()
 
-stan.on('connect', async ({ clientID }) => {
-  while (!connection.established && !connection.error) {
-    await sleep(100)
-  }
+// stan.on('connect', async ({ clientID }) => {
+//   while (!connection.established && !connection.error) {
+//     await sleep(100)
+//   }
 
-  if (connection.error) process.exit(1)
-  logger.info(`Connected to NATS as ${clientID}...`)
+//   if (connection.error) process.exit(1)
+//   logger.info(`Connected to NATS as ${clientID}...`)
 
-  await onCurrentExecutionHashChange(hash => {
-    if (!currentExecutionHash && hash) {
-      Object.entries(channels).forEach(([CHANNEL, msgHandler]) => {
-        // Attach optional debug handler
-        const handler = attachDebugHandler(CHANNEL, msgHandler)
-        const channel = stan.subscribe(CHANNEL, NATS_GROUP, opts)
-        channel.on('message', handleMessage(CHANNEL, handler))
-      })
-    }
-    currentExecutionHash = hash
-  })
-  initializePostUpdateChannel()
-})
+//   await onCurrentExecutionHashChange(hash => {
+//     if (!currentExecutionHash && hash) {
+//       Object.entries(channels).forEach(([CHANNEL, msgHandler]) => {
+//         // Attach optional debug handler
+//         const handler = attachDebugHandler(CHANNEL, msgHandler)
+//         const channel = stan.subscribe(CHANNEL, NATS_GROUP, opts)
+//         channel.on('message', handleMessage(CHANNEL, handler))
+//       })
+//     }
+//     currentExecutionHash = hash
+//   })
+//   initializePostUpdateChannel()
+// })
 
-stan.on('error', e => {
-  logger.error('NATS ERROR', e)
-  process.exit(1)
-})
+// stan.on('error', e => {
+//   logger.error('NATS ERROR', e)
+//   process.exit(1)
+// })

@@ -1,6 +1,5 @@
 const redis = require('redis')
 const redisLock = require('redis-lock')
-const { CURRENT_EXECUTION_HASH } = require('../config')
 const { logger } = require('./logger')
 
 const redisRetry = ({ attempt, error }) => {
@@ -47,18 +46,7 @@ listener
     logger.error('Listener failed to connect to Redis', error)
   })
 
-const onCurrentExecutionHashChange = async handleChange => {
-  const initialExecutionHash = await get(CURRENT_EXECUTION_HASH)
-  if (initialExecutionHash) handleChange(initialExecutionHash)
-
-  await listener.unsubscribe(CURRENT_EXECUTION_HASH)
-  await listener.subscribe(CURRENT_EXECUTION_HASH, async newHash => {
-    handleChange(newHash)
-  })
-}
-
 module.exports = {
-  onCurrentExecutionHashChange,
   lock,
   get,
   set,

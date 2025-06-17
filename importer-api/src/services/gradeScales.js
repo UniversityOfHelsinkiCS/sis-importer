@@ -1,5 +1,5 @@
 const { APIS } = require('../config')
-const { GRAPHQL_GRADE_SCALES_CHANNEL } = require('../utils/stan')
+const { GRAPHQL_GRADE_SCALES_CHANNEL } = require('../utils/channels')
 const GRAPHQL_GRADE_SCALES_SCHEDULE_ID = 'GRAPHQL_GRADE_SCALES'
 
 const info = {

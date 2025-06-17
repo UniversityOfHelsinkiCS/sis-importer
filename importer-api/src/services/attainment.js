@@ -1,5 +1,5 @@
 const { APIS } = require('../config')
-const { ORI_ATTAINMENT_CHANNEL } = require('../utils/stan')
+const { ORI_ATTAINMENT_CHANNEL } = require('../utils/channels')
 const ATTAINMENT_SCHEDULE_ID = 'ATTAINMENT'
 
 const info = {

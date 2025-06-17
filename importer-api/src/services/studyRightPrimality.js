@@ -1,5 +1,5 @@
 const { APIS } = require('../config')
-const { ORI_STUDY_RIGHT_PRIMALITY_CHANNEL } = require('../utils/stan')
+const { ORI_STUDY_RIGHT_PRIMALITY_CHANNEL } = require('../utils/channels')
 const STUDY_RIGHT_PRIMALITY_SCHEDULE_ID = 'STUDY_RIGHT_PRIMALITY'
 
 const info = {

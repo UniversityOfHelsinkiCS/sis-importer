@@ -1,4 +1,4 @@
-const { ORI_ATTAINMENT_CHANNEL } = require('../../utils/stan')
+const { ORI_ATTAINMENT_CHANNEL } = require('../../utils/channels')
 
 const matcher = attainment => attainment.personId === 'RETRACTED'
 

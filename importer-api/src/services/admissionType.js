@@ -1,5 +1,5 @@
 const { APIS, KORI_PUBLIC_API_URL } = require('../config')
-const { URN_ADMISSION_TYPE_CHANNEL } = require('../utils/stan')
+const { URN_ADMISSION_TYPE_CHANNEL } = require('../utils/channels')
 const ADMISSION_TYPE_SCHEDULE_ID = 'ADMISSION_TYPE'
 
 const info = {

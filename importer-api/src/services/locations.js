@@ -1,5 +1,5 @@
 const { APIS } = require('../config')
-const { KORI_LOCATION_CHANNEL } = require('../utils/stan')
+const { KORI_LOCATION_CHANNEL } = require('../utils/channels')
 const LOCATION_SCHEDULE_ID = 'LOCATION'
 
 const info = {

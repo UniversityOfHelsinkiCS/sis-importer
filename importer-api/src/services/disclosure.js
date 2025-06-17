@@ -1,5 +1,5 @@
 const { APIS } = require('../config')
-const { ORI_DISCLOSURE_CHANNEL } = require('../utils/stan')
+const { ORI_DISCLOSURE_CHANNEL } = require('../utils/channels')
 const DISCLOSURE_SCHEDULE_ID = 'DISCLOSURE'
 
 const info = {

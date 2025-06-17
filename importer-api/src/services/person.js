@@ -1,5 +1,5 @@
 const { APIS } = require('../config')
-const { ORI_PERSON_CHANNEL } = require('../utils/stan')
+const { ORI_PERSON_CHANNEL } = require('../utils/channels')
 const PERSON_SCHEDULE_ID = 'PERSON'
 
 const info = {

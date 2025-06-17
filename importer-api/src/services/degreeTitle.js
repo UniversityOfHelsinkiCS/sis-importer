@@ -1,5 +1,5 @@
 const { APIS, KORI_PUBLIC_API_URL } = require('../config')
-const { URN_DEGREE_TITLE_CHANNEL } = require('../utils/stan')
+const { URN_DEGREE_TITLE_CHANNEL } = require('../utils/channels')
 const DEGREE_TITLE_SCHEDULE_ID = 'DEGREE_TITLE'
 
 const info = {

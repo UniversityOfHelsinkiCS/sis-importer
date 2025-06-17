@@ -21,8 +21,7 @@ services:
       REDIS_URI: redis://importer-redis:6379
       REDIS_HOST: importer-redis
       REDIS_PORT: 6379
-      # BMQ: 1
-      SONIC: 0
+      SONIC: 1
     ports:
       - 3002:3002 # explorer at http://localhost:3002/
     volumes:
@@ -49,7 +48,6 @@ services:
       REDIS_URI: redis://importer-redis:6379
       REDIS_HOST: importer-redis
       REDIS_PORT: 6379
-      # BMQ: 1
     volumes:
       - ./importer-mankeli:/opt/app-root/src
 

@@ -1,5 +1,5 @@
 const { APIS } = require('../config')
-const { ILMO_ENROLMENT_CHANNEL } = require('../utils/stan')
+const { ILMO_ENROLMENT_CHANNEL } = require('../utils/channels')
 const ENROLMENT_SCHEDULE_ID = 'ENROLMENT'
 
 const info = {

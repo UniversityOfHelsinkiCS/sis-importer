@@ -19,8 +19,6 @@ module.exports.DB_CONNECTION_RETRY_LIMIT = process.env.NODE_ENV === 'development
 
 module.exports.REJECT_UNAUTHORIZED = process.env.KEY_PATH && process.env.CERT_PATH
 
-module.exports.NATS_GROUP = 'importer-api.workers'
-
 module.exports.REDIS_HOST = REDIS_HOST
 
 module.exports.REDIS_PORT = REDIS_PORT

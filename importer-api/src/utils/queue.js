@@ -10,7 +10,7 @@ const connection = {
 const queue = new Queue('importer-queue', {
   connection,
   limiter: {
-    max: 10,
+    max: 10000,
     duration: 1000
   },
   defaultJobOptions: {

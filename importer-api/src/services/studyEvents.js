@@ -1,5 +1,5 @@
 const { APIS } = require('../config')
-const { KORI_STUDY_EVENT_CHANNEL } = require('../utils/stan')
+const { KORI_STUDY_EVENT_CHANNEL } = require('../utils/channels')
 const STUDY_EVENT_SCHEDULE_ID = 'STUDY_EVENT'
 
 const info = {
