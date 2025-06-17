@@ -307,6 +307,28 @@ apparaattiRouter.get('/:studentNumber/studyrights', async (req, res) => {
   }
 })
 
+apparaattiRouter.get('/organisations', async (req, res) => {
+  const { limit, offset } = req.query
+  if (!limit || !offset) return res.sendStatus(400)
+
+  const organisations = await models.Organisation.findAll({
+    attributes: relevantAttributes.organisation,
+    where: {
+      [Op.and]: [
+        // Only latest snapshot
+        models.Organisation.sequelize.literal(
+          '(code, snapshot_date_time) in (select code, max(snapshot_date_time) from organisations group by code)'
+        )
+      ]
+    },
+    limit,
+    offset,
+    order: [['id', 'DESC']]
+  })
+
+  res.send(organisations)
+})
+
 router.use('/', apparaattiRouter)
 
 module.exports = router
