@@ -59,7 +59,9 @@ const serviceUpdateFun = serviceId => {
   return recursivelyUpdateResource
 }
 
-const update = async () => {
+const run = async () => {
+  if (isImporting) return
+  isImporting = true
   for (const serviceId of serviceIds) {
     if (forbiddenServiceIds.includes(serviceId)) {
       logger.info(`Skipping forbidden serviceId ${serviceId}`)
@@ -70,13 +72,6 @@ const update = async () => {
 
     await serviceUpdateFun(serviceId)()
   }
-}
-
-const run = async () => {
-  if (isImporting) return
-
-  isImporting = true
-  await update()
   isImporting = false
 }
 

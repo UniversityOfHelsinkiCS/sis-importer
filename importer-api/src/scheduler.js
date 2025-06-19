@@ -10,7 +10,7 @@ const { services, serviceIds } = require('./services')
 const { FETCH_AMOUNT, APIS } = require('./config')
 const { logger } = require('./utils/logger')
 const { chunk } = require('lodash')
-const { queue } = require('./utils/queue')
+const { queueEvents, queue, Job } = require('./utils/queue')
 
 const API_MAPPING = {
   [APIS.ori]: oriRequest,
@@ -20,6 +20,30 @@ const API_MAPPING = {
   [APIS.urn]: urnRequest
 }
 
+queueEvents.on('failed', async ({ jobId }) => {
+  const job = await Job.fromId(queue, jobId)
+
+  const entities = job.data
+
+  const parts = []
+  if (entities.length >= 2) {
+    const half = Math.round(entities.length / 2)
+    parts.push(entities.splice(0, half))
+    parts.push(entities.splice(half - 1, entities.length))
+    logger.info('Splitting the job and trying again, ', {
+      orignal: entities.length,
+      part1: parts[0].length,
+      part2: parts[1].length
+    })
+  } else {
+    return
+  }
+
+  for (const part in parts) {
+    await queue.add(job.name, part)
+  }
+})
+
 const fetchBy = async (api, url, ordinal, customRequest, limit = 1000, query) => {
   if (api === APIS.graphql) return graphqlRequest(query)
   if (api === APIS.custom) return customRequest(url)
@@ -27,19 +51,6 @@ const fetchBy = async (api, url, ordinal, customRequest, limit = 1000, query) =>
   const targetUrl = url.endsWith('/export') ? `${url}?since=${ordinal}&limit=${limit}` : url
   return API_MAPPING[api](targetUrl)
 }
-
-const createBMQJobs = async (channel, entities) => {
-  logger.info(`Creating BMQ jobs for ${channel}`)
-  await queue.addBulk(
-    entities.map(entityChunk => ({
-      name: channel,
-      data: entityChunk
-    }))
-  )
-  logger.info(`Created BMQ jobs for ${channel}`)
-}
-
-const createBMQJobsFromEntities = async (channel, entities) => createBMQJobs(channel, chunk(entities, 1000))
 
 const scheduleBMQ = async serviceId => {
   const { API, API_URL, REDIS_KEY, CHANNEL, customRequest, QUERY, GRAPHQL_KEY, ONETIME } = services[serviceId]
@@ -58,7 +69,14 @@ const scheduleBMQ = async serviceId => {
   )
   if (!entities || !entities.length) return
 
-  await createBMQJobsFromEntities(CHANNEL, entities)
+  logger.info(`Creating BMQ jobs for ${CHANNEL}`)
+  await queue.addBulk(
+    chunk(entities, 1000).map(entityChunk => ({
+      name: CHANNEL,
+      data: entityChunk
+    }))
+  )
+  logger.info(`Created BMQ jobs for ${CHANNEL}`)
 
   const amountScheduled = entities.length
 

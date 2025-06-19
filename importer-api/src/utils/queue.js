@@ -20,11 +20,7 @@ const queue = new Queue('importer-queue', {
     removeOnFail: {
       count: 5000
     },
-    attempts: 3,
-    backoff: {
-      type: 'exponential',
-      delay: 1000
-    }
+    attempts: 0
   }
 })
 
