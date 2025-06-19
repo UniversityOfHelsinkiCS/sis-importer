@@ -1,6 +1,7 @@
 const os = require('os')
 
 const winston = require('winston')
+const LokiTransport = require('winston-loki')
 const { IS_DEV } = require('../config')
 const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 
@@ -44,6 +45,13 @@ if (!IS_DEV) {
   )
 
   transports.push(new winston.transports.Console({ format: prodFormat }))
+
+  transports.push(
+    new LokiTransport({
+      host: 'http://loki-svc.toska-lokki.svc.cluster.local:3100',
+      labels: { app: 'sis-importer', environment: process.env.NODE_ENV || 'production' }
+    })
+  )
 
   if (!process.env.STAGING && !process.env.SERVICE_PROVIDER === 'fd') {
     transports.push(
