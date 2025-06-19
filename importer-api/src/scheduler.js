@@ -10,7 +10,8 @@ const { services, serviceIds } = require('./services')
 const { FETCH_AMOUNT, APIS } = require('./config')
 const { logger } = require('./utils/logger')
 const { chunk } = require('lodash')
-const { queueEvents, queue, Job } = require('./utils/queue')
+const { Job } = require('bullmq')
+const { queueEvents, queue } = require('./utils/queue')
 const { timed } = require('./utils/time')
 
 const API_MAPPING = {
@@ -29,8 +30,8 @@ queueEvents.on('failed', async ({ jobId }) => {
   const parts = []
   if (entities.length >= 2) {
     const half = Math.round(entities.length / 2)
-    parts.push(entities.splice(0, half))
-    parts.push(entities.splice(half - 1, entities.length))
+    parts.push(entities.slice(0, half))
+    parts.push(entities.slice(half))
     logger.info('Splitting the job and trying again, ', {
       original: entities.length,
       part1: parts[0].length,
@@ -46,6 +47,26 @@ queueEvents.on('failed', async ({ jobId }) => {
     timeMs: duration
   })
 })
+
+const testCorruptRandomEntity = entities => {
+  if (process.env.TEST_ENTITY_CORRUPTION_RATE > 0 && Math.random() < process.env.TEST_ENTITY_CORRUPTION_RATE) {
+    const corruptedIdx = Math.floor(Math.random() * entities.length)
+    const corrupted = entities[corruptedIdx]
+    Object.keys(corrupted).forEach(key => {
+      corrupted[key] = `${corrupted[key]} TEST CORRUPTION = ${Math.random()}` // Database operations will fail
+    })
+  }
+  return entities
+}
+
+const testErrorRandomEntity = entities => {
+  if (process.env.TEST_ENTITY_ERROR_RATE > 0 && Math.random() < process.env.TEST_ENTITY_ERROR_RATE) {
+    const corruptedIdx = Math.floor(Math.random() * entities.length)
+    const corrupted = entities[corruptedIdx]
+    corrupted.testError = 'TEST ERROR' // Mankeli will notice this and throw error
+  }
+  return entities
+}
 
 const fetchBy = async (api, url, ordinal, customRequest, limit = 1000, query) => {
   if (api === APIS.graphql) return graphqlRequest(query)
@@ -71,6 +92,7 @@ const scheduleBMQ = async serviceId => {
       GRAPHQL_KEY
     })
   )
+
   if (!entities || !entities.length) {
     logger.info(`No entities fetched from ${API_URL}`, {
       serviceId,
@@ -79,6 +101,9 @@ const scheduleBMQ = async serviceId => {
     })
     return
   }
+
+  testCorruptRandomEntity(entities)
+  testErrorRandomEntity(entities)
 
   logger.info(`Fetched ${entities.length} entities from ${API_URL}`, {
     serviceId,

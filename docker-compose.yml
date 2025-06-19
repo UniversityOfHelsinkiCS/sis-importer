@@ -20,6 +20,8 @@ services:
       REDIS_HOST: importer-redis
       REDIS_PORT: 6379
       SONIC: 1
+      TEST_ENTITY_CORRUPTION_RATE: 0 # 0 means no entities are corrupted, 1 means all entities are corrupted. Try something like 0.1
+      TEST_ENTITY_ERROR_RATE: 0 # same as TEST_ENTITY_CORRUPTION_RATE but causes errors in mankeli instead of corruption
     ports:
       - 3002:3002 # explorer at http://localhost:3002/
     volumes:
@@ -43,6 +45,7 @@ services:
       REDIS_URI: redis://importer-redis:6379
       REDIS_HOST: importer-redis
       REDIS_PORT: 6379
+      TEST_FAIL_RATE: 0 # 0 means no failures, 1 means all failures. Try something like 0.1
     volumes:
       - ./importer-mankeli:/opt/app-root/src
     deploy:

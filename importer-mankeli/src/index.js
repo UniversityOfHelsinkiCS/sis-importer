@@ -96,11 +96,31 @@ const channels = {
   [KORI_PUBLIC_CURRICULUM_PERIOD_CHANNEL]: curriculumPeriodHandler
 }
 
+if (process.env.TEST_FAIL_RATE > 0) {
+  Object.keys(channels).forEach(channelKey => {
+    const fn = channels[channelKey]
+    channels[channelKey] = async messageData => {
+      if (Math.random() < process.env.TEST_FAIL_RATE) {
+        await new Promise((resolve, reject) => {
+          setTimeout(
+            () => {
+              reject(new Error('Test failure'))
+            },
+            10 + Math.random() * 1000
+          )
+        })
+      }
+      return fn(messageData)
+    }
+  })
+}
+
 const splitEntitiesToActiveAndDeleted = (entities, channel) => {
   const active = []
   const deleted = []
 
   entities.forEach(entity => {
+    if (entity.testError) throw new Error(`Entity has testError key: ${entity.testError}`)
     if (entity.documentState === 'ACTIVE') return active.push(entity)
     if (entity.documentState === 'DELETED') return deleted.push(entity)
     // documentState must be DRAFT
@@ -119,25 +139,33 @@ createWorker(async message => {
     await sleep(100)
   }
 
-  if (connection.error) process.exit(1)
+  if (connection.error) {
+    logger.error(`Connection error: ${connection.error}`)
+    process.exit(1)
+  }
   const transaction = await createTransaction()
 
-  const channel = message.name
-  const entities = message.data
+  try {
+    const channel = message.name
+    const entities = message.data
 
-  logger.info(`Handling ${entities.length} entities for channel ${channel}`)
+    logger.info(`Handling ${entities.length} entities for channel ${channel}`)
 
-  const { active, deleted } = splitEntitiesToActiveAndDeleted(entities, channel)
+    const { active, deleted } = splitEntitiesToActiveAndDeleted(entities, channel)
 
-  const messageData = {
-    active,
-    deleted,
-    entities
+    const messageData = {
+      active,
+      deleted,
+      entities
+    }
+
+    const handler = channels[channel]
+
+    await handler(messageData)
+
+    await transaction.commit()
+  } catch (error) {
+    await transaction.rollback()
+    throw error // so that the job fails
   }
-
-  const handler = channels[channel]
-
-  await handler(messageData)
-
-  await transaction.commit()
 }).run()
