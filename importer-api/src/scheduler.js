@@ -11,6 +11,7 @@ const { FETCH_AMOUNT, APIS } = require('./config')
 const { logger } = require('./utils/logger')
 const { chunk } = require('lodash')
 const { queueEvents, queue, Job } = require('./utils/queue')
+const { timed } = require('./utils/time')
 
 const API_MAPPING = {
   [APIS.ori]: oriRequest,
@@ -31,7 +32,7 @@ queueEvents.on('failed', async ({ jobId }) => {
     parts.push(entities.splice(0, half))
     parts.push(entities.splice(half - 1, entities.length))
     logger.info('Splitting the job and trying again, ', {
-      orignal: entities.length,
+      original: entities.length,
       part1: parts[0].length,
       part2: parts[1].length
     })
@@ -39,9 +40,11 @@ queueEvents.on('failed', async ({ jobId }) => {
     return
   }
 
-  for (const part in parts) {
-    await queue.add(job.name, part)
-  }
+  const { duration } = await timed(Promise.all(parts.map(part => queue.add(job.name, part))))
+  logger.info({
+    message: 'Requeued two jobs',
+    timeMs: duration
+  })
 })
 
 const fetchBy = async (api, url, ordinal, customRequest, limit = 1000, query) => {
@@ -59,30 +62,45 @@ const scheduleBMQ = async serviceId => {
 
   if (ONETIME && latestOrdinal > 0) return
 
-  const { hasMore, entities, greatestOrdinal } = await fetchBy(
-    API,
-    API_URL,
-    latestOrdinal,
-    customRequest,
-    FETCH_AMOUNT,
-    { QUERY, GRAPHQL_KEY }
+  const {
+    result: { hasMore, entities, greatestOrdinal },
+    duration: fetchDuration
+  } = await timed(
+    fetchBy(API, API_URL, latestOrdinal, customRequest, FETCH_AMOUNT, {
+      QUERY,
+      GRAPHQL_KEY
+    })
   )
-  if (!entities || !entities.length) return
+  if (!entities || !entities.length) {
+    logger.info(`No entities fetched from ${API_URL}`, {
+      serviceId,
+      channel: CHANNEL,
+      timeMs: fetchDuration
+    })
+    return
+  }
 
-  logger.info(`Creating BMQ jobs for ${CHANNEL}`)
-  await queue.addBulk(
-    chunk(entities, 1000).map(entityChunk => ({
-      name: CHANNEL,
-      data: entityChunk
-    }))
-  )
-  logger.info(`Created BMQ jobs for ${CHANNEL}`)
+  logger.info(`Fetched ${entities.length} entities from ${API_URL}`, {
+    serviceId,
+    channel: CHANNEL,
+    timeMs: fetchDuration
+  })
 
-  const amountScheduled = entities.length
+  const jobs = chunk(entities, 1000).map(entityChunk => ({
+    name: CHANNEL,
+    data: entityChunk
+  }))
+
+  logger.info(`Queuing BMQ jobs for ${CHANNEL}`, {
+    count: jobs.length
+  })
+  const { duration: queueDuration } = await timed(queue.addBulk(jobs))
 
   logger.info({
-    message: `Queued ${serviceId} ${amountScheduled}`,
-    count: amountScheduled,
+    message: `Queued ${serviceId} ${entities.length}`,
+    count: entities.length,
+    channel: CHANNEL,
+    timeMs: queueDuration,
     serviceId
   })
 
