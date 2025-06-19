@@ -1,5 +1,5 @@
 const { APIS } = require('../config')
-const OSUVA_PLAN_CHANNEL = require('../utils/channels')
+const { OSUVA_PLAN_CHANNEL } = require('../utils/channels')
 const PLAN_SCHEDULE_ID = 'PLAN'
 
 const info = {

@@ -45,6 +45,8 @@ services:
       REDIS_PORT: 6379
     volumes:
       - ./importer-mankeli:/opt/app-root/src
+    deploy:
+      replicas: 3
 
   importer-db:
     container_name: sis-importer-db
