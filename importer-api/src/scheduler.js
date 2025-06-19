@@ -29,7 +29,7 @@ const fetchBy = async (api, url, ordinal, customRequest, limit = 1000, query) =>
 }
 
 const createBMQJobs = async (channel, entities) => {
-  logger.info(`Creating BMQ jobs for ${channel}`)
+  logger.info(`Creating BMQ jobs for ${JSON.stringify(channel, null, 2)}`)
   await queue.addBulk(
     entities.map(entityChunk => ({
       name: channel,
