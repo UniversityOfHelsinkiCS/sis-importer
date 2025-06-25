@@ -48,8 +48,8 @@ services:
       TEST_FAIL_RATE: 0 # 0 means no failures, 1 means all failures. Try something like 0.1
     volumes:
       - ./importer-mankeli:/opt/app-root/src
-    deploy:
-      replicas: 3
+    # deploy:
+    #   replicas: 3
 
   importer-db:
     container_name: sis-importer-db
