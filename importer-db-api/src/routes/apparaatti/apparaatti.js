@@ -77,7 +77,7 @@ router.get('/courses', async (req, res) => {
   const courseStartTreshold = addMonths(new Date(), 48)
 
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
-    attributes: relevantAttributes.courseUnitRealisation,
+    attributes: relevantAttributes.courseUnitRealisation.concat(['customCodeUrns']),
     limit,
     offset,
     where: {
