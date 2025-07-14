@@ -22,7 +22,7 @@ const addCourseUnitsToRealisations = async courseUnitRealisations => {
     include: [
       {
         model: models.CourseUnit,
-        attributes: relevantAttributes.courseUnit,
+        attributes: relevantAttributes.courseUnit.concat(['credits']),
         as: 'courseUnit',
         required: true
       }
