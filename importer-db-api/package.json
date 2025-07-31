@@ -11,8 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sentry/node": "^9.1.0",
-    "@sentry/profiling-node": "^9.1.0",
+    "@sentry/node": "^10.0.0",
+    "@sentry/profiling-node": "^10.0.0",
     "axios": "^1.0.0",
     "date-fns": "^4.0.0",
     "es6-error": "^4.1.1",
