@@ -145,10 +145,6 @@ If one wants to increase the speed of the importer when developing, set the flag
 
 http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public
 
-### NATS-streaming-console
-
-http://localhost:8282/
-
 ## CI
 
 All three services (api, mankeli and db-api) go through individual staging and production github actions workflows, defined in .github/workflows.
