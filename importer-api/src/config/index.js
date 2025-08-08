@@ -3,7 +3,6 @@ const REDIS_PORT = process.env.REDIS_PORT || 6379
 const REDIS_HOST = process.env.REDIS_HOST || 'importet-redis'
 const REJECT_UNAUTHORIZED = process.env.KEY_PATH && process.env.CERT_PATH
 const SONIC = process.env.SONIC === '1'
-const CURRENT_EXECUTION_HASH = 'CURRENT_EXECUTION_HASH'
 const IS_DEV = process.env.NODE_ENV === 'development'
 const FETCH_AMOUNT = IS_DEV && !SONIC ? 15 : 1000
 const MAX_CHUNK_SIZE = IS_DEV && !SONIC ? 5 : 100
@@ -30,7 +29,6 @@ module.exports = {
   REDIS_PORT,
   REJECT_UNAUTHORIZED,
   SONIC,
-  CURRENT_EXECUTION_HASH,
   FETCH_AMOUNT,
   MAX_CHUNK_SIZE,
   IS_DEV,
