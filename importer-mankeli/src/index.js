@@ -134,7 +134,7 @@ const splitEntitiesToActiveAndDeleted = (entities, channel) => {
   }
 }
 
-createWorker(async message => {
+createWorker(async job => {
   while (!connection.established && !connection.error) {
     await sleep(100)
   }
@@ -146,8 +146,8 @@ createWorker(async message => {
   const transaction = await createTransaction()
 
   try {
-    const channel = message.name
-    const entities = message.data
+    const channel = job.name
+    const entities = job.data
 
     logger.info(`Handling ${entities.length} entities for channel ${channel}`)
 

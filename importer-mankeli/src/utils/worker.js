@@ -8,8 +8,8 @@ const connection = {
   port: REDIS_PORT
 }
 
-const createWorker = messageHandler => {
-  const worker = new Worker('importer-queue', messageHandler, { connection, autorun: false })
+const createWorker = jobHandler => {
+  const worker = new Worker('importer-queue', jobHandler, { connection, autorun: false })
 
   worker.on('completed', job => {
     logger.info({
@@ -21,8 +21,7 @@ const createWorker = messageHandler => {
   })
 
   worker.on('error', error => {
-    logger.error('Job returned error:')
-    logger.error(error.toString())
+    logger.error(`Job returned error: ${error.toString()}`)
   })
 
   worker.on('failed', (job, error) => {
