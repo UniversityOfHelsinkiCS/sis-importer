@@ -1,6 +1,6 @@
 const PORT = process.env.PORT || 3002
 const REDIS_PORT = process.env.REDIS_PORT || 6379
-const REDIS_HOST = process.env.REDIS_HOST || 'importet-redis'
+const REDIS_HOST = process.env.REDIS_HOST || 'importer-redis'
 const REJECT_UNAUTHORIZED = process.env.KEY_PATH && process.env.CERT_PATH
 const SONIC = process.env.SONIC === '1'
 const IS_DEV = process.env.NODE_ENV === 'development'
