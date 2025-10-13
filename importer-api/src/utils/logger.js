@@ -37,18 +37,12 @@ if (!IS_DEV) {
     silly: 6
   }
 
-  const prodFormat = winston.format.printf(({ level, ...rest }) => {
-    if (SERVICE_PROVIDER !== 'fd') {
-      return JSON.stringify({
-        level: levels[level],
-        ...rest
-      })
-    } else {
-      return JSON.stringify({
-        funidata: 'Mock message'
-      })
-    }
-  })
+  const prodFormat = winston.format.printf(({ level, ...rest }) =>
+    JSON.stringify({
+      level: levels[level],
+      ...rest
+    })
+  )
 
   transports.push(new winston.transports.Console({ format: prodFormat }))
 
