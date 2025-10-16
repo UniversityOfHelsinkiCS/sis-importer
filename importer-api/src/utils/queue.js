@@ -1,6 +1,14 @@
 const { Queue, QueueEvents } = require('bullmq')
 
-const { REDIS_HOST, REDIS_PORT, SERVICE_PROVIDER } = require('../config')
+const {
+  REDIS_HOST,
+  REDIS_PORT,
+  SERVICE_PROVIDER,
+  QUEUE_COMPLETE_COUNT,
+  QUEUE_COMPLETE_AGE,
+  QUEUE_FAIL_COUNT,
+  QUEUE_FAIL_AGE
+} = require('../config')
 
 const connection = {
   host: REDIS_HOST,
@@ -18,8 +26,14 @@ const defaultJobOptions = {
 }
 const fdJobOptions = {
   ...defaultJobOptions,
-  removeOnComplete: true,
-  removeOnFail: true
+  removeOnComplete: {
+    age: QUEUE_COMPLETE_AGE,
+    count: QUEUE_COMPLETE_COUNT
+  },
+  removeOnFail: {
+    age: QUEUE_FAIL_AGE,
+    count: QUEUE_FAIL_COUNT
+  }
 }
 
 const queue = new Queue('importer-queue', {
