@@ -46,27 +46,29 @@ if (!IS_DEV) {
 
   transports.push(new winston.transports.Console({ format: prodFormat }))
 
-  transports.push(
-    new LokiTransport({
-      host: 'http://loki-svc.toska-lokki.svc.cluster.local:3100',
-      labels: { app: 'sis-importer', environment: process.env.NODE_ENV || 'production' }
-    })
-  )
-
-  if (!process.env.STAGING && SERVICE_PROVIDER !== 'fd') {
+  if (SERVICE_PROVIDER !== 'fd') {
     transports.push(
-      new WinstonGelfTransporter({
-        handleExceptions: true,
-        host: 'svm-116.cs.helsinki.fi',
-        port: 9503,
-        protocol: 'udp',
-        hostName: os.hostname(),
-        additional: {
-          app: 'importer-api',
-          environment: 'production'
-        }
+      new LokiTransport({
+        host: 'http://loki-svc.toska-lokki.svc.cluster.local:3100',
+        labels: { app: 'sis-importer', environment: process.env.NODE_ENV || 'production' }
       })
     )
+
+    if (!process.env.STAGING) {
+      transports.push(
+        new WinstonGelfTransporter({
+          handleExceptions: true,
+          host: 'svm-116.cs.helsinki.fi',
+          port: 9503,
+          protocol: 'udp',
+          hostName: os.hostname(),
+          additional: {
+            app: 'importer-api',
+            environment: 'production'
+          }
+        })
+      )
+    }
   }
 }
 
