@@ -6,6 +6,11 @@ const SONIC = process.env.SONIC === '1'
 const IS_DEV = process.env.NODE_ENV === 'development'
 const FETCH_AMOUNT = IS_DEV && !SONIC ? 15 : 1000
 const MAX_CHUNK_SIZE = IS_DEV && !SONIC ? 5 : 100
+const QUEUE_COMPLETE_COUNT = process.env.QUEUE_COMPLETE_COUNT
+const QUEUE_COMPLETE_AGE = process.env.QUEUE_COMPLETE_AGE
+
+const QUEUE_FAIL_COUNT = process.env.QUEUE_FAIL_COUNT
+const QUEUE_FAIL_AGE = process.env.QUEUE_FAIL_AGE
 const APIS = {
   ori: 'ORI',
   kori: 'KORI',
@@ -38,5 +43,9 @@ module.exports = {
   SERVICE_PROVIDER,
   ROOT_ORG_ID,
   KORI_PUBLIC_API_URL,
-  KORI_API_BASE_URL
+  KORI_API_BASE_URL,
+  QUEUE_COMPLETE_COUNT,
+  QUEUE_COMPLETE_AGE,
+  QUEUE_FAIL_COUNT,
+  QUEUE_FAIL_AGE
 }
