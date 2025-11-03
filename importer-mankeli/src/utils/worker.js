@@ -20,9 +20,8 @@ const createWorker = jobHandler => {
       timems: job.finishedOn - job.processedOn
     })
     if (SERVICE_PROVIDER === 'fd') {
-      redisDel(`bull:importer-queue:${job.id}`).then(() =>
-        logger.info(`Deleted from redis bull:importer-queue:${job.id}`)
-      )
+      const redisKey = `bull:importer-queue:${job.id}`
+      redisDel(redisKey).then(() => logger.info(`Deleted from redis ${redisKey}`))
     }
   })
 
