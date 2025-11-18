@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, ARRAY, JSONB } = require('sequelize')
+const { Model, STRING, DATE, ARRAY, JSONB, Op } = require('sequelize')
 const { connection } = require('../connection')
 
 class CourseUnitRealisation extends Model {}
@@ -65,7 +65,9 @@ CourseUnitRealisation.init(
     tableName: 'course_unit_realisations',
     defaultScope: {
       where: {
-        documentState: 'ACTIVE'
+        documentState: {
+          [Op.notIn]: ['DELETED', 'DRAFT']
+        }
       }
     }
   }

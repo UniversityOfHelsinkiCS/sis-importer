@@ -4,6 +4,12 @@ const dateFns = require('date-fns')
 
 class CourseUnitRealisation extends Model {}
 
+const documentStateScope = {
+  documentState: {
+    [Op.notIn]: ['DELETED', 'DRAFT']
+  }
+}
+
 const getActivityPeriodComparisonWhere = (column, operator, date) => {
   return {
     [Op.and]: [
@@ -15,7 +21,7 @@ const getActivityPeriodComparisonWhere = (column, operator, date) => {
           }
         }
       },
-      { documentState: 'ACTIVE' }
+      documentStateScope
     ]
   }
 }
@@ -27,7 +33,7 @@ const scopes = {
         assessmentItemIds: {
           [Op.overlap]: ids
         },
-        documentState: 'ACTIVE'
+        ...documentStateScope
       }
     }
   },
@@ -116,7 +122,7 @@ CourseUnitRealisation.init(
     scopes,
     defaultScope: {
       where: {
-        documentState: 'ACTIVE'
+        ...documentStateScope
       }
     }
   }
