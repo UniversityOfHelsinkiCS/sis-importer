@@ -14,7 +14,8 @@ const getActivityPeriodComparisonWhere = (column, operator, date) => {
             [operator]: dateFns.format(new Date(date), 'yyyy-MM-dd')
           }
         }
-      }
+      },
+      { documentState: 'ACTIVE' }
     ]
   }
 }
@@ -25,7 +26,8 @@ const scopes = {
       where: {
         assessmentItemIds: {
           [Op.overlap]: ids
-        }
+        },
+        documentState: 'ACTIVE'
       }
     }
   },
@@ -96,6 +98,9 @@ CourseUnitRealisation.init(
     customCodeUrns: {
       type: JSONB
     },
+    documentState: {
+      type: STRING
+    },
     createdAt: {
       type: DATE
     },
@@ -108,7 +113,12 @@ CourseUnitRealisation.init(
     sequelize,
     modelName: 'course_unit_realisation',
     tableName: 'course_unit_realisations',
-    scopes
+    scopes,
+    defaultScope: {
+      where: {
+        documentState: 'ACTIVE'
+      }
+    }
   }
 )
 

@@ -48,6 +48,9 @@ CourseUnitRealisation.init(
     customCodeUrns: {
       type: JSONB
     },
+    documentState: {
+      type: STRING
+    },
     createdAt: {
       type: DATE
     },
@@ -59,7 +62,12 @@ CourseUnitRealisation.init(
     underscored: true,
     sequelize: connection.sequelize,
     modelName: 'course_unit_realisation',
-    tableName: 'course_unit_realisations'
+    tableName: 'course_unit_realisations',
+    defaultScope: {
+      where: {
+        documentState: 'ACTIVE'
+      }
+    }
   }
 )
 
