@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run tests
         uses: ./.github/actions/run-tests
         with:
@@ -24,7 +24,7 @@ jobs:
     needs: [test]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build and push image
         uses: ./.github/actions/build-and-push-image
         with:
