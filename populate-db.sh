@@ -1,41 +1,69 @@
 #!/bin/bash
-DIR_PATH=$(dirname "$0")
-DB=importer-db
+
 CONTAINER=sis-importer-db
-SERVICE=importer-db
-BACKUP=$DIR_PATH/backups/importer.sql.gz
+SERVICE_NAME=importer-db
+DB_NAME=importer-db
+
+FOLDER_NAME="sis_importer"
+
+PROJECT_ROOT=$(dirname $(realpath "$0"))
+BACKUPS=$PROJECT_ROOT/backups/
+DOCKER_COMPOSE=$PROJECT_ROOT/docker-compose.yml
+
+S3_CONF=~/.s3cfg
 
 retry () {
     for i in {1..60}
     do
-        $@ && break || echo "Retry attempt $i failed, waiting..." && sleep 10;
+        $@ && break || echo "Retry attempt $i failed, waiting..." && sleep 3;
     done
 }
 
-mkdir -p backups
+if [ ! -f "$S3_CONF" ]; then
+  echo ""
+  echo "!! No config file for s3 bucket !!"
+  echo "Create file for path ~/.s3cfg and copy the credetials from version.helsinki.fi"
+  echo ""
+  return 0
+fi
 
-echo "Enter your Uni Helsinki username:"
-read username
-echo "Fetching backup data"
-scp -r -o ProxyCommand="ssh -W %h:%p $username@melkki.cs.helsinki.fi" $username@toska.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/importer.sql.gz $BACKUP
+echo "Creating backups folder"
+mkdir -p ${BACKUPS}
 
-echo "Setting up db"
-docker compose down
-docker compose up -d $SERVICE
+echo "Listing available backups in S3 bucket..."
+backup_files=$(s3cmd -c "$S3_CONF" ls "s3://psyduck/${FOLDER_NAME}/" | awk '{print $4}' | grep '\.sql\.gz$')
 
-echo "Dropping $DB"
-retry docker exec -u postgres $CONTAINER pg_isready --dbname=$DB
-docker exec $CONTAINER psql -U dev template1 -c "DROP DATABASE \"$DB\"" || echo "container $CONTAINER DB $DB doesn't exists"
+if [ -z "$backup_files" ]; then
+  echo "No backup files found in S3 bucket!"
+  exit 1
+fi
 
-echo "Creating $DB"
-retry docker exec -u postgres $CONTAINER pg_isready --dbname=$DB
-docker exec $CONTAINER psql -U dev template1 -c "CREATE DATABASE \"$DB\"" || echo "container $CONTAINER DB $DB already exists"
+echo "Available backups:"
+select chosen_backup in $backup_files; do
+  if [ -n "$chosen_backup" ]; then
+    echo "You selected: $chosen_backup"
+    FILE_NAME=$(basename "$chosen_backup")
+    break
+  else
+    echo "Invalid selection. Please select a valid backup number."
+  fi
+done
 
-echo "Restoring $DB"
-docker exec -i $CONTAINER /bin/bash  -c "gunzip | psql -U dev -d $DB" < $BACKUP 2> /dev/null
+echo "Fetching the selected dump: $FILE_NAME"
+s3cmd -c "$S3_CONF" get "$chosen_backup" "$BACKUPS"
 
-echo "Restarting db, db-api and adminer"
-./run.sh db up
+if [ ! -f "${BACKUPS}${FILE_NAME}" ]; then
+  echo "Download failed or file not found: ${BACKUPS}${FILE_NAME}"
+  exit 1
+fi
 
-echo "View adminer here: http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public (password = dev)"
-echo "Run ./run.sh up to restart other importer services"
+echo "Removing database and related volume"
+docker-compose -f $DOCKER_COMPOSE down -v
+
+echo "Starting postgres in the background"
+docker-compose -f $DOCKER_COMPOSE up -d $SERVICE_NAME
+
+retry docker-compose -f $DOCKER_COMPOSE exec $SERVICE_NAME pg_isready --dbname=$DB_NAME
+
+echo "Populating ${FOLDER_NAME}"
+docker exec -i $CONTAINER /bin/bash -c "gunzip | psql -U postgres" < ${BACKUPS}${FILE_NAME}
