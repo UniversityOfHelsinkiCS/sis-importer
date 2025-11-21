@@ -126,9 +126,12 @@ updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res
       courseUnitRealisationTypeUrn: {
         [Op.in]: validRealisationTypes
       },
-      documentState: {
-        [Op.in]: ['ACTIVE', 'DRAFT', 'DELETED', null]
-      }
+      [Op.or]: [
+        { documentState: null },
+        { documentState: 'ACTIVE' },
+        { documentState: 'DRAFT' },
+        { documentState: 'DELETED' }
+      ]
     },
     attributes: relevantAttributes.courseUnitRealisation,
     limit,

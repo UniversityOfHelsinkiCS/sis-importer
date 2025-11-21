@@ -5,9 +5,7 @@ const dateFns = require('date-fns')
 class CourseUnitRealisation extends Model {}
 
 const documentStateScope = {
-  documentState: {
-    [Op.notIn]: ['DELETED', 'DRAFT']
-  }
+  [Op.or]: [{ documentState: null }, { documentState: 'ACTIVE' }]
 }
 
 const getActivityPeriodComparisonWhere = (column, operator, date) => {

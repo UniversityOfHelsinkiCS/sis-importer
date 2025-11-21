@@ -66,7 +66,7 @@ CourseUnitRealisation.init(
     defaultScope: {
       where: {
         documentState: {
-          [Op.notIn]: ['DELETED', 'DRAFT']
+          [Op.or]: [{ documentState: null }, { documentState: 'ACTIVE' }]
         }
       }
     }
