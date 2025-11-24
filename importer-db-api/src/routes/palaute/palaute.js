@@ -120,18 +120,17 @@ updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res
   }
 
   const courseUnitRealisations = await models.CourseUnitRealisation.scope({
-    method: ['activityPeriodEndDateAfter', since]
+    method: ['activityPeriodEndDateAfter', since],
+    where: {
+      documentState: {
+        [Op.or]: [null, 'ACTIVE', 'DRAFT', 'DELETED']
+      }
+    }
   }).findAll({
     where: {
       courseUnitRealisationTypeUrn: {
         [Op.in]: validRealisationTypes
-      },
-      [Op.or]: [
-        { documentState: null },
-        { documentState: 'ACTIVE' },
-        { documentState: 'DRAFT' },
-        { documentState: 'DELETED' }
-      ]
+      }
     },
     attributes: relevantAttributes.courseUnitRealisation,
     limit,
