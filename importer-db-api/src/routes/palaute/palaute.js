@@ -143,6 +143,35 @@ updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res
   res.send(courseUnitRealisationsWithCourseUnits)
 })
 
+updaterRouter.get('/deleted_course_unit_realisations', async (req, res) => {
+  const { limit, offset, since: sinceRaw } = req.query
+  if (!limit || !offset) return res.sendStatus(400)
+
+  let since = new Date(sinceRaw)
+  if (!sinceRaw || since === 'Invalid Date') {
+    since = defaultSince
+  }
+
+  const courseUnitRealisations = await models.CourseUnitRealisation.scope({
+    method: ['activityPeriodEndDateAfter', since],
+    where: {
+      documentState: 'DELETED'
+    }
+  }).findAll({
+    where: {
+      courseUnitRealisationTypeUrn: {
+        [Op.in]: validRealisationTypes
+      }
+    },
+    attributes: relevantAttributes.courseUnitRealisation,
+    limit,
+    offset,
+    order: [['id', 'DESC']]
+  })
+
+  res.send(courseUnitRealisations)
+})
+
 updaterRouter.get('/course_unit_realisation_with_course_unit/:id', async (req, res) => {
   const { id } = req.params
 
