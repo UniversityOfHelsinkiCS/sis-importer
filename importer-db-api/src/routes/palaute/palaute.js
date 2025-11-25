@@ -7,27 +7,6 @@ const { isRefreshingPersonStudyRightsView } = require('./personStudyRightsView')
 
 const defaultSince = new Date('2021-01-01')
 
-const getCourseUnitRealisationsWithDocumentState = async (documentState, since, limit, offset) => {
-  const courseUnitRealisations = await models.CourseUnitRealisation.scope({
-    method: ['activityPeriodEndDateAfter', since],
-    where: {
-      documentState
-    }
-  }).findAll({
-    where: {
-      courseUnitRealisationTypeUrn: {
-        [Op.in]: validRealisationTypes
-      }
-    },
-    attributes: relevantAttributes.courseUnitRealisation,
-    limit,
-    offset,
-    order: [['id', 'DESC']]
-  })
-
-  return courseUnitRealisations
-}
-
 const addCourseUnitsToRealisations = async courseUnitRealisations => {
   const assessmentItemIds = courseUnitRealisations.flatMap(c => c.assessmentItemIds)
   const assessmentItemsWithCrap = await models.AssessmentItem.findAll({
@@ -140,51 +119,8 @@ updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res
     since = defaultSince
   }
 
-  const activeCurs = await getCourseUnitRealisationsWithDocumentState('ACTIVE', since, limit, offset)
-  const draftCurs = await getCourseUnitRealisationsWithDocumentState('DRAFT', since, limit, offset)
-  const deletedCurs = await getCourseUnitRealisationsWithDocumentState('DELETED', since, limit, offset)
-  const nullStateCurs = await getCourseUnitRealisationsWithDocumentState(null, since, limit, offset)
-
-  const courseUnitRealisations = [...activeCurs, ...draftCurs, ...deletedCurs, ...nullStateCurs]
-
-  const courseUnitRealisationsWithCourseUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
-
-  res.send(courseUnitRealisationsWithCourseUnits)
-})
-
-updaterRouter.get('/course_unit_realisations_without_course_units', async (req, res) => {
-  const { limit, offset, since: sinceRaw } = req.query
-  if (!limit || !offset) return res.sendStatus(400)
-
-  let since = new Date(sinceRaw)
-  if (!sinceRaw || since === 'Invalid Date') {
-    since = defaultSince
-  }
-
-  const activeCurs = await getCourseUnitRealisationsWithDocumentState('ACTIVE', since, limit, offset)
-  const draftCurs = await getCourseUnitRealisationsWithDocumentState('DRAFT', since, limit, offset)
-  const deletedCurs = await getCourseUnitRealisationsWithDocumentState('DELETED', since, limit, offset)
-  const nullStateCurs = await getCourseUnitRealisationsWithDocumentState(null, since, limit, offset)
-
-  const courseUnitRealisations = [...deletedCurs, ...activeCurs, ...draftCurs, ...nullStateCurs]
-
-  res.send(courseUnitRealisations)
-})
-
-updaterRouter.get('/deleted_course_unit_realisations', async (req, res) => {
-  const { limit, offset, since: sinceRaw } = req.query
-  if (!limit || !offset) return res.sendStatus(400)
-
-  let since = new Date(sinceRaw)
-  if (!sinceRaw || since === 'Invalid Date') {
-    since = defaultSince
-  }
-
   const courseUnitRealisations = await models.CourseUnitRealisation.scope({
-    method: ['activityPeriodEndDateAfter', since],
-    where: {
-      documentState: 'DELETED'
-    }
+    method: ['activityPeriodEndDateAfterAllDocumentStates', since]
   }).findAll({
     where: {
       courseUnitRealisationTypeUrn: {
@@ -197,7 +133,9 @@ updaterRouter.get('/deleted_course_unit_realisations', async (req, res) => {
     order: [['id', 'DESC']]
   })
 
-  res.send(courseUnitRealisations)
+  const courseUnitRealisationsWithCourseUnits = await addCourseUnitsToRealisations(courseUnitRealisations)
+
+  res.send(courseUnitRealisationsWithCourseUnits)
 })
 
 updaterRouter.get('/course_unit_realisation_with_course_unit/:id', async (req, res) => {

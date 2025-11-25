@@ -40,6 +40,20 @@ const scopes = {
       where: getActivityPeriodComparisonWhere('endDate', Op.gt, date)
     }
   },
+  activityPeriodEndDateAfterAllDocumentStates(date) {
+    return {
+      [Op.and]: [
+        { activityPeriod: { endDate: { [Op.ne]: null } } },
+        {
+          activityPeriod: {
+            endDate: {
+              [Op.gt]: dateFns.format(new Date(date), 'yyyy-MM-dd')
+            }
+          }
+        }
+      ]
+    }
+  },
   activityPeriodEndDateBefore(date) {
     return {
       where: getActivityPeriodComparisonWhere('endDate', Op.lt, date)
