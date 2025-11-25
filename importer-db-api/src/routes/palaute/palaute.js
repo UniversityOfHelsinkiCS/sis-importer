@@ -152,6 +152,25 @@ updaterRouter.get('/course_unit_realisations_with_course_units', async (req, res
   res.send(courseUnitRealisationsWithCourseUnits)
 })
 
+updaterRouter.get('/course_unit_realisations_without_course_units', async (req, res) => {
+  const { limit, offset, since: sinceRaw } = req.query
+  if (!limit || !offset) return res.sendStatus(400)
+
+  let since = new Date(sinceRaw)
+  if (!sinceRaw || since === 'Invalid Date') {
+    since = defaultSince
+  }
+
+  const activeCurs = await getCourseUnitRealisationsWithDocumentState('ACTIVE', since, limit, offset)
+  const draftCurs = await getCourseUnitRealisationsWithDocumentState('DRAFT', since, limit, offset)
+  const deletedCurs = await getCourseUnitRealisationsWithDocumentState('DELETED', since, limit, offset)
+  const nullStateCurs = await getCourseUnitRealisationsWithDocumentState(null, since, limit, offset)
+
+  const courseUnitRealisations = [...deletedCurs, ...activeCurs, ...draftCurs, ...nullStateCurs]
+
+  res.send(courseUnitRealisations)
+})
+
 updaterRouter.get('/deleted_course_unit_realisations', async (req, res) => {
   const { limit, offset, since: sinceRaw } = req.query
   if (!limit || !offset) return res.sendStatus(400)
