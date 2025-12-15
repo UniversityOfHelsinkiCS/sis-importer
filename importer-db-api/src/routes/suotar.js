@@ -509,7 +509,12 @@ router.get('/course-unit-enrolments/:code/', async (req, res) => {
       courseUnitRealisationId: courseUnitRealisations.map(({ id }) => id),
       state: 'ENROLLED'
     },
-    include: [{ model: models.Person, attributes: ['studentNumber', 'firstNames', 'lastName'] }],
+    include: [
+      {
+        model: models.Person,
+        attributes: ['studentNumber', 'firstNames', 'lastName', 'primaryEmail', 'secondaryEmail']
+      }
+    ],
     raw: true,
     nest: true
   })
