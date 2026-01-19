@@ -367,9 +367,6 @@ apparaattiRouter.get('/organisations', async (req, res) => {
 })
 
 apparaattiRouter.get('/organisations/count', async (req, res) => {
-  const { limit, offset } = req.query
-  if (!limit || !offset) return res.sendStatus(400)
-
   const organisations = await models.Organisation.count({
     where: {
       [Op.and]: [
