@@ -101,6 +101,28 @@ router.get('/courses', async (req, res) => {
   res.send(courseUnitRealisationsWithCourseUnits)
 })
 
+router.get('/courses/count', async (req, res) => {
+  const courseStartTreshold = addMonths(new Date(), 48)
+
+  const courseUnitRealisationsCount = await models.CourseUnitRealisation.count({
+    where: {
+      [Op.and]: [
+        {
+          'activityPeriod.endDate': {
+            [Op.gte]: new Date()
+          }
+        },
+        {
+          'activityPeriod.startDate': {
+            [Op.lte]: courseStartTreshold
+          }
+        }
+      ]
+    }
+  })
+  res.json(courseUnitRealisationsCount)
+})
+
 apparaattiRouter.get('/enrolments-new', async (req, res) => {
   const { since: sinceRaw, limit, offset } = req.query
   if (!limit || !offset) return res.sendStatus(400)
@@ -139,6 +161,12 @@ apparaattiRouter.get('/persons', async (req, res) => {
   })
 
   res.send(persons)
+})
+
+apparaattiRouter.get('/persons/count', async (req, res) => {
+  const personsCount = await models.Person.count()
+
+  res.json(personsCount)
 })
 
 const getEducationByIdForStudyright = async id => {
@@ -237,6 +265,15 @@ apparaattiRouter.get('/studyrights', async (req, res) => {
   }
 })
 
+apparaattiRouter.get('/studyrights/count', async (req, res) => {
+  try {
+    const studyRights = await models.StudyRight.count()
+    return res.json(studyRights)
+  } catch (e) {
+    res.status(500).json(e.toString())
+  }
+})
+
 //this is partially taken from archeology.js
 apparaattiRouter.get('/:studentNumber/studyrights', async (req, res) => {
   try {
@@ -327,6 +364,24 @@ apparaattiRouter.get('/organisations', async (req, res) => {
   })
 
   res.send(organisations)
+})
+
+apparaattiRouter.get('/organisations/count', async (req, res) => {
+  const { limit, offset } = req.query
+  if (!limit || !offset) return res.sendStatus(400)
+
+  const organisations = await models.Organisation.count({
+    where: {
+      [Op.and]: [
+        // Only latest snapshot
+        models.Organisation.sequelize.literal(
+          '(code, snapshot_date_time) in (select code, max(snapshot_date_time) from organisations group by code)'
+        )
+      ]
+    }
+  })
+
+  res.json(organisations)
 })
 
 router.use('/', apparaattiRouter)
