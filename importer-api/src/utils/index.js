@@ -1,4 +1,5 @@
 const { logger } = require('./logger')
+const { SERVICE_PROVIDER } = require('../config')
 
 const sleep = ms => new Promise(res => setTimeout(() => res(), ms))
 
@@ -10,13 +11,13 @@ const retry = async (func, params, attempts = 6) => {
     } catch (err) {
       if (i === attempts) {
         logger.error({ message: 'Calling function failed', meta: err.stack })
-        throw err
+        if (SERVICE_PROVIDER !== 'fd') throw err
       }
       if (err.response.status === 403) {
         // Forbidden. We won't have access by bashing our head against it
         logger.error({ message: 'Forbidden endpoint', meta: err.stack })
 
-        throw err
+        if (SERVICE_PROVIDER !== 'fd') throw err
       }
       logger.info(`Retrying ${i}/${attempts - 1}`)
       await sleep(i * 1000)
@@ -30,7 +31,7 @@ const request = async (instance, path, attemps = 6) => {
     return res.data
   } catch (err) {
     logger.error(`Request failed for ${path}`, err)
-    throw err
+    if (SERVICE_PROVIDER !== 'fd') throw err
   }
 }
 

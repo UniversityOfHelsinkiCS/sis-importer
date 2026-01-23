@@ -35,6 +35,8 @@ const set = async (key, val) => await client.set(key, val)
 
 const expire = async (key, val) => await client.expire(key, val)
 
+const del = async key => await client.del(key)
+
 const listener = client.duplicate()
 listener.on('error', () => logger.error('REDIS ERROR'))
 listener
@@ -50,5 +52,6 @@ module.exports = {
   lock,
   get,
   set,
-  expire
+  expire,
+  del
 }

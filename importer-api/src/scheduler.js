@@ -7,7 +7,7 @@ const { osuvaRequest } = require('./utils/osuvaApi')
 const { graphqlRequest } = require('./utils/graphqlApi')
 const { get: redisGet, del: redisDel } = require('./utils/redis')
 const { services, serviceIds } = require('./services')
-const { FETCH_AMOUNT, APIS } = require('./config')
+const { FETCH_AMOUNT, APIS, SERVICE_PROVIDER } = require('./config')
 const { logger } = require('./utils/logger')
 const { chunk } = require('lodash')
 const { Job } = require('bullmq')
@@ -82,6 +82,7 @@ const scheduleBMQ = async serviceId => {
   const latestOrdinal = (await redisGet(REDIS_KEY)) || 0
 
   if (ONETIME && latestOrdinal > 0) return
+  if (SERVICE_PROVIDER === 'fd') await queue.trimEvents(10)
 
   const {
     result: { hasMore, entities, greatestOrdinal },

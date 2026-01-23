@@ -56,23 +56,40 @@ if [ ! -f "${BACKUPS}${FILE_NAME}" ]; then
   exit 1
 fi
 
-echo "Setting up db"
-docker compose down
-docker compose up -d $SERVICE
+echo "Listing available backups in S3 bucket..."
+backup_files=$(s3cmd -c "$S3_CONF" ls "s3://psyduck/${FOLDER_NAME}/" | awk '{print $4}' | grep '\.sql\.gz$')
 
-echo "Dropping $DB"
-retry docker exec -u postgres $CONTAINER pg_isready --dbname=$DB
-docker exec $CONTAINER psql -U dev template1 -c "DROP DATABASE \"$DB\"" || echo "container $CONTAINER DB $DB doesn't exists"
+if [ -z "$backup_files" ]; then
+  echo "No backup files found in S3 bucket!"
+  exit 1
+fi
 
-echo "Creating $DB"
-retry docker exec -u postgres $CONTAINER pg_isready --dbname=$DB
-docker exec $CONTAINER psql -U dev template1 -c "CREATE DATABASE \"$DB\"" || echo "container $CONTAINER DB $DB already exists"
+echo "Available backups:"
+select chosen_backup in $backup_files; do
+  if [ -n "$chosen_backup" ]; then
+    echo "You selected: $chosen_backup"
+    FILE_NAME=$(basename "$chosen_backup")
+    break
+  else
+    echo "Invalid selection. Please select a valid backup number."
+  fi
+done
 
 echo "Restoring $DB"
 docker exec -i $CONTAINER /bin/bash  -c "gunzip | psql -U dev -d $DB" < $BACKUPS$FILE_NAME 2> /dev/null
 
-echo "Restarting db, db-api and adminer"
-./run.sh db up
+if [ ! -f "${BACKUPS}${FILE_NAME}" ]; then
+  echo "Download failed or file not found: ${BACKUPS}${FILE_NAME}"
+  exit 1
+fi
 
-echo "View adminer here: http://localhost:5051/?pgsql=importer-db&username=dev&db=importer-db&ns=public (password = dev)"
-echo "Run ./run.sh up to restart other importer services"
+echo "Removing database and related volume"
+docker-compose -f $DOCKER_COMPOSE down -v
+
+echo "Starting postgres in the background"
+docker-compose -f $DOCKER_COMPOSE up -d $SERVICE_NAME
+
+retry docker-compose -f $DOCKER_COMPOSE exec $SERVICE_NAME pg_isready --dbname=$DB_NAME
+
+echo "Populating ${FOLDER_NAME}"
+docker exec -i $CONTAINER /bin/bash -c "gunzip | psql -U postgres" < ${BACKUPS}${FILE_NAME}

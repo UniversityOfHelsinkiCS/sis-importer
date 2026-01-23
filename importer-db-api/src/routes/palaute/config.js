@@ -30,7 +30,8 @@ const relevantAttributes = {
     'studyGroupSets',
     'organisations',
     'responsibilityInfos',
-    'customCodeUrns'
+    'customCodeUrns',
+    'documentState'
   ],
   assessmentItem: ['id', 'name', 'nameSpecifier', 'assessmentItemType', 'organisations', 'primaryCourseUnitGroupId'],
   person: [

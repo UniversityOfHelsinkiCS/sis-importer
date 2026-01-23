@@ -4,6 +4,10 @@ const dateFns = require('date-fns')
 
 class CourseUnitRealisation extends Model {}
 
+const documentStateScope = {
+  [Op.or]: [{ documentState: null }, { documentState: 'ACTIVE' }]
+}
+
 const getActivityPeriodComparisonWhere = (column, operator, date) => {
   return {
     [Op.and]: [
@@ -14,7 +18,8 @@ const getActivityPeriodComparisonWhere = (column, operator, date) => {
             [operator]: dateFns.format(new Date(date), 'yyyy-MM-dd')
           }
         }
-      }
+      },
+      documentStateScope
     ]
   }
 }
@@ -25,13 +30,28 @@ const scopes = {
       where: {
         assessmentItemIds: {
           [Op.overlap]: ids
-        }
+        },
+        ...documentStateScope
       }
     }
   },
   activityPeriodEndDateAfter(date) {
     return {
       where: getActivityPeriodComparisonWhere('endDate', Op.gt, date)
+    }
+  },
+  activityPeriodEndDateAfterAllDocumentStates(date) {
+    return {
+      [Op.and]: [
+        { activityPeriod: { endDate: { [Op.ne]: null } } },
+        {
+          activityPeriod: {
+            endDate: {
+              [Op.gt]: dateFns.format(new Date(date), 'yyyy-MM-dd')
+            }
+          }
+        }
+      ]
     }
   },
   activityPeriodEndDateBefore(date) {
@@ -96,6 +116,9 @@ CourseUnitRealisation.init(
     customCodeUrns: {
       type: JSONB
     },
+    documentState: {
+      type: STRING
+    },
     createdAt: {
       type: DATE
     },
@@ -108,7 +131,12 @@ CourseUnitRealisation.init(
     sequelize,
     modelName: 'course_unit_realisation',
     tableName: 'course_unit_realisations',
-    scopes
+    scopes,
+    defaultScope: {
+      where: {
+        ...documentStateScope
+      }
+    }
   }
 )
 

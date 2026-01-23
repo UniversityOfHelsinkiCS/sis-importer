@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, ARRAY, JSONB } = require('sequelize')
+const { Model, STRING, DATE, ARRAY, JSONB, Op } = require('sequelize')
 const { connection } = require('../connection')
 
 class CourseUnitRealisation extends Model {}
@@ -48,6 +48,9 @@ CourseUnitRealisation.init(
     customCodeUrns: {
       type: JSONB
     },
+    documentState: {
+      type: STRING
+    },
     createdAt: {
       type: DATE
     },
@@ -59,7 +62,14 @@ CourseUnitRealisation.init(
     underscored: true,
     sequelize: connection.sequelize,
     modelName: 'course_unit_realisation',
-    tableName: 'course_unit_realisations'
+    tableName: 'course_unit_realisations',
+    defaultScope: {
+      where: {
+        documentState: {
+          [Op.or]: [{ documentState: null }, { documentState: 'ACTIVE' }]
+        }
+      }
+    }
   }
 )
 

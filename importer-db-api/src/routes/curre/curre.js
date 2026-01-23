@@ -3,7 +3,7 @@ const express = require('express')
 const models = require('../../models')
 
 const { addMonths } = require('date-fns')
-const { timeTillCourseStart, relevantAttributes } = require('./config')
+const { timeTillCourseStart, relevantAttributes, validRealisationTypes } = require('./config')
 
 const router = express.Router()
 
@@ -81,6 +81,9 @@ router.get('/courses', async (req, res) => {
     limit,
     offset,
     where: {
+      courseUnitRealisationTypeUrn: {
+        [Op.in]: validRealisationTypes
+      },
       [Op.and]: [
         {
           'activityPeriod.endDate': {
