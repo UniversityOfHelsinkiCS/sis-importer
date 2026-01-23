@@ -1,23 +1,60 @@
 #!/bin/bash
-DIR_PATH=$(dirname "$0")
+# 
 DB=importer-db
 CONTAINER=sis-importer-db
 SERVICE=importer-db
-BACKUP=$DIR_PATH/backups/importer.sql.gz
+
+FOLDER_NAME=sis_importer
+
+PROJECT_ROOT=$(dirname $(dirname $(realpath "$0")))
+BACKUPS=$PROJECT_ROOT/backups/
+
+S3_CONF=~/.s3cfg
 
 retry () {
     for i in {1..60}
     do
-        $@ && break || echo "Retry attempt $i failed, waiting..." && sleep 10;
+        $@ && break || echo "Retry attempt $i failed, waiting..." && sleep 3;
     done
 }
 
-mkdir -p backups
+if [ ! -f "$S3_CONF" ]; then
+  echo ""
+  echo "!! No config file for s3 bucket !!"
+  echo "Create file for path ~/.s3cfg and copy the credetials from version.helsinki.fi"
+  echo ""
+  return 0
+fi
 
-echo "Enter your Uni Helsinki username:"
-read username
-echo "Fetching backup data"
-scp -r -o ProxyCommand="ssh -W %h:%p $username@melkki.cs.helsinki.fi" $username@toska.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/importer.sql.gz $BACKUP
+echo "Creating backups folder"
+mkdir -p ${BACKUPS}
+
+echo "Listing available backups in S3 bucket..."
+backup_files=$(s3cmd -c "$S3_CONF" ls "s3://psyduck/${FOLDER_NAME}/" | awk '{print $4}' | grep '\.sql\.gz$')
+
+if [ -z "$backup_files" ]; then
+  echo "No backup files found in S3 bucket!"
+  exit 1
+fi
+
+echo "Available backups:"
+select chosen_backup in $backup_files; do
+  if [ -n "$chosen_backup" ]; then
+    echo "You selected: $chosen_backup"
+    FILE_NAME=$(basename "$chosen_backup")
+    break
+  else
+    echo "Invalid selection. Please select a valid backup number."
+  fi
+done
+
+echo "Fetching the selected dump: $FILE_NAME"
+s3cmd -c "$S3_CONF" get "$chosen_backup" "$BACKUPS"
+
+if [ ! -f "${BACKUPS}${FILE_NAME}" ]; then
+  echo "Download failed or file not found: ${BACKUPS}${FILE_NAME}"
+  exit 1
+fi
 
 echo "Setting up db"
 docker compose down
@@ -32,7 +69,7 @@ retry docker exec -u postgres $CONTAINER pg_isready --dbname=$DB
 docker exec $CONTAINER psql -U dev template1 -c "CREATE DATABASE \"$DB\"" || echo "container $CONTAINER DB $DB already exists"
 
 echo "Restoring $DB"
-docker exec -i $CONTAINER /bin/bash  -c "gunzip | psql -U dev -d $DB" < $BACKUP 2> /dev/null
+docker exec -i $CONTAINER /bin/bash  -c "gunzip | psql -U dev -d $DB" < $BACKUPS$FILE_NAME 2> /dev/null
 
 echo "Restarting db, db-api and adminer"
 ./run.sh db up
