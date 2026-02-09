@@ -38,6 +38,13 @@ if (!IS_DEV) {
   transports.push(new winston.transports.Console({ format: prodFormat }))
 }
 
+transports.push(
+      new LokiTransport({
+        host: 'http://loki-svc.toska-lokki.svc.cluster.local:3100',
+        labels: { app: 'importer-db-api', environment: process.env.NODE_ENV || 'production' }
+      })
+    )
+
 const logger = winston.createLogger({ transports })
 
 module.exports = logger
