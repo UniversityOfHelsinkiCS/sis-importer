@@ -2,6 +2,7 @@ const router = require('express').Router()
 const axios = require('axios').default
 const fs = require('fs')
 const https = require('https')
+const { Op } = require('sequelize')
 
 const models = require('../models')
 
@@ -59,7 +60,7 @@ router.get('/person/:personId', async (req, res) => {
 
   const groups = await models.PersonGroup.findAll({
     where: {
-      type: 'TUTORING_STUDENT_GROUP'
+      type: { [Op.or]: ['TUTORING_STUDENT_GROUP', 'TARGET_STUDENT_GROUP'] }
     },
     raw: true
   })
