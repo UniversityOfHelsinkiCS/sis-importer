@@ -75,6 +75,8 @@ router.get('/courses', async (req, res) => {
   if (!limit || !offset) return res.sendStatus(400)
 
   const courseStartTreshold = addMonths(new Date(), 48)
+  const endDateLimit = new Date()
+  endDateLimit.setFullYear(endDateLimit.getFullYear() - 1)
 
   const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
     attributes: relevantAttributes.courseUnitRealisation.concat(['customCodeUrns', 'nameSpecifier']),
@@ -84,7 +86,7 @@ router.get('/courses', async (req, res) => {
       [Op.and]: [
         {
           'activityPeriod.endDate': {
-            [Op.gte]: new Date()
+            [Op.gte]: endDateLimit
           }
         },
         {
