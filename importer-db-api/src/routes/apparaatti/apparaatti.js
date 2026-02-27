@@ -106,12 +106,15 @@ router.get('/courses', async (req, res) => {
 router.get('/courses/count', async (req, res) => {
   const courseStartTreshold = addMonths(new Date(), 48)
 
+  const endDateLimit = new Date()
+  endDateLimit.setFullYear(endDateLimit.getFullYear() - 1)
+
   const courseUnitRealisationsCount = await models.CourseUnitRealisation.count({
     where: {
       [Op.and]: [
         {
           'activityPeriod.endDate': {
-            [Op.gte]: new Date()
+            [Op.gte]: endDateLimit
           }
         },
         {
