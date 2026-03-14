@@ -35,7 +35,7 @@ Start the service
 
 Routes for the various apps are found [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-db-api/src/routes)
 
-**You can most likely skip the rest of this readme.** The below stuff is only relevant if you need to modify or run locally the acual importer.
+You can skip the rest of this readme.** The below stuff is only relevant if you need to modify or run locally the acual importer.
 
 ## How to connect to the local DB
 
