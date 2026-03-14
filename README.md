@@ -17,7 +17,7 @@ For step by step overview of how the importer works, see the following READMEs
 
 ## What is importer-db-api?
 
-The above picture shows also *importer-db-api* that is the component serving the other toska apps that need the data in importer db. Most likely this is the component you need to work with.
+The picture above also shows *importer-db-api*, the component serving the other toska apps that need data from the importer db. **Most likely this is the component you need to work with** and you do not need to touch or care about the importer itself. 
 
 ### getting started
 
