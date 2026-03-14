@@ -8,17 +8,40 @@ Importer fetches data from Sisu using the export apis. See [example](https://sis
 
 New data from Sisu is fetched once an hour.
 
-[Architecture of importer](./how_tos/importer.png)
+![Architecture of importer](./how_tos/importer.png)
 
 For step by step overview of how the importer works, see the following READMEs
 
 - [Fetcher's README](./importer-api/README.md)
 - [Mankeli's README](./importer-mankeli/README.md)
 
+## What is importer-db-api?
+
+The above picture shows also *importer-db-api* that is the component serving the other toska apps that need the data in importer db. Most likely this is the component you need to work with.
+
+### getting started
+
+Populate the db
+
+```bash
+./populate-db.sh
+```
+
+Start the service 
+
+```bash
+`./run.sh db up`
+```
+
+Routes for the various apps are found [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-db-api/src/routes)
+
+**You can most likely skip the rest of this readme.** The below stuff is only relevant if you need to modify or run locally the acual importer.
+
 ## How to connect to the local DB
 
-Connect to db: `docker exec -it sis-importer-db psql -U dev -h importer-db -d importer-db`
-Password is `dev`
+```
+docker exec -it sis-importer-db psql "postgresql://dev:dev@importer-db:5432/importer-db"
+```
 
 ## Caveats
 
