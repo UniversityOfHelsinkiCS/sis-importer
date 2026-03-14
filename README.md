@@ -8,12 +8,13 @@ Importer fetches data from Sisu using the export apis. See [example](https://sis
 
 New data from Sisu is fetched once an hour.
 
-![Architecture of importer](./how_tos/importer.png)
-
 For step by step overview of how the importer works, see the following READMEs
 
 - [Fetcher's README](./importer-api/README.md)
 - [Mankeli's README](./importer-mankeli/README.md)
+
+Overall architecture
+![Architecture of importer](./how_tos/importer.png)
 
 ## What is importer-db-api?
 
