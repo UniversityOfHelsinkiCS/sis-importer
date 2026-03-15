@@ -25,7 +25,7 @@ Person.init(
       type: STRING
     },
     eduPersonPrincipalName: {
-      type: String
+      type: STRING
     },
     employeeNumber: {
       type: STRING
