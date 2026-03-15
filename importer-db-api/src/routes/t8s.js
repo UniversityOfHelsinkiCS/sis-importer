@@ -14,7 +14,7 @@ const router = express.Router()
 router.get('/employees/:personId/course_unit_realisations', async (req, res) => {
   try {
     const { personId } = req.params
-    const today = new Date().toISOString().split('T')[0] // Format: YYYY-MM-DD
+    const today = new Date().toISOString().split('T')[0]
 
     const courseUnitRealisations = await models.CourseUnitRealisation.findAll({
       attributes: { exclude: ['studyGroupSets', 'customCodeUrns'] },
