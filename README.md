@@ -31,7 +31,7 @@ Populate the db
 Start the service 
 
 ```bash
-`./run.sh db up`
+./run.sh db up
 ```
 
 Routes for the various apps are found [here](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-db-api/src/routes)
