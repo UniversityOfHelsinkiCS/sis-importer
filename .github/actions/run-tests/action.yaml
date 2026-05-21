@@ -9,6 +9,10 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Install safe chain
+      shell: bash
+      run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
+      
     - name: Install packages
       shell: bash
       run: npm ci && npm ci --prefix ${{ inputs.path }}
