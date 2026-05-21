@@ -81,7 +81,88 @@ grapaRouter.get('/persons', async (req, res) => {
     }
   )
 
-  res.send(personsWithStudyRightOrEmployeeNumber)
+  const personIds = personsWithStudyRightOrEmployeeNumber.map(person => person.id)
+
+  if (!personIds.length) return res.send([])
+
+  const studyRights = await models.StudyRight.findAll({
+    where: {
+      personId: personIds
+    },
+    order: [
+      ['personId', 'ASC'],
+      ['id', 'DESC'],
+      ['modificationOrdinal', 'DESC']
+    ],
+    include: [models.Organisation, models.Education],
+    raw: true,
+    nest: true
+  })
+
+  const seenStudyRights = new Set()
+  const latestStudyRights = studyRights.filter(studyRight => {
+    const studyRightKey = `${studyRight.personId}:${studyRight.id}`
+
+    if (seenStudyRights.has(studyRightKey)) return false
+
+    seenStudyRights.add(studyRightKey)
+    return true
+  })
+
+  const moduleGroupIds = [
+    ...new Set(
+      latestStudyRights
+        .map(studyRight => studyRight.education?.groupId)
+        .filter(Boolean)
+        .map(groupId => groupId.replace('EDU', 'DP'))
+    )
+  ]
+
+  const modules = moduleGroupIds.length
+    ? await models.Module.findAll({
+        where: {
+          groupId: moduleGroupIds
+        },
+        attributes: ['groupId', 'code'],
+        raw: true
+      })
+    : []
+
+  const moduleCodeByGroupId = modules.reduce((acc, module) => {
+    acc[module.groupId] = module.code
+    return acc
+  }, {})
+
+  const studyRightsByPersonId = latestStudyRights.reduce((acc, studyRight) => {
+    const moduleGroupId = studyRight.education?.groupId?.replace('EDU', 'DP')
+    const moduleCode = moduleGroupId ? moduleCodeByGroupId[moduleGroupId] : undefined
+    const formattedStudyRight = {
+      faculty_code: studyRight.organisation?.code,
+      elements: [
+        {
+          code: moduleCode,
+          start_date: studyRight.valid?.startDate,
+          end_date: studyRight.valid?.endDate
+        }
+      ],
+      id: studyRight.id,
+      valid: {
+        start_date: studyRight.valid?.startDate,
+        end_date: studyRight.valid?.endDate
+      }
+    }
+
+    if (!acc[studyRight.personId]) acc[studyRight.personId] = []
+    acc[studyRight.personId].push(formattedStudyRight)
+    return acc
+  }, {})
+
+  const personsWithStudyRights = personsWithStudyRightOrEmployeeNumber.map(person => ({
+    ...person.toJSON(),
+    studyRights: studyRightsByPersonId[person.id] || []
+  }))
+
+  res.send(personsWithStudyRights)
 })
 
 grapaRouter.get('/studytracks', async (req, res) => {
