@@ -136,24 +136,18 @@ grapaRouter.get('/persons', async (req, res) => {
   const studyRightsByPersonId = latestStudyRights.reduce((acc, studyRight) => {
     const moduleGroupId = studyRight.education?.groupId?.replace('EDU', 'DP')
     const moduleCode = moduleGroupId ? moduleCodeByGroupId[moduleGroupId] : undefined
-    const formattedStudyRight = {
-      faculty_code: studyRight.organisation?.code,
-      elements: [
-        {
-          code: moduleCode,
-          start_date: studyRight.valid?.startDate,
-          end_date: studyRight.valid?.endDate
-        }
-      ],
-      id: studyRight.id,
-      valid: {
+    const elements = [
+      {
+        code: moduleCode,
         start_date: studyRight.valid?.startDate,
         end_date: studyRight.valid?.endDate
       }
-    }
+    ].filter(element => element.code)
+
+    if (!elements.length) return acc
 
     if (!acc[studyRight.personId]) acc[studyRight.personId] = []
-    acc[studyRight.personId].push(formattedStudyRight)
+    acc[studyRight.personId].push(...elements)
     return acc
   }, {})
 
