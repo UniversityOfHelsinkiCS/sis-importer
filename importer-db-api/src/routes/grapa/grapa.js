@@ -81,17 +81,18 @@ grapaRouter.get('/persons', async (req, res) => {
     }
   )
 
-
   const personIds = personsWithStudyRightOrEmployeeNumber.map(person => person.id)
 
   if (!personIds.length) return res.send([])
 
-
-  const studyRightsQuery = await sequelize.query('SELECT S.valid, S.person_id, E.group_id AS education_group_id FROM studyrights S LEFT JOIN educations E ON E.id = S.education_id WHERE S.person_id IN (:personids) ORDER BY S.person_id ASC, S.id DESC, S.modification_ordinal DESC', {
-    replacements: {
-      personids: personIds
+  const studyRightsQuery = await sequelize.query(
+    'SELECT S.valid, S.person_id, E.group_id AS education_group_id FROM studyrights S LEFT JOIN educations E ON E.id = S.education_id WHERE S.person_id IN (:personids) ORDER BY S.person_id ASC, S.id DESC, S.modification_ordinal DESC',
+    {
+      replacements: {
+        personids: personIds
+      }
     }
-  })
+  )
 
   const studyRights = studyRightsQuery ? studyRightsQuery[0] : []
 
@@ -104,7 +105,6 @@ grapaRouter.get('/persons', async (req, res) => {
     return true
   })
 
-
   const moduleGroupIds = [
     ...new Set(
       latestStudyRights
@@ -114,15 +114,14 @@ grapaRouter.get('/persons', async (req, res) => {
     )
   ]
 
-
   const modules = moduleGroupIds.length
     ? await models.Module.findAll({
-      where: {
-        groupId: moduleGroupIds
-      },
-      attributes: ['groupId', 'code'],
-      raw: true
-    })
+        where: {
+          groupId: moduleGroupIds
+        },
+        attributes: ['groupId', 'code'],
+        raw: true
+      })
     : []
 
   const moduleCodeByGroupId = modules.reduce((acc, module) => {
