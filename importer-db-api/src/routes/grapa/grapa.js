@@ -3,7 +3,7 @@ const { relevantAttributes, masterThesisCourseCode } = require('./config')
 const models = require('../../models')
 const { sequelize } = require('../../config/db')
 const { isRefreshingPersonStudyRightsView } = require('../palaute/personStudyRightsView')
-const { Op } = require('sequelize')
+const { Op, QueryTypes } = require('sequelize')
 
 const router = express.Router()
 
@@ -86,15 +86,16 @@ grapaRouter.get('/persons', async (req, res) => {
   if (!personIds.length) return res.send([])
 
   const studyRightsQuery = await sequelize.query(
-    'SELECT S.valid, S.person_id, E.group_id AS education_group_id FROM studyrights S LEFT JOIN educations E ON E.id = S.education_id WHERE S.person_id IN (:personids) ORDER BY S.person_id ASC, S.id DESC, S.modification_ordinal DESC',
+    'SELECT S.id, S.valid, S.person_id, E.group_id AS education_group_id FROM studyrights S LEFT JOIN educations E ON E.id = S.education_id WHERE S.person_id IN (:personids) ORDER BY S.person_id ASC, S.id DESC, S.modification_ordinal DESC',
     {
       replacements: {
         personids: personIds
-      }
+      },
+      type: QueryTypes.SELECT
     }
   )
 
-  const studyRights = studyRightsQuery ? studyRightsQuery[0] : []
+  const studyRights = studyRightsQuery ? studyRightsQuery : []
 
   const seenStudyRights = new Set()
   const latestStudyRights = studyRights.filter(studyRight => {
@@ -136,7 +137,8 @@ grapaRouter.get('/persons', async (req, res) => {
       {
         code: moduleCode,
         start_date: studyRight.valid?.startDate,
-        end_date: studyRight.valid?.endDate
+        end_date: studyRight.valid?.endDate,
+        id: studyRight.id
       }
     ].filter(element => element.code)
 
