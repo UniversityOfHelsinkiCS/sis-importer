@@ -432,7 +432,7 @@ router.post('/study-rights-by-person', async (req, res) => {
   if (!Array.isArray(data)) return res.status(400).send({ error: 'Input should be an array' })
   const studyRights = await models.StudyRight.findAll({
     where: { personId: data, documentState: 'ACTIVE' },
-    attributes: ['id', 'personId', 'valid', 'snapshotDateTime', 'grantDate'],
+    attributes: ['id', 'personId', 'valid', 'snapshotDateTime', 'grantDate', 'modificationOrdinal'],
     include: [{ model: models.Organisation, attributes: ['code'] }, { model: models.TermRegistrations }],
     nest: true,
     raw: true
@@ -444,7 +444,11 @@ router.post('/study-rights-by-person', async (req, res) => {
       key =>
         studyRightsById[key]
           .filter(r => isBefore(new Date(r.snapshotDateTime), new Date()))
-          .sort((a, b) => new Date(b.snapshotDateTime) - new Date(a.snapshotDateTime))[0] || null
+          .sort((a, b) => {
+            const snapshotDiff = new Date(b.snapshotDateTime) - new Date(a.snapshotDateTime)
+            if (snapshotDiff !== 0) return snapshotDiff
+            return (Number(b.modificationOrdinal) || 0) - (Number(a.modificationOrdinal) || 0)
+          })[0] || null
     )
     .filter(s => !!s) // Filter out study rights where snapshots only in future
   return res.send(activeSnapshots)
@@ -459,6 +463,7 @@ router.get('/study-right/:id', async (req, res) => {
       id,
       documentState: 'ACTIVE'
     },
+    attributes: ['id', 'personId', 'valid', 'snapshotDateTime', 'grantDate', 'modificationOrdinal'],
     raw: true
   })
 
@@ -466,7 +471,11 @@ router.get('/study-right/:id', async (req, res) => {
   if (!out.length) return res.send(studyRights[0])
   const sorted = out
     .filter(r => isBefore(new Date(r.snapshotDateTime), new Date()))
-    .sort((a, b) => new Date(b.snapshotDateTime) - new Date(a.snapshotDateTime))
+    .sort((a, b) => {
+      const snapshotDiff = new Date(b.snapshotDateTime) - new Date(a.snapshotDateTime)
+      if (snapshotDiff !== 0) return snapshotDiff
+      return (Number(b.modificationOrdinal) || 0) - (Number(a.modificationOrdinal) || 0)
+    })
 
   return res.send(sorted[0] || {})
 })
