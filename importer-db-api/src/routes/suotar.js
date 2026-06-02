@@ -407,16 +407,21 @@ router.post('/study-rights', async (req, res) => {
       id: data,
       documentState: 'ACTIVE'
     },
-    attributes: ['id', 'personId', 'valid', 'snapshotDateTime', 'grantDate'],
+    attributes: ['id', 'personId', 'valid', 'snapshotDateTime', 'grantDate', 'modificationOrdinal'],
     raw: true
   })
   const studyRightsById = _.groupBy(studyRights, 'id')
+
   const activeSnapshots = Object.keys(studyRightsById)
     .map(
       key =>
         studyRightsById[key]
           .filter(r => isBefore(new Date(r.snapshotDateTime), new Date()))
-          .sort((a, b) => new Date(b.snapshotDateTime) - new Date(a.snapshotDateTime))[0] || null
+          .sort((a, b) => {
+            const snapshotDiff = new Date(b.snapshotDateTime) - new Date(a.snapshotDateTime)
+            if (snapshotDiff !== 0) return snapshotDiff
+            return (Number(b.modificationOrdinal) || 0) - (Number(a.modificationOrdinal) || 0)
+          })[0] || null
     )
     .filter(s => !!s) // Filter out study rights where snapshots only in future
   return res.send(activeSnapshots)
