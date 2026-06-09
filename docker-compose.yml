@@ -26,6 +26,8 @@ services:
       - 3002:3002 # explorer at http://localhost:3002/
     volumes:
       - ./importer-api:/opt/app-root/src
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   importer-mankeli:
     build:
@@ -48,6 +50,8 @@ services:
       TEST_FAIL_RATE: 0 # 0 means no failures, 1 means all failures. Try something like 0.1
     volumes:
       - ./importer-mankeli:/opt/app-root/src
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     # deploy:
     #   replicas: 3
 
@@ -85,6 +89,8 @@ services:
       - 3000:3000
     volumes:
       - ./importer-db-api:/opt/app-root/src
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   importer-redis:
     command: ['redis-server', '--appendonly', 'yes', '--port', '6379']

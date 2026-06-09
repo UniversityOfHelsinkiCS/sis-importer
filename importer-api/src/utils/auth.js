@@ -16,7 +16,7 @@ const getAuthHeaders = () => {
     return getSisBasicAuthHeader()
   }
 
-  if (!hasCerts) return { token: PROXY_TOKEN }
+  if (!hasCerts) return { Authorization: `Bearer ${PROXY_TOKEN}` }
   if (hasCerts && API_KEY) return { 'X-Api-Key': API_KEY }
 
   return {}
