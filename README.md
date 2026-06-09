@@ -40,9 +40,16 @@ You can skip the rest of this readme.** The below stuff is only relevant if you 
 
 ## How to connect to the local DB
 
+Through docker container (rudimentary):
 ```
 docker exec -it sis-importer-db psql "postgresql://dev:dev@importer-db:5432/importer-db"
 ```
+
+Or using pg-cli (highly recommended, password is "dev")
+```
+pgcli -h localhost -p 5432 -U dev -d importer-db
+```
+
 
 ## Caveats
 
