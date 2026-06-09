@@ -80,7 +80,7 @@ docker exec -it sis-importer-db psql "postgresql://dev:dev@importer-db:5432/impo
 
 ## Local development
 
-1. See initial setup in https://version.helsinki.fi/toska/dokumentaatio/-/blob/master/guides/how_to_sis-importer_locally.md - contains too much secret data to have here
+1. Go through the steps in the internal document (has secret data) https://version.helsinki.fi/toska/dokumentaatio/-/blob/5a5e0639a58ffdac025e1bfa9bd73b1177409e00/guides/how_to_importer_locally.md  
 2. `npm start` will start the application scaled to 3 mankelis.
 3.
 
