@@ -86,7 +86,7 @@ grapaRouter.get('/persons', async (req, res) => {
   if (!personIds.length) return res.send([])
 
   const studyRightsQuery = await sequelize.query(
-    'SELECT S.id, S.valid, S.person_id, E.group_id AS education_group_id FROM studyrights S LEFT JOIN educations E ON E.id = S.education_id WHERE S.person_id IN (:personids) ORDER BY S.person_id ASC, S.id DESC, S.modification_ordinal DESC',
+    'SELECT S.id, S.valid, S.person_id, S.accepted_selection_path, E.group_id AS education_group_id FROM studyrights S LEFT JOIN educations E ON E.id = S.education_id WHERE S.person_id IN (:personids) ORDER BY S.person_id ASC, S.id DESC, S.modification_ordinal DESC',
     {
       replacements: {
         personids: personIds
@@ -138,7 +138,8 @@ grapaRouter.get('/persons', async (req, res) => {
         code: moduleCode,
         start_date: studyRight.valid?.startDate,
         end_date: studyRight.valid?.endDate,
-        id: studyRight.id
+        id: studyRight.id,
+        accepted_selection_path: studyRight.accepted_selection_path
       }
     ].filter(element => element.code)
 
