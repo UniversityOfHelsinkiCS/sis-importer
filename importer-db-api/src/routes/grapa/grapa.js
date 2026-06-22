@@ -109,9 +109,16 @@ grapaRouter.get('/persons', async (req, res) => {
   const moduleGroupIds = [
     ...new Set(
       latestStudyRights
-        .map(studyRight => studyRight.education_group_id)
-        .filter(Boolean)
-        .map(groupId => groupId.replace('EDU', 'DP'))
+        .map(studyRight => {
+          return [
+            studyRight.education_group_id ? studyRight.education_group_id.replace('EDU', 'DP') : undefined,
+            studyRight.accepted_selection_path?.educationPhase2ChildGroupId,
+            studyRight.accepted_selection_path?.educationPhase1ChildGroupId,
+            studyRight.accepted_selection_path?.educationPhase1GroupId,
+            studyRight.accepted_selection_path?.educationPhase2GroupId
+          ].filter(Boolean)
+        })
+        .flat()
     )
   ]
 
@@ -120,26 +127,61 @@ grapaRouter.get('/persons', async (req, res) => {
         where: {
           groupId: moduleGroupIds
         },
-        attributes: ['groupId', 'code'],
+        attributes: ['groupId', 'code', 'id'],
         raw: true
       })
     : []
 
   const moduleCodeByGroupId = modules.reduce((acc, module) => {
-    acc[module.groupId] = module.code
+    acc[module.groupId] = module
     return acc
   }, {})
 
   const studyRightsByPersonId = latestStudyRights.reduce((acc, studyRight) => {
-    const moduleGroupId = studyRight.education_group_id?.replace('EDU', 'DP')
-    const moduleCode = moduleGroupId ? moduleCodeByGroupId[moduleGroupId] : undefined
+    const educationModuleGroupId = studyRight.education_group_id?.replace('EDU', 'DP')
+
+    const programmeStudytrackPairs = {}
+
+    if (studyRight.accepted_selection_path?.educationPhase1GroupId)
+      programmeStudytrackPairs[studyRight.accepted_selection_path?.educationPhase1GroupId] =
+        studyRight.accepted_selection_path?.educationPhase1ChildGroupId
+
+    if (studyRight.accepted_selection_path?.educationPhase2GroupId)
+      programmeStudytrackPairs[studyRight.accepted_selection_path?.educationPhase2GroupId] =
+        studyRight.accepted_selection_path?.educationPhase2ChildGroupId
+
+    const selections = Array.from(
+      new Set(
+        [
+          studyRight.education_group_id ? studyRight.education_group_id.replace('EDU', 'DP') : undefined,
+          studyRight.accepted_selection_path?.educationPhase1GroupId,
+          studyRight.accepted_selection_path?.educationPhase2GroupId
+        ].filter(Boolean)
+      )
+    )
+
+    const moduleCode = educationModuleGroupId ? moduleCodeByGroupId[educationModuleGroupId]?.code : undefined
+
     const elements = [
       {
         code: moduleCode,
         start_date: studyRight.valid?.startDate,
         end_date: studyRight.valid?.endDate,
         id: studyRight.id,
-        accepted_selection_path: studyRight.accepted_selection_path
+        selections: selections.map(programmeGroupId => {
+          return {
+            code: moduleCodeByGroupId[programmeGroupId]?.code,
+            moduleId: moduleCodeByGroupId[programmeGroupId]?.id,
+            groupId: programmeGroupId,
+            studyTrack: programmeStudytrackPairs[programmeGroupId]
+              ? {
+                  code: moduleCodeByGroupId[programmeStudytrackPairs[programmeGroupId]]?.code,
+                  moduleId: moduleCodeByGroupId[programmeStudytrackPairs[programmeGroupId]]?.id,
+                  groupId: programmeStudytrackPairs[programmeGroupId]
+                }
+              : null
+          }
+        })
       }
     ].filter(element => element.code)
 
