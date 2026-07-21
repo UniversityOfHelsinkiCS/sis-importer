@@ -1,8 +1,7 @@
 const { Worker } = require('bullmq')
 const { logger } = require('./logger')
-const { del: redisDel } = require('./redis')
 
-const { REDIS_HOST, REDIS_PORT, SERVICE_PROVIDER } = require('../config')
+const { REDIS_HOST, REDIS_PORT } = require('../config')
 
 const connection = {
   host: REDIS_HOST,
@@ -19,10 +18,6 @@ const createWorker = jobHandler => {
       count: job.data?.length,
       timems: job.finishedOn - job.processedOn
     })
-    if (SERVICE_PROVIDER === 'fd') {
-      const redisKey = `bull:importer-queue:${job.id}`
-      redisDel(redisKey).then(() => logger.info(`Deleted from redis ${redisKey}`))
-    }
   })
 
   worker.on('error', error => {
