@@ -2,7 +2,6 @@ const axios = require('axios').default
 const fs = require('fs')
 const https = require('https')
 
-const { SERVICE_PROVIDER } = require('../config')
 const { retry } = require('./index')
 const { SIS_API_URL, PROXY_TOKEN, KEY_PATH, CERT_PATH, API_KEY } = process.env
 
@@ -22,8 +21,8 @@ const agent = hasCerts
   : new https.Agent()
 
 const graphqlInstance = axios.create({
-  baseURL: SERVICE_PROVIDER.toLowerCase() === 'fd' ? `${SIS_API_URL}/api` : `${SIS_API_URL}/graphql`,
-  headers: SERVICE_PROVIDER.toLowerCase() === 'fd' ? {} : getHeaders(),
+  baseURL: `${SIS_API_URL}/graphql`,
+  headers: getHeaders(),
   httpsAgent: agent
 })
 
