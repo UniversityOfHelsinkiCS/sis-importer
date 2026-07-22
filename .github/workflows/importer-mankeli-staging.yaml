@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - importer-mankeli/**
+      - .npmrc
       - .github/workflows/importer-mankeli-staging.yaml
       - docker-compose.ci.yml
 
