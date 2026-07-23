@@ -11,6 +11,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@sentry/node": "10.65.0",
+    "@sentry/profiling-node": "10.65.0",
     "async": "^3.0.0",
     "axios": "^1.0.0",
     "bullmq": "^5.54.0",

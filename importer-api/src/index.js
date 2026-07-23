@@ -1,3 +1,5 @@
+require('./utils/sentry')
+
 const { schedule: scheduleCron } = require('./utils/cron')
 const { resetOnetimeServices } = require('./scheduler')
 const { REJECT_UNAUTHORIZED, IS_DEV, PORT } = require('./config')
