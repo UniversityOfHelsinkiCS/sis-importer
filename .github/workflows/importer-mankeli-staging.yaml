@@ -14,6 +14,7 @@ jobs:
   build_and_push_anon_sis_importer_db:
     name: 'Build anon sis-importer-db and push to toska hub if new migrations have been added'
     runs-on: ubuntu-latest
+    if: ${{ github.actor != 'renovate[bot]' }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -39,6 +40,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    if: ${{ github.actor != 'renovate[bot]' }}
 
     needs:
       - build_and_push_anon_sis_importer_db
@@ -53,6 +55,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     needs: [test]
+    if: ${{ github.actor != 'renovate[bot]' }}
 
     steps:
       - uses: actions/checkout@v4
