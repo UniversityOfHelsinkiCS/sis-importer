@@ -52,7 +52,7 @@ jobs:
         with:
           path: importer-mankeli
 
-  build-and-push:
+  build-and-push-version:
     runs-on: ubuntu-latest
     needs: [test]
     if: ${{ github.actor != 'renovate[bot]' }}
