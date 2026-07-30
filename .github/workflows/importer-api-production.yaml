@@ -28,6 +28,4 @@ jobs:
         with:
           image: importer-api
           tag: production
-          registry: registry.version.helsinki.fi/toska/openshift/kontit/
-          username: kontit
-          password: ${{ secrets.VERSION_PUSH_SECRET }}
+          password: ${{ secrets.QUAY_IO_TOKEN }}
