@@ -27,9 +27,9 @@ jobs:
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v3
         with:
-          registry: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+          registry: registry.version.helsinki.fi/toska/openshift/kontit/
+          username: kontit
+          password: ${{ secrets.VERSION_PUSH_SECRET }}
       - name: 'Let importer-mankeli run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
