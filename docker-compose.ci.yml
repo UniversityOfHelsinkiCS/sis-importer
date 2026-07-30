@@ -1,7 +1,7 @@
 services:
   importer-db:
     container_name: sis-importer-db
-    image: registry.version.helsinki.fi/toska/openshift/kontit/sis-importer-db
+    image: registry.version.helsinki.fi/toska/openshift/kontit/sis-importer-db:staging
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d sis-importer-db" ]
       interval: 5s
