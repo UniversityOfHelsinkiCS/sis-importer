@@ -170,6 +170,7 @@ grapaRouter.get('/persons', async (req, res) => {
         id: studyRight.id,
         selections: selections.map(programmeGroupId => {
           return {
+            id: studyRight.id + '_' + programmeGroupId,
             code: moduleCodeByGroupId[programmeGroupId]?.code,
             moduleId: moduleCodeByGroupId[programmeGroupId]?.id,
             groupId: programmeGroupId,
