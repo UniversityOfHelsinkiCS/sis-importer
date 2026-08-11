@@ -201,6 +201,130 @@ grapaRouter.get('/persons', async (req, res) => {
   res.send(personsWithStudyRights)
 })
 
+grapaRouter.get('/programs', async (req, res) => {
+  const [educations] = await sequelize.query(`
+    WITH edu AS (
+      SELECT DISTINCT id, 
+          ARRAY(SELECT DISTINCT value->>0 FROM jsonb_array_elements(jsonb_path_query_array(structure, '$.**.moduleGroupId'))) "group_ids",
+          structure,
+          education_type AS type, 
+          id AS edu_id
+      FROM educations AS tmp
+      WHERE education_type = ANY (ARRAY['urn:code:education-type:degree-education:bachelors-degree', 'urn:code:education-type:degree-education:bachelors-and-masters-degree', 'urn:code:education-type:degree-education:masters-degree'])
+      ),
+      programs AS (
+          SELECT 
+              group_ids,
+              structure,
+              type,
+              id,
+              (
+                  SELECT jsonb_agg(jsonb_build_object(
+                      'group_id', value, 
+                      'id', modules.id,
+                      'type', modules.type,
+                      'name', modules.name,
+                      'code', modules.code,
+                      'valid_from', modules.validity_period->>'startDate'
+                  )) 
+                  FROM unnest(edu.group_ids) AS value
+                  LEFT JOIN modules ON value = modules.group_id
+                  WHERE modules.type = ANY (ARRAY['DegreeProgramme', 'StudyModule'])
+              ) "modules"
+          FROM edu
+    )
+
+    SELECT * FROM programs;
+    `)
+
+  const programs = {}
+  const modules = {}
+  const now = new Date()
+  const seenModules = new Set()
+
+  // Get all modules from educations and store them by group_id
+  educations.forEach(education => {
+    if (education.modules) {
+      education.modules.forEach(module => {
+        const validity_start = new Date(module.valid_from)
+        if (!seenModules.has(module.code) && validity_start <= now) {
+          modules[module.group_id] = module
+          seenModules.add(module.code)
+        }
+        if (
+          seenModules.has(module.code) &&
+          validity_start <= now &&
+          new Date(modules[module.group_id]) < validity_start
+        ) {
+          modules[module.group_id] = module
+        }
+        // If the validity period has not started yet, and there is no other version of the programme that has started yet
+        else if (!seenModules.has(module.code)) {
+          modules[module.group_id] = module
+        }
+        // Otherwise skip
+        else {
+          return
+        }
+      })
+    }
+  })
+
+  educations.forEach(education => {
+    const phases = []
+    if (education.structure.phase1) phases.push({ data: education.structure.phase1, type: 'phase1' })
+    if (education.structure.phase2) phases.push({ data: education.structure.phase2, type: 'phase2' })
+
+    phases.forEach(phase => {
+      phase.data.options.forEach(option => {
+        if (phase.data.options) {
+          const programme_module = modules[option.moduleGroupId]
+
+          if (programme_module) {
+            // Only get "modern" programmes
+            if (!programme_module.code || !programme_module.code.match(/(\d_)*[MK]H\d+/)) return
+
+            const children = option.childOptions ? option.childOptions.map(child => child.moduleGroupId) : []
+
+            let level = null
+            // Getting the level (masters or bachelors) from the code
+            if (programme_module.code.length >= 2 && programme_module.code[1] === 'H') {
+              level = programme_module.code[0] === 'K' ? 'bachelor' : programme_module.code[0] === 'M' ? 'master' : null
+            } else if (
+              programme_module.code.length >= 3 &&
+              programme_module.code.at(-3) === '-' &&
+              programme_module.code.at(-1) === 'a'
+            ) {
+              level = programme_module.code.endsWith('-ba')
+                ? 'bachelor'
+                : programme_module.code.endsWith('-ma')
+                  ? 'master'
+                  : null
+            }
+
+            // Append only unseen programmes
+            if (!programs[programme_module.code]) {
+              programs[programme_module.code] = {
+                ...programme_module,
+                level,
+                children: {}
+              }
+            }
+
+            // Always append child modules
+            children.forEach(child => {
+              programs[programme_module.code].children[child] = modules[child]
+            })
+          }
+        }
+      })
+    })
+  })
+
+  res.send(programs)
+  return
+})
+
 grapaRouter.get('/studytracks', async (req, res) => {
   const { limit, offset, codes } = req.query
   if (!limit || !offset || !codes) return res.sendStatus(400)
