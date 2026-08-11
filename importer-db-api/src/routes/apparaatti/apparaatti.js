@@ -382,7 +382,6 @@ apparaattiRouter.get('/organisations/count', async (req, res) => {
       ]
     }
   })
-
   res.json(organisations)
 })
 
