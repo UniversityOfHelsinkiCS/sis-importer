@@ -3,10 +3,11 @@ services:
     container_name: sis-importer-db
     image: registry-toska.ext.ocp-prod-0.k8s.it.helsinki.fi/sis-importer-db
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d sis-importer-db" ]
+      test: [ "CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d sis-importer-db" ]
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 60s
 
   importer-db-api:
     build:
