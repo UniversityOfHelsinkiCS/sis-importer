@@ -47,4 +47,4 @@ jobs:
         with:
           image: importer-db-api
           tag: staging
-          password: ${{ secrets.QUAY_IO_TOKEN }}
+          password: ${{ secrets.VERSION_PUSH_SECRET }}

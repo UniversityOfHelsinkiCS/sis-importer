@@ -42,4 +42,4 @@ jobs:
         with:
           image: importer-db-api
           tag: production
-          password: ${{ secrets.QUAY_IO_TOKEN }}
+          password: ${{ secrets.VERSION_PUSH_SECRET }}
