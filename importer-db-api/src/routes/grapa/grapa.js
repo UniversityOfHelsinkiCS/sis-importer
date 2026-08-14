@@ -368,6 +368,23 @@ grapaRouter.get('/studytracks', async (req, res) => {
   res.send(studyTracksWithProgramCodes.filter(st => st.name.fi && st.name.en && st.name.sv))
 })
 
+grapaRouter.get('/modules', async (req, res) => {
+  const { limit, offset, ids } = req.query
+  if (!limit || !offset || !ids) return res.sendStatus(400)
+
+  const modules = (
+    await models.Module.findAll({
+      where: {
+        id: ids
+      }
+    })
+  ).filter(p => !p.validityPeriod?.endDate)
+
+  if (modules.length === 0) return res.send([])
+
+  res.send(modules)
+})
+
 router.use('/', grapaRouter)
 
 module.exports = router
