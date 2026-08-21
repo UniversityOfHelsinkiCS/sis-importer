@@ -1,5 +1,5 @@
 const express = require('express')
-const { relevantAttributes, masterThesisCourseCode } = require('./config')
+const { relevantAttributes, masterThesisCourseCode, bachelorThesisCourseCode } = require('./config')
 const models = require('../../models')
 const { sequelize } = require('../../config/db')
 const { isRefreshingPersonStudyRightsView } = require('../palaute/personStudyRightsView')
@@ -9,7 +9,7 @@ const router = express.Router()
 
 const grapaRouter = express.Router()
 
-grapaRouter.get('/masters-attainments/:orgCode', async (req, res) => {
+grapaRouter.get('/attainments/:orgCode', async (req, res) => {
   const { limit, offset, personIds } = req.query
 
   if (!limit || !offset || !personIds) return res.sendStatus(400)
@@ -34,7 +34,7 @@ grapaRouter.get('/masters-attainments/:orgCode', async (req, res) => {
         model: models.CourseUnit,
         as: 'courseUnit',
         where: {
-          courseUnitType: masterThesisCourseCode,
+          courseUnitType: [masterThesisCourseCode, bachelorThesisCourseCode],
           organisations: {
             [Op.contains]: [
               {
