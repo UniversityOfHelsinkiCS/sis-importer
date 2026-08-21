@@ -1,9 +1,6 @@
-const os = require('os')
-
 const winston = require('winston')
 const LokiTransport = require('winston-loki')
 const { IS_DEV } = require('../config')
-const { WinstonGelfTransporter } = require('winston-gelf-transporter')
 
 const { combine, timestamp, printf, splat } = winston.format
 
@@ -52,22 +49,6 @@ if (!IS_DEV) {
       labels: { app: 'sis-importer', environment: process.env.NODE_ENV || 'production' }
     })
   )
-
-  if (!process.env.STAGING) {
-    transports.push(
-      new WinstonGelfTransporter({
-        handleExceptions: true,
-        host: 'svm-116.cs.helsinki.fi',
-        port: 9503,
-        protocol: 'udp',
-        hostName: os.hostname(),
-        additional: {
-          app: 'importer-mankeli',
-          environment: 'production'
-        }
-      })
-    )
-  }
 }
 
 const logger = winston.createLogger({ transports })
