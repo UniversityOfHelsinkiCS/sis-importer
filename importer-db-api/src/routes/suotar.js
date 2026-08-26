@@ -209,9 +209,30 @@ router.post('/verify', async (req, res) => {
   return res.send(output)
 })
 
+const hasDocumentState = (enrolment, state) => enrolment.assessmentItem.documentState === state
+
+/**
+ * Assessment items are stored as snapshots, one row per (id, modificationOrdinal), and are
+ * joined to enrolments by the non-unique id. Ranks the resulting rows so that the snapshot
+ * live in Sisu comes first: active before deleted, newest modification first.
+ */
+const newestAssessmentItemSnapshotFirst = (a, b) => {
+  const activeDiff = Number(hasDocumentState(b, 'ACTIVE')) - Number(hasDocumentState(a, 'ACTIVE'))
+  if (activeDiff !== 0) return activeDiff
+
+  const deletedDiff = Number(hasDocumentState(a, 'DELETED')) - Number(hasDocumentState(b, 'DELETED'))
+  if (deletedDiff !== 0) return deletedDiff
+
+  const enrolmentDiff = (Number(b.modificationOrdinal) || 0) - (Number(a.modificationOrdinal) || 0)
+  if (enrolmentDiff !== 0) return enrolmentDiff
+
+  return (Number(b.assessmentItem.modificationOrdinal) || 0) - (Number(a.assessmentItem.modificationOrdinal) || 0)
+}
+
 /**
  * Get all enrolments for given person and course code. All enrolments are enriched with
- * course unit realisation data of the enrolment.
+ * course unit realisation data of the enrolment. Only the newest snapshot of each
+ * (enrolment, assessment item) pair is returned.
  * Post list of {personId, code} objects.
  */
 router.post('/enrolments', async (req, res) => {
@@ -231,7 +252,7 @@ router.post('/enrolments', async (req, res) => {
       {
         model: models.AssessmentItem,
         as: 'assessmentItem',
-        attributes: ['credits', 'gradeScaleId', 'autoId']
+        attributes: ['credits', 'gradeScaleId', 'modificationOrdinal', 'documentState']
       },
       {
         model: models.CourseUnitRealisation,
@@ -243,9 +264,10 @@ router.post('/enrolments', async (req, res) => {
     raw: true,
     nest: true
   })
-  const output = enrolments
-    // Sort by assessment item autoId to get the most recent snapshot of enrolment
-    .sort((a, b) => b.assessmentItem.autoId - a.assessmentItem.autoId)
+  const enrolmentsBySnapshotGroup = _.groupBy(enrolments, e => `${e.id}_${e.assessmentItemId}`)
+  const output = Object.keys(enrolmentsBySnapshotGroup)
+    .map(key => enrolmentsBySnapshotGroup[key].sort(newestAssessmentItemSnapshotFirst)[0])
+    .sort(newestAssessmentItemSnapshotFirst)
     .reduce((acc, e) => {
       const item = acc.find(i => i.personId === e.personId && i.code === e.courseUnit.code)
       if (!item)
