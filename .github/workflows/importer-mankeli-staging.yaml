@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'renovate[bot]' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v3
         id: check_migrations
         with:
@@ -46,7 +46,7 @@ jobs:
       - build_and_push_anon_sis_importer_db
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Run tests
         uses: ./.github/actions/run-tests
         with:
@@ -58,7 +58,7 @@ jobs:
     if: ${{ github.actor != 'renovate[bot]' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build and push image
         uses: ./.github/actions/build-and-push-image
         with:
