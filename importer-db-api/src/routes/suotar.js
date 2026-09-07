@@ -209,6 +209,64 @@ router.post('/verify', async (req, res) => {
   return res.send(output)
 })
 
+const ATTAINMENT_STATUS_LIMIT = 1000
+
+/**
+ * Post an array of attainment ids, the hy-kur-* Suotar sent to Sisu. Returns the attainment
+ * Sisu holds for each, or null.
+ *
+ * Not /verify, which cannot answer courses.mooc.fi: it filters misregistered attainments away,
+ * so a reversal is indistinguishable from nothing, and it never returns the match's own id.
+ */
+router.post('/attainment-status', async (req, res) => {
+  const ids = req.body
+  if (!Array.isArray(ids)) return res.status(400).send({ error: 'Input should be an array' })
+  if (ids.length > ATTAINMENT_STATUS_LIMIT)
+    return res.status(400).send({ error: `At most ${ATTAINMENT_STATUS_LIMIT} ids per request` })
+  if (!ids.every(id => typeof id === 'string')) return res.status(400).send({ error: 'Ids should be strings' })
+
+  const attributes = ['id', 'personId', 'type', 'misregistration', 'assessmentItemAttainmentIds']
+
+  const submittedAttainments = await models.Attainment.findAll({
+    where: { id: { [Op.in]: ids } },
+    attributes,
+    raw: true
+  })
+
+  // assessmentItemAttainmentIds carries no index, so the person is what makes this affordable.
+  const personIds = _.uniq(submittedAttainments.map(a => a.personId))
+  const courseUnitAttainments = personIds.length
+    ? await models.Attainment.findAll({
+        where: {
+          personId: { [Op.in]: personIds },
+          type: 'CourseUnitAttainment',
+          assessmentItemAttainmentIds: { [Op.overlap]: ids }
+        },
+        attributes,
+        raw: true
+      })
+    : []
+
+  const output = ids.map(submittedId => {
+    const submittedAttainment = submittedAttainments.find(a => a.id === submittedId)
+    if (!submittedAttainment) return { id: submittedId, attainment: null }
+
+    // What Sisu built from the submitted attainment, which is the final registration.
+    const finalAttainments = courseUnitAttainments.filter(
+      a => a.personId === submittedAttainment.personId && a.assessmentItemAttainmentIds.includes(submittedId)
+    )
+    // Misregistered attainments stay in the data, so prefer a valid final attainment over a
+    // reversed one where both exist.
+    const reported = finalAttainments.find(a => !a.misregistration) || finalAttainments[0] || submittedAttainment
+
+    return {
+      id: submittedId,
+      attainment: { id: reported.id, type: reported.type, misregistration: !!reported.misregistration }
+    }
+  })
+  return res.send(output)
+})
+
 const hasDocumentState = (enrolment, state) => enrolment.assessmentItem.documentState === state
 
 /**
