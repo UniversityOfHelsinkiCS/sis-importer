@@ -479,6 +479,62 @@ router.get('/responsibles/:courseCode', async (req, res) => {
   return res.send(personsWithRoles)
 })
 
+const DAY = 24 * 60 * 60 * 1000
+
+/**
+ * Extensions made after the previous validity had already ended. A lapsed study right looks
+ * unbroken in its newest validity, so only the version history shows the gap: from the old end
+ * date until the extending version appeared. A gap counts only if the importer stored the old end
+ * date before it passed, which rules out versions imported after the fact, and only if it lasted
+ * a day, which absorbs import lag around the end date.
+ */
+const findLapses = versions => {
+  const byOrdinal = _.sortBy(versions, v => Number(v.modificationOrdinal) || 0)
+  const lapses = []
+  for (let i = 1; i < byOrdinal.length; i++) {
+    const endedOn = byOrdinal[i - 1].valid && byOrdinal[i - 1].valid.endDate
+    const after = byOrdinal[i]
+    const newEnd = after.valid && after.valid.endDate
+    if (!endedOn || !after.createdAt || (newEnd && newEnd <= endedOn)) continue
+
+    const endFirstSeen = Math.min(
+      ...byOrdinal
+        .slice(0, i)
+        .filter(v => v.valid && v.valid.endDate === endedOn)
+        .map(v => new Date(v.createdAt).getTime())
+    )
+    const ended = new Date(endedOn).getTime()
+    if (endFirstSeen < ended && new Date(after.createdAt).getTime() - ended >= DAY) {
+      lapses.push({ endedOn, extendedAt: after.createdAt })
+    }
+  }
+  return lapses
+}
+
+/**
+ * Newest snapshot of each study right, leaving out those with snapshots only in the future,
+ * with the lapses its version history reveals.
+ */
+const newestSnapshots = studyRights =>
+  Object.values(_.groupBy(studyRights, 'id'))
+    .map(versions => {
+      // A joined include can repeat a version, so versions are told apart by ordinal
+      const current = _.uniqBy(
+        versions
+          .filter(r => isBefore(new Date(r.snapshotDateTime), new Date()))
+          .sort((a, b) => {
+            const snapshotDiff = new Date(b.snapshotDateTime) - new Date(a.snapshotDateTime)
+            if (snapshotDiff !== 0) return snapshotDiff
+            return (Number(b.modificationOrdinal) || 0) - (Number(a.modificationOrdinal) || 0)
+          }),
+        'modificationOrdinal'
+      )
+      if (!current.length) return null
+      const { createdAt, ...newest } = current[0]
+      return { ...newest, lapses: findLapses(current) }
+    })
+    .filter(s => !!s)
+
 router.post('/study-rights', async (req, res) => {
   const data = req.body
   if (!Array.isArray(data)) return res.status(400).send({ error: 'Input should be an array' })
@@ -487,24 +543,12 @@ router.post('/study-rights', async (req, res) => {
       id: data,
       documentState: 'ACTIVE'
     },
-    attributes: ['id', 'personId', 'valid', 'snapshotDateTime', 'grantDate', 'modificationOrdinal'],
+    attributes: ['id', 'personId', 'valid', 'snapshotDateTime', 'grantDate', 'modificationOrdinal', 'createdAt'],
+    include: [{ model: models.TermRegistrations }],
+    nest: true,
     raw: true
   })
-  const studyRightsById = _.groupBy(studyRights, 'id')
-
-  const activeSnapshots = Object.keys(studyRightsById)
-    .map(
-      key =>
-        studyRightsById[key]
-          .filter(r => isBefore(new Date(r.snapshotDateTime), new Date()))
-          .sort((a, b) => {
-            const snapshotDiff = new Date(b.snapshotDateTime) - new Date(a.snapshotDateTime)
-            if (snapshotDiff !== 0) return snapshotDiff
-            return (Number(b.modificationOrdinal) || 0) - (Number(a.modificationOrdinal) || 0)
-          })[0] || null
-    )
-    .filter(s => !!s) // Filter out study rights where snapshots only in future
-  return res.send(activeSnapshots)
+  return res.send(newestSnapshots(studyRights))
 })
 
 router.post('/study-rights-by-person', async (req, res) => {
@@ -512,26 +556,13 @@ router.post('/study-rights-by-person', async (req, res) => {
   if (!Array.isArray(data)) return res.status(400).send({ error: 'Input should be an array' })
   const studyRights = await models.StudyRight.findAll({
     where: { personId: data, documentState: 'ACTIVE' },
-    attributes: ['id', 'personId', 'valid', 'snapshotDateTime', 'grantDate', 'modificationOrdinal'],
+    attributes: ['id', 'personId', 'valid', 'snapshotDateTime', 'grantDate', 'modificationOrdinal', 'createdAt'],
     include: [{ model: models.Organisation, attributes: ['code'] }, { model: models.TermRegistrations }],
     nest: true,
     raw: true
   })
 
-  const studyRightsById = _.groupBy(studyRights, 'id')
-  const activeSnapshots = Object.keys(studyRightsById)
-    .map(
-      key =>
-        studyRightsById[key]
-          .filter(r => isBefore(new Date(r.snapshotDateTime), new Date()))
-          .sort((a, b) => {
-            const snapshotDiff = new Date(b.snapshotDateTime) - new Date(a.snapshotDateTime)
-            if (snapshotDiff !== 0) return snapshotDiff
-            return (Number(b.modificationOrdinal) || 0) - (Number(a.modificationOrdinal) || 0)
-          })[0] || null
-    )
-    .filter(s => !!s) // Filter out study rights where snapshots only in future
-  return res.send(activeSnapshots)
+  return res.send(newestSnapshots(studyRights))
 })
 
 router.get('/study-right/:id', async (req, res) => {
