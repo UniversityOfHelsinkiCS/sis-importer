@@ -1,3 +1,4 @@
+/* eslint-disable */
 const express = require('express')
 const { relevantAttributes, masterThesisCourseCode, bachelorThesisCourseCode } = require('./config')
 const models = require('../../models')
@@ -112,7 +113,8 @@ grapaRouter.get('/persons', async (req, res) => {
       latestStudyRights
         .map(studyRight => {
           return [
-            studyRight.education_group_id && studyRight.education_group_id?.startsWith("hy-EDU") ? studyRight.education_group_id.replace('EDU', 'DP') : undefined,
+            studyRight.education_group_id && studyRight.education_group_id?.startsWith('hy-EDU')
+            ? studyRight.education_group_id.replace('EDU', 'DP') : undefined,
             studyRight.accepted_selection_path?.educationPhase2ChildGroupId,
             studyRight.accepted_selection_path?.educationPhase1ChildGroupId,
             studyRight.accepted_selection_path?.educationPhase1GroupId,
@@ -140,7 +142,7 @@ grapaRouter.get('/persons', async (req, res) => {
 
   const studyRightsByPersonId = latestStudyRights.reduce((acc, studyRight) => {
     let educationModuleGroupId = studyRight.education_group_id?.replace('EDU', 'DP')
-    
+
     // If the module group id guessed from education group id does not exist, fallback to selection path.
     // Using phase1 by default with fallback to phase2 if it does not exist.
     if (moduleCodeByGroupId[educationModuleGroupId] === undefined) {
