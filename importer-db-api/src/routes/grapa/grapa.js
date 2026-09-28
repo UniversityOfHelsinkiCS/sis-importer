@@ -4,6 +4,7 @@ const models = require('../../models')
 const { sequelize } = require('../../config/db')
 const { isRefreshingPersonStudyRightsView } = require('../palaute/personStudyRightsView')
 const { Op, QueryTypes } = require('sequelize')
+const logger = require('../../utils/logger')
 
 const router = express.Router()
 
@@ -111,7 +112,7 @@ grapaRouter.get('/persons', async (req, res) => {
       latestStudyRights
         .map(studyRight => {
           return [
-            studyRight.education_group_id ? studyRight.education_group_id.replace('EDU', 'DP') : undefined,
+            studyRight.education_group_id && studyRight.education_group_id?.startsWith("hy-EDU") ? studyRight.education_group_id.replace('EDU', 'DP') : undefined,
             studyRight.accepted_selection_path?.educationPhase2ChildGroupId,
             studyRight.accepted_selection_path?.educationPhase1ChildGroupId,
             studyRight.accepted_selection_path?.educationPhase1GroupId,
@@ -138,7 +139,22 @@ grapaRouter.get('/persons', async (req, res) => {
   }, {})
 
   const studyRightsByPersonId = latestStudyRights.reduce((acc, studyRight) => {
-    const educationModuleGroupId = studyRight.education_group_id?.replace('EDU', 'DP')
+    let educationModuleGroupId = studyRight.education_group_id?.replace('EDU', 'DP')
+    
+    // If the module group id guessed from education group id does not exist, fallback to selection path.
+    // Using phase1 by default with fallback to phase2 if it does not exist.
+    if (moduleCodeByGroupId[educationModuleGroupId] === undefined) {
+      if (studyRight.accepted_selection_path?.educationPhase1GroupId) {
+        educationModuleGroupId = studyRight.accepted_selection_path?.educationPhase1GroupId
+      }
+      else if (studyRight.accepted_selection_path?.educationPhase2GroupId) {
+        educationModuleGroupId = studyRight.accepted_selection_path?.educationPhase2GroupId
+      }
+      else {
+        logger.error({message: `[grapa] No base module found for studyright ${studyRight.id} for person ${studyRight.person_id}`})
+      }
+    }
+    
 
     const programmeStudytrackPairs = {}
 
@@ -189,6 +205,7 @@ grapaRouter.get('/persons', async (req, res) => {
     if (!elements.length) return acc
 
     if (!acc[studyRight.person_id]) acc[studyRight.person_id] = []
+
     acc[studyRight.person_id].push(...elements)
     return acc
   }, {})
