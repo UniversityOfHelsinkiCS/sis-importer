@@ -13,11 +13,11 @@
   "dependencies": {
     "@sentry/node": "^10.0.0",
     "axios": "^1.0.0",
-    "bullmq": "^5.54.0",
+    "bullmq": "5.76.11",
     "lodash": "^4.17.21",
     "pg": "^8.12.0",
     "pg-hstore": "^2.3.4",
-    "redis": "5.12.1",
+    "redis": "4.7.1",
     "redis-lock": "^1.0.0",
     "sequelize": "^6.0.0",
     "umzug": "^3.8.0",
