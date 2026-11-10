@@ -89,6 +89,12 @@ t
 **/coverage/
 **/.eslintcache
 **/.DS_Store
+**/.claude
+**/.gemini
+**/.cursor
+**/.specstory
+
+MEMORY.md
 CLAUDE.md
 GEMINI.md
 AGENTS.md
