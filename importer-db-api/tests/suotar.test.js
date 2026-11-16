@@ -82,6 +82,28 @@ test('gets batch attainments by student number and course code without substitut
   expect(resp.body[0].attainments.length).toBe(0)
 })
 
+test('keeps the course code attainments when other course units are included', async () => {
+  const pairs = ['433237', '457144', 'not-a-student'].map(studentNumber => ({ courseCode: 'MAT11001', studentNumber }))
+  const attainmentIds = body => body.map(({ attainments }) => attainments.map(({ id }) => id))
+
+  const plain = await supertest(app)
+    .post('/suotar/attainments')
+    .query({ noSubstitutions: true })
+    .query(auth)
+    .send(pairs)
+  const widened = await supertest(app)
+    .post('/suotar/attainments')
+    .query({ noSubstitutions: true, includeOtherCourseUnits: true })
+    .query(auth)
+    .send(pairs)
+
+  expect(widened.status).toBe(200)
+  expect(widened.body.map(({ studentNumber }) => studentNumber)).toEqual(pairs.map(p => p.studentNumber))
+  attainmentIds(plain.body).forEach((ids, i) =>
+    expect(attainmentIds(widened.body)[i]).toEqual(expect.arrayContaining(ids))
+  )
+})
+
 test('gets batch enrollments by student number and course code', async () => {
   const personIds = ['hy-hlo-125835733', 'hy-hlo-124371492', 'not-a-student']
   const resp = await supertest(app)
@@ -114,6 +136,48 @@ test('gets batch enrollments by student number and course code', async () => {
     })
 
   expect(invalidStudent.enrolments.length).toBe(0)
+})
+
+test('answers each pair once, under the code asked for', async () => {
+  const pair = { code: 'TKT20005', personId: 'hy-hlo-125835733' }
+  const resp = await supertest(app)
+    .post('/suotar/enrolments')
+    .query(auth)
+    .send([pair, pair, { code: 'not-a-course', personId: pair.personId }])
+
+  expect(resp.status).toBe(200)
+  expect(resp.body.map(({ personId, code }) => [personId, code])).toEqual([
+    [pair.personId, 'TKT20005'],
+    [pair.personId, 'not-a-course']
+  ])
+  expect(resp.body[0].enrolments.length).toBe(2)
+  expect(resp.body[1].enrolments.length).toBe(0)
+})
+
+test('keeps the course code enrolments when other course units are included', async () => {
+  const pairs = ['hy-hlo-125835733', 'hy-hlo-124371492', 'not-a-student'].map(personId => ({
+    code: 'TKT20005',
+    personId
+  }))
+  const enrolmentIds = body => body.map(({ enrolments }) => enrolments.map(({ id }) => id))
+
+  const plain = await supertest(app).post('/suotar/enrolments').query(auth).send(pairs)
+  const widened = await supertest(app)
+    .post('/suotar/enrolments')
+    .query({ includeOtherCourseUnits: true })
+    .query(auth)
+    .send(pairs)
+
+  expect(widened.status).toBe(200)
+  expect(widened.body.map(({ personId, code }) => [personId, code])).toEqual(pairs.map(p => [p.personId, p.code]))
+  enrolmentIds(plain.body).forEach((ids, i) =>
+    expect(enrolmentIds(widened.body)[i]).toEqual(expect.arrayContaining(ids))
+  )
+  for (const { personId, enrolments } of widened.body) {
+    for (const enrolment of enrolments) {
+      expect(enrolment.personId).toBe(personId)
+    }
+  }
 })
 
 test.skip('gets batch enrollments with invalid data', async () => {

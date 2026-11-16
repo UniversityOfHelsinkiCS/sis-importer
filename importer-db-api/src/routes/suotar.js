@@ -75,10 +75,14 @@ router.post('/send/course-unit-attainment', async (req, res) => {
  * Post list of {courseCode, studentNumber} pairs here to get their attainments.
  *
  * Use req param noSubstitutions=true to include attainments for the course code only.
+ *
+ * Use req param includeOtherCourseUnits=true to also get attainments of the code's own assessment
+ * items that are recorded under another course unit including them.
  */
 router.post('/attainments', async (req, res) => {
   const data = req.body
   const { noSubstitutions } = req.query
+  const includeOtherCourseUnits = req.query.includeOtherCourseUnits === 'true'
 
   if (!Array.isArray(data)) return res.status(400).send({ error: 'Input should be an array' })
 
@@ -93,6 +97,9 @@ router.post('/attainments', async (req, res) => {
     data.map(({ courseCode }) => courseCode),
     !!noSubstitutions
   )
+  const assessmentItemIdsByCode = includeOtherCourseUnits
+    ? await getAssessmentItemIdsByCode(data.map(({ courseCode }) => courseCode))
+    : {}
 
   const output = []
   for (const { studentNumber, courseCode } of data) {
@@ -101,11 +108,13 @@ router.post('/attainments', async (req, res) => {
       output.push({ studentNumber, courseCode, attainments: [] })
       continue
     }
+    const onCourseUnit = { courseUnitId: { [Op.in]: allCourseUnits[courseCode].map(({ id }) => id) } }
+    const assessmentItemIds = assessmentItemIdsByCode[courseCode] || []
     const allAttainments = await models.Attainment.findAll({
       where: {
-        courseUnitId: {
-          [Op.in]: allCourseUnits[courseCode].map(({ id }) => id)
-        },
+        ...(assessmentItemIds.length
+          ? { [Op.or]: [onCourseUnit, { assessmentItemId: { [Op.in]: assessmentItemIds } }] }
+          : onCourseUnit),
         personId: person.id,
         misregistration: false,
         attainmentDate: { [Op.gt]: sub(new Date(), { years: 10 }) } // Why 10 years?
@@ -292,25 +301,44 @@ const newestAssessmentItemSnapshotFirst = (a, b) => {
  * course unit realisation data of the enrolment. Only the newest snapshot of each
  * (enrolment, assessment item) pair is returned.
  * Post list of {personId, code} objects.
+ *
+ * Use req param includeOtherCourseUnits=true to also get enrolments made through another course
+ * unit on one of the code's own assessment items. They come back under the code asked for;
+ * courseUnit.code tells which course unit the enrolment was made through.
  */
 router.post('/enrolments', async (req, res) => {
   const data = req.body
+  const includeOtherCourseUnits = req.query.includeOtherCourseUnits === 'true'
   if (!Array.isArray(data)) return res.status(400).send({ error: 'Input should be an array' })
 
   if (data.some(row => !row.personId || !row.code))
     throw new Error('Input should be a list of { personId, code } objects')
 
+  const groupIdsByCode = includeOtherCourseUnits ? await getGroupIdsByCode(data.map(({ code }) => code)) : {}
+  const ownGroupIds = code => groupIdsByCode[code] || []
+
+  // A $nested.column$ reference is not mapped from the attribute name, hence the snake case
+  const onCourse = code =>
+    ownGroupIds(code).length
+      ? {
+          [Op.or]: [
+            { '$courseUnit.code$': code },
+            { '$assessmentItem.primary_course_unit_group_id$': { [Op.in]: ownGroupIds(code) } }
+          ]
+        }
+      : { '$courseUnit.code$': code }
+
   const enrolments = await models.Enrolment.findAll({
     where: {
       [Op.or]: data.map(({ personId, code }) => ({
-        [Op.and]: [{ personId }, { '$courseUnit.code$': code }, { state: 'ENROLLED' }]
+        [Op.and]: [{ personId }, onCourse(code), { state: 'ENROLLED' }]
       }))
     },
     include: [
       {
         model: models.AssessmentItem,
         as: 'assessmentItem',
-        attributes: ['credits', 'gradeScaleId', 'modificationOrdinal', 'documentState']
+        attributes: ['credits', 'gradeScaleId', 'modificationOrdinal', 'documentState', 'primaryCourseUnitGroupId']
       },
       {
         model: models.CourseUnitRealisation,
@@ -322,29 +350,23 @@ router.post('/enrolments', async (req, res) => {
     raw: true,
     nest: true
   })
-  const enrolmentsBySnapshotGroup = _.groupBy(enrolments, e => `${e.id}_${e.assessmentItemId}`)
-  const output = Object.keys(enrolmentsBySnapshotGroup)
-    .map(key => enrolmentsBySnapshotGroup[key].sort(newestAssessmentItemSnapshotFirst)[0])
+  const newestSnapshots = Object.values(_.groupBy(enrolments, e => `${e.id}_${e.assessmentItemId}`))
+    .map(snapshots => snapshots.sort(newestAssessmentItemSnapshotFirst)[0])
     .sort(newestAssessmentItemSnapshotFirst)
-    .reduce((acc, e) => {
-      const item = acc.find(i => i.personId === e.personId && i.code === e.courseUnit.code)
-      if (!item)
-        acc.push({
-          personId: e.personId,
-          code: e.courseUnit.code,
-          enrolments: [e]
-        })
-      else item.enrolments.push(e)
-      return acc
-    }, [])
 
-  // Ad empty rows for input rows with no enrolments
+  const isFor =
+    ({ personId, code }) =>
+    e =>
+      e.personId === personId &&
+      (e.courseUnit.code === code || ownGroupIds(code).includes(e.assessmentItem.primaryCourseUnitGroupId))
+
+  // One row per pair asked about, empty when the person has no enrolment on the course
   return res.send(
-    output.concat(
-      data
-        .filter(row => !output.find(enrolment => row.personId === enrolment.personId && row.code === enrolment.code))
-        .map(({ personId, code }) => ({ personId, code, enrolments: [] }))
-    )
+    _.uniqBy(data, ({ personId, code }) => `${personId} ${code}`).map(({ personId, code }) => ({
+      personId,
+      code,
+      enrolments: newestSnapshots.filter(isFor({ personId, code }))
+    }))
   )
 })
 
@@ -705,6 +727,36 @@ const getCourseUnits = async (code, noSubstitutions = false) => {
       },
       raw: true
     })) || []
+  )
+}
+
+/**
+ * The group ids of the course units carrying each code. An assessment item names the group it
+ * belongs to in primaryCourseUnitGroupId, whichever course units include it.
+ * Output: {courseCode: [groupIds]}
+ */
+const getGroupIdsByCode = async codes => {
+  const courseUnits = await models.CourseUnit.findAll({
+    where: { code: { [Op.in]: _.uniq(codes) } },
+    attributes: ['code', 'groupId'],
+    raw: true
+  })
+  return _.mapValues(_.groupBy(courseUnits, 'code'), units => _.uniq(units.map(({ groupId }) => groupId)))
+}
+
+/**
+ * The ids of the assessment items each code owns.
+ * Output: {courseCode: [assessmentItemIds]}
+ */
+const getAssessmentItemIdsByCode = async codes => {
+  const groupIdsByCode = await getGroupIdsByCode(codes)
+  const assessmentItems = await models.AssessmentItem.findAll({
+    where: { primaryCourseUnitGroupId: { [Op.in]: _.uniq(Object.values(groupIdsByCode).flat()) } },
+    attributes: ['id', 'primaryCourseUnitGroupId'],
+    raw: true
+  })
+  return _.mapValues(groupIdsByCode, groupIds =>
+    _.uniq(assessmentItems.filter(a => groupIds.includes(a.primaryCourseUnitGroupId)).map(({ id }) => id))
   )
 }
 
